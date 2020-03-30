@@ -5,7 +5,6 @@ import javax.ws.rs.core.HttpHeaders;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.MessageSource;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
@@ -14,18 +13,18 @@ import org.springframework.web.client.RestTemplate;
 
 import com.bsms.cons.MbApiConstant;
 import com.bsms.domain.MbApiTxLog;
+import com.bsms.domain.MbAppContent;
+import com.bsms.repository.MbAppContentRepository;
 import com.bsms.repository.MbTxLogRepository;
-import com.bsms.restobj.BalanceInfoResp;
 import com.bsms.restobj.MbApiReq;
 import com.bsms.restobj.MbApiResp;
 import com.bsms.restobj.MbApiStatusResp;
-import com.bsms.restobjclient.BalanceInquiryDispResp;
 import com.bsms.restobjclient.OnlineStatementDispResp;
 import com.bsms.restobjclient.OnlineStatementReq;
 import com.bsms.restobjclient.OnlineStatementResp;
 import com.bsms.util.MbJsonUtil;
 import com.bsms.util.RestUtil;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.bsms.util.TrxIdUtil;
 import com.google.gson.Gson;
 
 @Service("onlineStatementByDate")
@@ -34,29 +33,23 @@ public class MbStatementOnlineByDateServiceImpl extends MbBaseServiceImpl implem
 	@Value("${core.service.statementonline}")
     private String statementOnline;
 	
-	@Value("${core.uid}")
+	@Value("${core.uid2}")
 	private String coreUid;
 	
-	@Value("${core.pass}")
+	@Value("${core.pass2}")
 	private String corePass;
 	
-	@Value("${core.company}")
+	@Value("${core.company2}")
 	private String coreCompany;
 	
-	@Value("${core.columnname}")
-	private String coreColumnname;
-	
-	@Value("${core.operand}")
-	private String coreOperand;
-	
-	@Autowired
-    private ObjectMapper objMapper;
-
-    @Autowired
-    private MessageSource msg;
-
     @Autowired
     private MbTxLogRepository txLogRepository;
+    
+    @Autowired
+	private MbAppContentRepository mbAppContentRepository;
+    
+    private String responseDesc;
+	private String responseCode;
     
     MbApiResp mbApiResp;
     
@@ -70,14 +63,14 @@ public class MbStatementOnlineByDateServiceImpl extends MbBaseServiceImpl implem
         
         OnlineStatementReq onlineStatementReq = new OnlineStatementReq();
         
-        onlineStatementReq.setCorrelationId("11111");
-        onlineStatementReq.setTransactionId("22222");
-        onlineStatementReq.setCoreUsername("DEVTWS");
-        onlineStatementReq.setCorePassword("123123");
-        onlineStatementReq.setCoreCompany("ID0010001");
+        onlineStatementReq.setCorrelationId(request.getCorrelation_id());
+        onlineStatementReq.setTransactionId(TrxIdUtil.getTransactionID(6));
+        onlineStatementReq.setCoreUsername(coreUid);
+        onlineStatementReq.setCorePassword(corePass);
+        onlineStatementReq.setCoreCompany(coreCompany);
         onlineStatementReq.setAccountNumber(request.getAccount_number());
-        onlineStatementReq.setStartDate(request.getStartDate()); // 20160101
-        onlineStatementReq.setEndDate(request.getEndDate()); // 20160821
+        onlineStatementReq.setStartDate(request.getStart_date()); 
+        onlineStatementReq.setEndDate(request.getEnd_date()); 
         
         System.out.println(new Gson().toJson(onlineStatementReq));
     	
@@ -94,30 +87,45 @@ public class MbStatementOnlineByDateServiceImpl extends MbBaseServiceImpl implem
         	System.out.println(new Gson().toJson(response.getBody()));
         	
         	if("00".equals(onlineStatementResp.getResponseCode())) {
-        	
+        		
         		OnlineStatementDispResp onlineStatementDispResp = new OnlineStatementDispResp();
-            	onlineStatementDispResp.setContent(onlineStatementResp.getContent());
-            	
+        		
+        		onlineStatementDispResp.setTransactionId(TrxIdUtil.getTransactionID(6));
+        		onlineStatementDispResp.setPeriode(onlineStatementResp.getContent().getPeriode());
+        		onlineStatementDispResp.setyHEAD1FIX(onlineStatementResp.getContent().getyHEAD1FIX());
+        		onlineStatementDispResp.setAccountName(onlineStatementResp.getContent().getAccountName());
+        		onlineStatementDispResp.setCustAdd(onlineStatementResp.getContent().getCustAdd());
+        		onlineStatementDispResp.setCustAdd2(onlineStatementResp.getContent().getCustAdd2());
+        		onlineStatementDispResp.setCustAdd3(onlineStatementResp.getContent().getCustAdd3());
+        		onlineStatementDispResp.setSaldoAwal(onlineStatementResp.getContent().getSaldoAwal());
+        		onlineStatementDispResp.setTotalDebet(onlineStatementResp.getContent().getTotalDebet());
+        		onlineStatementDispResp.setTotalKredit(onlineStatementResp.getContent().getTotalKredit());
+        		onlineStatementDispResp.setSaldoAkhir(onlineStatementResp.getContent().getSaldoAkhir());
+        		
+        		onlineStatementDispResp.setDetailTransaksi(onlineStatementResp.getContent().getDetailTransaksi());
+        		
             	mbApiResp = MbJsonUtil.createResponse(request, onlineStatementDispResp,
-    					new MbApiStatusResp(onlineStatementResp.getResponseCode(), MbApiConstant.OK_MESSAGE));
+    					new MbApiStatusResp(onlineStatementResp.getResponseCode(), MbApiConstant.OK_MESSAGE), onlineStatementResp.getResponseCode(), MbApiConstant.SUCCESS_MSG);
         		
         	} else {
         		
-        		String responseCode = onlineStatementResp.getContent().getErrorCode();
-        		String responseDesc = onlineStatementResp.getContent().getErrorMessage();
-        		mbApiResp = MbJsonUtil.createResponse(request, new MbApiStatusResp(responseCode, responseDesc));
-        		
+        		MbAppContent mbAppContent = mbAppContentRepository.findByLangIdAndLanguage("60002", "id");
+    			responseDesc = mbAppContent.getDescription();
+    			responseCode = MbApiConstant.ERR_CODE;
+    			mbApiResp = MbJsonUtil.createResponseDesc(request, responseCode, responseDesc);
         	}
     		
 		} catch (Exception e) {
-			mbApiResp = MbJsonUtil.createExceptionSL(request, e);
+			MbAppContent mbAppContent = mbAppContentRepository.findByLangIdAndLanguage("60002", "id");
+			responseDesc = mbAppContent.getDescription();
+			responseCode = MbApiConstant.ERR_CODE;
+			mbApiResp = MbJsonUtil.createResponseDesc(request, responseCode, responseDesc);
 		}
     	
     	txLog.setResponse(mbApiResp);
 		txLogRepository.save(txLog);
 		
 		return mbApiResp;
-    	
     }
     
 }
