@@ -36,8 +36,6 @@ public class MbApiReq implements Serializable {
 	private String branchId;
 	private String terminalId;
 	private String tellerId;
-	private String startDate;
-	private String endDate;
 	private String traceNum;
 	private String channelType;
 	private String channelId;
@@ -88,6 +86,7 @@ public class MbApiReq implements Serializable {
 	private String requestType; 
 	private String versionValue; 
 	
+	private String correlation_id;
 	private String modul_id;
 	private String public_key;
 	private String ip_address;
@@ -96,6 +95,8 @@ public class MbApiReq implements Serializable {
 	private String version_value;
 	private String device_type;
 	private String account_number;
+	private String start_date;
+	private String end_date;
 
 	private Object content;
 	private MbApiContentReq reqContent;
