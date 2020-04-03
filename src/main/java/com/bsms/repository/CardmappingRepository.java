@@ -13,6 +13,8 @@ public interface CardmappingRepository extends CrudRepository<CardMapping, Long>
 	
 	CardMapping findOneByCustomeridAndAccountnumber(Long customerId, String accountNumber);
 	
+//	List<CardMapping> findAccountnumberByCustomerid(Long customerId);
+	
 	List<CardMapping> findAccountnumberByCustomerid(Long customerId);
 	
 	

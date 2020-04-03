@@ -20,6 +20,7 @@ public class ListAccountReq implements Serializable {
 	private String coreCompany;
 	private String colomName;
 	private String operand;
+	private String accountNumber;
 	
 	private List<String> listAccountNumber;
 
@@ -79,5 +80,12 @@ public class ListAccountReq implements Serializable {
 		this.listAccountNumber = listAccountNumber;
 	}
 
+	public String getAccountNumber() {
+		return accountNumber;
+	}
+
+	public void setAccountNumber(String accountNumber) {
+		this.accountNumber = accountNumber;
+	}
 	
 }
