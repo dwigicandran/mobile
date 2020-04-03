@@ -110,7 +110,8 @@ public class MbJsonUtil {
 
 		response.setResponseTime(MbDateFormatUtil.formatTime(new Date()));
 		response.setResponseCode(responseCode);
-		response.setResponseDescription(responseDesc);
+		//response.setResponseDescription(responseDesc);
+		response.setResponseMessage(responseDesc);
 		return response;
 
 	}
@@ -199,7 +200,8 @@ public class MbJsonUtil {
 
 		response.setResponseTime(MbDateFormatUtil.formatTime(new Date()));
 		response.setResponseCode(MbConstant.ERROR_NUM_UNKNOWN);
-		response.setResponseDescription(respDesc);
+		response.setResponseMessage(respDesc);
+//		response.setResponseDescription(respDesc);
 		
 //		response.setRespStatus(new MbApiStatusResp(MbConstant.ERROR_NUM_UNKNOWN, e.toString()));
 

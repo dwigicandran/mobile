@@ -82,8 +82,6 @@ public class PinKeyRetrieval extends MbBaseServiceImpl implements MbService {
 			System.out.println(new Gson().toJson(pinKeyReq));
 			
 			Security secure = securityRepository.findByMbSessionId(request.getSessionId());
-			
-			
 
 			if (secure == null) {
 				MbAppContent mbAppContent = mbAppContentRepository.findByLangIdAndLanguage("60002",

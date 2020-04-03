@@ -41,8 +41,13 @@ public class MbBaseServiceImpl {
     protected MbServiceException createSlServiceException(String errCode, String errDesc, MbApiTxLog txLog, MbTxLogRepository txLogRepository) {
 
         txLogRepository.save(txLog);
+        
+        MbServiceException response  = new MbServiceException(null);
+        response.setResponseCode(errCode);
+        response.setResponseMessage(errDesc);
 
-        return new MbServiceException(MbErrorUtil.createError(errCode, errDesc));
+        return response;
+        // return new MbServiceException(MbErrorUtil.createError(errCode, errDesc));
     }
 	
 }
