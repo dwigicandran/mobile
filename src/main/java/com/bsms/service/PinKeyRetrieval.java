@@ -97,6 +97,7 @@ public class PinKeyRetrieval extends MbBaseServiceImpl implements MbService {
 			pinKeyResp = response.getBody();
 			
 			System.out.println(new Gson().toJson(response));
+			System.out.println(url + " ::: URL PIN KEY RETRIEVAL :::");
 			
 			System.out.println(pinKeyResp.getZpkZmk() + " ::: ZPK ZMK :::");
 			System.out.println(pinKeyResp.getResponseCode() + " ::: RESPONSE CODE :::");

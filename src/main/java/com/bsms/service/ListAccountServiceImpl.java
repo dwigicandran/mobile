@@ -33,7 +33,6 @@ import com.bsms.restobjclient.ListAccountDispResp;
 import com.bsms.restobjclient.ListAccountReq;
 import com.bsms.restobjclient.ListAccountResp;
 import com.bsms.restobjclient.OnlineStatementResp;
-import com.bsms.restobjclient.PortofolioDispResp;
 import com.bsms.restobjclient.PortofolioResp;
 import com.bsms.util.MbJsonUtil;
 import com.bsms.util.RestUtil;
@@ -44,9 +43,6 @@ import com.dto.accountlist.ListOfAccount;
 import com.dto.accountlist.Specfintrxacc;
 import com.dto.portofolio.ListOfPortofolio;
 import com.google.gson.Gson;
-
-import org.json.JSONArray;
-import org.json.JSONObject;
 
 @Service("listAccount")
 public class ListAccountServiceImpl extends MbBaseServiceImpl implements MbService {
@@ -99,8 +95,6 @@ public class ListAccountServiceImpl extends MbBaseServiceImpl implements MbServi
 	@Value("${core.operand}")
 	private String coreOperand;
 
-	RestTemplate restTemplate = new RestTemplate();
-
 	private String responseDesc;
 	private String responseCode;
 
@@ -116,15 +110,11 @@ public class ListAccountServiceImpl extends MbBaseServiceImpl implements MbServi
 		Security security = securityRepository.findByMbSessionId(request.getSessionId());
 		Long customerId = security.getCustomerId();
 
-		System.out.println(" ::: CUSTOMER ID ::: " + customerId);
-
 		List<CardMapping> cardMapping = cardmappingRepository.findAccountnumberByCustomerid(customerId);
-
 		List<String> accNum = new ArrayList<String>();
 
 		for (CardMapping cm : cardMapping) {
 			accNum.add(cm.getAccountnumber());
-			System.out.println(" ::: NO REK ::: " + cm.getAccountnumber());
 		}
 
 		ListAccountReq listAccountReq = new ListAccountReq();
@@ -163,8 +153,6 @@ public class ListAccountServiceImpl extends MbBaseServiceImpl implements MbServi
 				for (int i = 0; i < 1; i++) {
 					custIdFromLoa = list.get(i).getCustomer();
 				}
-
-				System.out.println(custIdFromLoa + " ::: customer id from list of account ::: ");
 
 				// get spesific account
 				ListAccountReq ListAccountPortofolioReq = new ListAccountReq();

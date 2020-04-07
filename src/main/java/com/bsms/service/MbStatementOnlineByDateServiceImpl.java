@@ -6,8 +6,6 @@ import java.util.Date;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.core.HttpHeaders;
 
-import org.joda.time.Days;
-import org.joda.time.Period;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
