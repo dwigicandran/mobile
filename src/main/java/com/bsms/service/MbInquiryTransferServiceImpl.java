@@ -28,6 +28,9 @@ import com.bsms.util.RestUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 
+//addition by Dodo
+import com.bsms.util.TrxIdUtil;
+
 @Service("inquiryTransfer")
 public class MbInquiryTransferServiceImpl extends MbBaseServiceImpl implements MbService  {
 
@@ -61,18 +64,21 @@ public class MbInquiryTransferServiceImpl extends MbBaseServiceImpl implements M
         
         InquiryTrfReq inquiryTrfReq = new InquiryTrfReq();
         
-        inquiryTrfReq.setCorrelationId(request.getCorrelationId());
-		inquiryTrfReq.setTransactionId(request.getTransactionId());
-        inquiryTrfReq.setDeliveryChannel(request.getDeliveryChannel());
-        inquiryTrfReq.setSourceAccountNumber(request.getSourceAccountNumber());
+        inquiryTrfReq.setCorrelationId(TrxIdUtil.getTransactionID(6));//addition by Dodo
+		inquiryTrfReq.setTransactionId(TrxIdUtil.getTransactionID(6));//addition by Dodo
+        inquiryTrfReq.setDeliveryChannel("6027");//addition by Dodo
+        inquiryTrfReq.setSourceAccountNumber(request.getAccount_number());//addition by Dodo
         inquiryTrfReq.setSourceAccountName(request.getSourceAccountName());
         inquiryTrfReq.setDestinationAccountNumber(request.getDestinationAccountNumber());
         inquiryTrfReq.setDestinationAccountName(request.getDestinationAccountName());
-        inquiryTrfReq.setEncryptedPinBlock(request.getEncryptedPinBlock());
+        //inquiryTrfReq.setEncryptedPinBlock(request.getEncryptedPinBlock());
         inquiryTrfReq.setAmount(request.getAmount());
         inquiryTrfReq.setDescription(request.getDescription());
-        inquiryTrfReq.setStan(request.getStan());
+        //inquiryTrfReq.setStan(request.getStan());
         inquiryTrfReq.setPan(request.getPan());
+        inquiryTrfReq.setCardAcceptorTerminal("00307180");//addition by Dodo
+        inquiryTrfReq.setCardAcceptorMerchantId(request.getMsisdn());//addition by Dodo
+        inquiryTrfReq.setCurrency("360");//addition by Dodo
 
         System.out.println(new Gson().toJson(inquiryTrfReq));
         
