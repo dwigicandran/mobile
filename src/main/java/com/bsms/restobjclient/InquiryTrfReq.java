@@ -30,4 +30,9 @@ public class InquiryTrfReq implements Serializable {
 	private String stan;
 	private String pan;
 	
+	//addition by dodo
+	private String cardAcceptorTerminal;
+	private String cardAcceptorMerchantId;
+	private String currency;
+	
 }
