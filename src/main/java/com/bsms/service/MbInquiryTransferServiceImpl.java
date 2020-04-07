@@ -63,9 +63,10 @@ public class MbInquiryTransferServiceImpl extends MbBaseServiceImpl implements M
         txLogRepository.save(txLog);
         
         InquiryTrfReq inquiryTrfReq = new InquiryTrfReq();
+        String trx_id=TrxIdUtil.getTransactionID(6);
         
-        inquiryTrfReq.setCorrelationId(TrxIdUtil.getTransactionID(6));//addition by Dodo
-		inquiryTrfReq.setTransactionId(TrxIdUtil.getTransactionID(6));//addition by Dodo
+        inquiryTrfReq.setCorrelationId(trx_id);//addition by Dodo
+		inquiryTrfReq.setTransactionId(trx_id);//addition by Dodo
         inquiryTrfReq.setDeliveryChannel("6027");//addition by Dodo
         inquiryTrfReq.setSourceAccountNumber(request.getAccount_number());//addition by Dodo
         inquiryTrfReq.setSourceAccountName(request.getSourceAccountName());
