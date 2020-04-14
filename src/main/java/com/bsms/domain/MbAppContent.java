@@ -1,5 +1,6 @@
 package com.bsms.domain;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
@@ -9,6 +10,7 @@ import javax.persistence.Table;
 public class MbAppContent {
 
 	@Id
+	@Column(name="lang_id")
 	private String langId;
 	
 	private long lang_type;

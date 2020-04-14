@@ -35,6 +35,7 @@ import com.bsms.repository.ErrormsgRepository;
 import com.bsms.repository.MbAppContentRepository;
 import com.bsms.restobj.MbApiReq;
 import com.bsms.restobj.MbApiResp;
+import com.bsms.restobj.MbApiStatusResp;
 import com.bsms.service.MbService;
 import com.bsms.service.VerifyServiceImpl;
 import com.bsms.trx.TrxLog;
@@ -134,7 +135,6 @@ public class ApiBaseController {
 					
 					response = verifyServiceImpl.process(header, requestContext, request);
 					
-//					System.out.println(response.getResponseCode() + "*** RESPONSE CODE DARI VERIFY SERVICE ***");
 					if(!"00".equals(response.getResponseCode())) {
 						
 						ErrorMessage errMsg = errormsgRepository.findByCodeAndLanguage(response.getResponseCode(), "id");
@@ -144,70 +144,35 @@ public class ApiBaseController {
 						response = service.process(header, requestContext, request);
 					}
 				} else {
-					// Service Dispatcher
 					MbService service = (MbService) context.getBean(serviceName);
 					response = service.process(header, requestContext, request);
 				}
 						
 			} else {
-				// Service Dispatcher
 				MbService service = (MbService) context.getBean(serviceName);
 				response = service.process(header, requestContext, request);
 			}
 			
-		} catch (JsonParseException e) {
-			response = MbJsonUtil.createJsonParseExceptionResponse(e);
-			MbLogUtil.writeLogError(log, e, MbApiConstant.NOT_AVAILABLE);
-		} catch (JsonMappingException e) {
-			response = MbJsonUtil.createJsonParseExceptionResponse(e);
-			MbLogUtil.writeLogError(log, e, MbApiConstant.NOT_AVAILABLE);
-			
-		} catch (IOException e) {
-			response = MbJsonUtil.createJsonParseExceptionResponse(e);
-			MbLogUtil.writeLogError(log, e, MbApiConstant.NOT_AVAILABLE);
 		} catch (MbServiceException e) {
             throw createException(e, request);
+            
         } catch (Exception e) {
         	e.printStackTrace();
-        	//throw createException(e, request);
         	
-        	response = MbJsonUtil.createJsonParseExceptionResponse(e, "Permintaan tidak dapat diproses, silahkan dicoba beberapa saat lagi.");
+        	String msg = "Permintaan tidak dapat diproses, silahkan dicoba beberapa saat lagi.";
+        	response = MbJsonUtil.createJsonParseExceptionResponse(e, msg);
 			MbLogUtil.writeLogError(log, e, MbApiConstant.NOT_AVAILABLE);
         }
 		
 		return response;
 		
 	}
-	
-	protected WebApplicationException createException(Exception e, MbApiReq request) {
-        MbLogUtil.writeLogError(log, e, request==null ? MbApiConstant.NOT_AVAILABLE : request.getTraceNum());
-        MbApiResp response = new MbApiResp();
-        if (request == null) {
-            response.setChannelId(MbApiConstant.NOT_AVAILABLE);
-            response.setChannelType(MbApiConstant.NOT_AVAILABLE);
-            response.setTraceNum(MbApiConstant.NOT_AVAILABLE);
-            response.setResponseTime(MbDateFormatUtil.formatTime(new Date()));
-
-            response.setContent(MbErrorUtil.createError(INTERNAL_SERVER_ERROR, e.getMessage()));
-        } else {
-        	if (e instanceof AppException)
-        		response = MbJsonUtil.createResponse(request, MbErrorUtil.createError(INTERNAL_SERVER_ERROR, e.getMessage()));
-        	else
-        		try { 
-        			response = MbJsonUtil.createResponse(request, MbErrorUtil.createError(INTERNAL_SERVER_ERROR, MessageUtil.obtain("600002", request.getLanguage())));
-        		}
-	        	catch (Exception ex) {
-	        		
-	        	}
-        }
-        return new WebApplicationException(Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                .entity(response).build());
-    }
-	
+		
 	protected WebApplicationException createException(MbServiceException e, MbApiReq request){
-		MbApiResp response = MbJsonUtil.createResponse(request, e.getErrors());
-        return new WebApplicationException(Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                .entity(response).build());
-    }
+		MbApiResp response = MbJsonUtil.createResponseCustom(request, e.getErrors());
+		
+		return new WebApplicationException(Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+	             	.entity(response).build());
+	}
 
 }
