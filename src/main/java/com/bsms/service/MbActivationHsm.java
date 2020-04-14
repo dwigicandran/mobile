@@ -24,8 +24,8 @@ import com.bsms.util.MbJsonUtil;
 import com.bsms.util.RestUtil;
 import com.bsms.util.TrxIdUtil;
 
-@Service("activation")
-public class MbActivation implements MbService {
+@Service("activationHsm")
+public class MbActivationHsm implements MbService {
 
 	@Autowired
     private MbTxLogRepository txLogRepository;

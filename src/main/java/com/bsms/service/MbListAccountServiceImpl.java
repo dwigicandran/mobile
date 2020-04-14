@@ -45,7 +45,7 @@ import com.dto.portofolio.ListOfPortofolio;
 import com.google.gson.Gson;
 
 @Service("listAccount")
-public class ListAccountServiceImpl extends MbBaseServiceImpl implements MbService {
+public class MbListAccountServiceImpl extends MbBaseServiceImpl implements MbService {
 
 	@Autowired
 	CardmappingRepository cardMappingRepository;
@@ -95,17 +95,17 @@ public class ListAccountServiceImpl extends MbBaseServiceImpl implements MbServi
 	@Value("${core.operand}")
 	private String coreOperand;
 
-	private String responseDesc;
-	private String responseCode;
-
-	MbApiResp mbApiResp;
-
 	@Override
 	public MbApiResp process(HttpHeaders header, ContainerRequestContext requestContext, MbApiReq request)
 			throws Exception {
 
 		MbApiTxLog txLog = new MbApiTxLog();
 		txLogRepository.save(txLog);
+		
+		String responseDesc = null;
+		String responseCode = null;
+
+		MbApiResp mbApiResp = null;
 
 		Security security = securityRepository.findByMbSessionId(request.getSessionId());
 		Long customerId = security.getCustomerId();

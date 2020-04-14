@@ -18,7 +18,7 @@ import com.bsms.restobjclient.InquiryMUBPReq;
 import com.dto.inquirymubp.SoaHeader;
 
 //TODO : validasi request dan response UBP
-public class InquiryMUBP extends MbBaseServiceImpl implements MbService {
+public class MbInquiryMUBPServiceImpl extends MbBaseServiceImpl implements MbService {
 
 	@Value("${core.service.inqMubp}")
 	private String url;
