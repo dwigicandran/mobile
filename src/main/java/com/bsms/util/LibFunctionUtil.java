@@ -50,117 +50,106 @@ import javax.crypto.spec.SecretKeySpec;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 
-//import org.json.me.JSONObject;
-//
-//import pkg_lib.Document;
-//import pkg_lib.DocumentException;
-//import pkg_lib.EL;
-//import pkg_lib.LibConfig;
-//import pkg_lib.LibFunction;
-//import pkg_lib.LibMSSQL;
-//import pkg_lib.Logger;
-//import pkg_lib.MessagingException;
-//import pkg_lib.MimeBodyPart;
-//import pkg_lib.MimeMessage;
-//import pkg_lib.MimeMultipart;
-//import pkg_lib.PdfWriter;
-//import pkg_lib.Session;
-//import pkg_lib.LibFunction.EmailSender;
-//import pkg_lib.LibFunction.SMSSender;
+import java.text.DateFormat;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Random;
 
 public class LibFunctionUtil {
 
 	public static String log_message = "";
 //	  private static Logger logger = LogManager.getLogger("bsm-service");
 
-	  public static String getDatetime(String format) {
-	    DateFormat dateFormat = null;
-	    Date date = null;
-	    try {
-	      dateFormat = new SimpleDateFormat(format.trim());
-	      date = new Date();
-	    } catch (Exception ex) {
-	      return "";
-	    }
-	    return dateFormat.format(date);
-	  }
+	public static String getDatetime(String format) {
+		DateFormat dateFormat = null;
+		Date date = null;
+		try {
+			dateFormat = new SimpleDateFormat(format.trim());
+			date = new Date();
+		} catch (Exception ex) {
+			return "";
+		}
+		return dateFormat.format(date);
+	}
 
-	  public static String DateFormat(String format_org, String format, String date_str) {
-	    String result = "";
-	    try {
-	      SimpleDateFormat input_date = new SimpleDateFormat(format_org);
-	      SimpleDateFormat date_format = new SimpleDateFormat(format, new Locale("id", "ID"));
-	      result = date_format.format(input_date.parse(date_str));
-	    } catch (ParseException e) {
-	      return date_str;
-	    } catch (Exception e) {
-	      return date_str;
-	    }
-	    return result;
-	  }
+	public static String DateFormat(String format_org, String format, String date_str) {
+		String result = "";
+		try {
+			SimpleDateFormat input_date = new SimpleDateFormat(format_org);
+			SimpleDateFormat date_format = new SimpleDateFormat(format, new Locale("id", "ID"));
+			result = date_format.format(input_date.parse(date_str));
+		} catch (ParseException e) {
+			return date_str;
+		} catch (Exception e) {
+			return date_str;
+		}
+		return result;
+	}
 
-	  public static boolean CreateDir(String dir_name) {
-	    File directory = new File(dir_name);
-	    try {
-	      if (!directory.exists()) {
-	        directory.mkdir();
-	      }
-	      return true;
-	    } catch (Exception ex) {
-	      System.out.println(ex.getMessage());
-	      return false;
-	    }
-	  }
+	public static boolean CreateDir(String dir_name) {
+		File directory = new File(dir_name);
+		try {
+			if (!directory.exists()) {
+				directory.mkdir();
+			}
+			return true;
+		} catch (Exception ex) {
+			System.out.println(ex.getMessage());
+			return false;
+		}
+	}
 
-	  public static boolean CreateFile(String file_name) {
+	public static boolean CreateFile(String file_name) {
 
-	    try {
-	      File f;
-	      f = new File(file_name.trim());
-	      if (!f.exists()) {
-	        f.createNewFile();
-	      } else {
-	        return false;
-	      }
+		try {
+			File f;
+			f = new File(file_name.trim());
+			if (!f.exists()) {
+				f.createNewFile();
+			} else {
+				return false;
+			}
 
-	      return true;
-	    } catch (IOException Ex) {
-	      System.out.println(Ex.getMessage());
-	      return false;
-	    } catch (Exception ex) {
-	      System.out.println(ex.getMessage());
-	      return false;
-	    }
-	  }
+			return true;
+		} catch (IOException Ex) {
+			System.out.println(Ex.getMessage());
+			return false;
+		} catch (Exception ex) {
+			System.out.println(ex.getMessage());
+			return false;
+		}
+	}
 
-	  public static boolean WriteFile(String file_name, String data) {
-	    try {
-	      String filename = file_name.trim();
-	      FileWriter fw = new FileWriter(filename, true);
-	      fw.write(data);
-	      fw.close();
-	      return true;
-	    } catch (IOException Ex) {
-	      System.out.println(Ex.getMessage());
-	      return false;
-	    } catch (Exception ex) {
-	      System.out.println(ex.getMessage());
-	      return false;
-	    }
-	  }
+	public static boolean WriteFile(String file_name, String data) {
+		try {
+			String filename = file_name.trim();
+			FileWriter fw = new FileWriter(filename, true);
+			fw.write(data);
+			fw.close();
+			return true;
+		} catch (IOException Ex) {
+			System.out.println(Ex.getMessage());
+			return false;
+		} catch (Exception ex) {
+			System.out.println(ex.getMessage());
+			return false;
+		}
+	}
 
-	  public static boolean DeleteFile(String fileName) {
-	    try {
-	      File f = new File(fileName);
-	      if (f.exists()) {
-	        f.delete();
-	      }
-	    } catch (Exception ex) {
-	      System.out.println(ex.getMessage());
-	      return false;
-	    }
-	    return true;
-	  }
+	public static boolean DeleteFile(String fileName) {
+		try {
+			File f = new File(fileName);
+			if (f.exists()) {
+				f.delete();
+			}
+		} catch (Exception ex) {
+			System.out.println(ex.getMessage());
+			return false;
+		}
+		return true;
+	}
 
 //	  public static boolean ReplaceFile(String old_file, String new_file) {
 //
@@ -265,363 +254,362 @@ public class LibFunctionUtil {
 //	    }
 //	  }
 
-	  public static String ReadFile(String filename) {
-	    String content = "";
-	    File file = new File(filename);
-	    try {
-	      FileReader reader = new FileReader(file);
-	      char[] chars = new char[(int) file.length()];
-	      reader.read(chars);
-	      content = new String(chars);
-	      reader.close();
-	    } catch (Exception e) {
-	      return "";
-	    }
+	public static String ReadFile(String filename) {
+		String content = "";
+		File file = new File(filename);
+		try {
+			FileReader reader = new FileReader(file);
+			char[] chars = new char[(int) file.length()];
+			reader.read(chars);
+			content = new String(chars);
+			reader.close();
+		} catch (Exception e) {
+			return "";
+		}
 
-	    return content;
-	  }
+		return content;
+	}
 
-	  public static boolean isNumber(String number) {
-	    try {
-	      if (number == null) {
-	        return false;
-	      }
+	public static boolean isNumber(String number) {
+		try {
+			if (number == null) {
+				return false;
+			}
 
-	      if (number.equals("")) {
-	        return false;
-	      }
-	      Double.parseDouble(number);
-	      return true;
-	    } catch (Exception ex) {
-	      return false;
-	    }
-	  }
+			if (number.equals("")) {
+				return false;
+			}
+			Double.parseDouble(number);
+			return true;
+		} catch (Exception ex) {
+			return false;
+		}
+	}
 
-	  public static String DecimalToString(double value) {
-	    String result = "";
-	    try {
-	      DecimalFormat df = new DecimalFormat("0");
-	      result = df.format(value);
-	    } catch (Exception ex) {
-	      result = "";
-	    }
-	    return result.trim();
-	  }
+	public static String DecimalToString(double value) {
+		String result = "";
+		try {
+			DecimalFormat df = new DecimalFormat("0");
+			result = df.format(value);
+		} catch (Exception ex) {
+			result = "";
+		}
+		return result.trim();
+	}
 
-	  public static String RandomNumber(int count) {
-	    try {
-	      Random rand = new Random();
-	      String[] charset = {"0", "1", "2", "3", "4", "5", "6", "7", "8", "9"};
-	      StringBuffer sb = new StringBuffer();
-	      for (int n = 0; n < count; n++) {
-	        sb = sb.append(charset[rand.nextInt(10)]);
-	      }
-	      return (sb.toString());
-	    } catch (Exception ex) {
-	      return "";
-	    }
-	  }
+	public static String RandomNumber(int count) {
+		try {
+			Random rand = new Random();
+			String[] charset = { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9" };
+			StringBuffer sb = new StringBuffer();
+			for (int n = 0; n < count; n++) {
+				sb = sb.append(charset[rand.nextInt(10)]);
+			}
+			return (sb.toString());
+		} catch (Exception ex) {
+			return "";
+		}
+	}
 
-//	  public static String getTransactionID(int count) {
-//	    try {
-//	      //String result = LibFunction.getDatetime("yyyyMMddhhmmss");
-//	      String result = LibFunction.getDatetime("yyyyMMddHHmmss");
-//	      Random rand = new Random();
-//	      String[] charset = {"0", "1", "2", "3", "4", "5", "6", "7", "8", "9"};
-//	      StringBuffer sb = new StringBuffer();
-//	      for (int n = 0; n < count; n++) {
-//	        sb = sb.append(charset[rand.nextInt(10)]);
-//	      }
-//
-//	      result += sb.toString();
-//	      return result;
-//	    } catch (Exception ex) {
-//	      return "";
-//	    }
-//	  }
+	public String getTransactionID(int count) {
+		try {
+			String result = LibFunctionUtil.getDatetime("yyyyMMddHHmmss");
+			Random rand = new Random();
+			String[] charset = { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9" };
+			StringBuffer sb = new StringBuffer();
+			for (int n = 0; n < count; n++) {
+				sb = sb.append(charset[rand.nextInt(10)]);
+			}
 
-	  public static boolean ArraySearch(String array[], String key) {
-	    try {
-	      for (int i = 0; i < array.length; i++) {
-	        if (array[i].equals(key)) {
-	          return true;
-	        }
-	      }
-	    } catch (Exception ex) {
-	      return false;
-	    }
-	    return false;
-	  }
+			result += sb.toString();
+			return result;
+		} catch (Exception ex) {
+			return "";
+		}
+	}
 
-	  public static String[] SplitString(String text, String delimiter) {
-	    String result[] = null;
-	    try {
-	      if (text != null) {
-	        int lenght = text.length();
-	        int first = 0;
-	        Vector lista = new Vector();
-	        if (text.indexOf(delimiter) != -1) {
-	          for (int i = 0; i < lenght; i++) {
-	            if (i + delimiter.length() <= lenght) {
-	              if (text.substring(i, i + delimiter.length()).equals(delimiter)) {
-	                lista.addElement(text.substring(first, i));
-	                first = i + delimiter.length();
-	              }
-	            }
-	          }
-	          if (!text.endsWith(delimiter)) {
-	            lista.addElement(text.substring(first, lenght));
-	          }
-	        } else {
-	          lista.addElement(text);
-	        }
-	        result = new String[lista.size()];
-	        for (int i = 0; i < lista.size(); i++) {
-	          result[i] = lista.elementAt(i).toString();
-	        }
-	      }
-	    } catch (Exception ex) {
-	      result[0] = "";
-	      return result;
-	    }
-	    return result;
-	  }
+	public static boolean ArraySearch(String array[], String key) {
+		try {
+			for (int i = 0; i < array.length; i++) {
+				if (array[i].equals(key)) {
+					return true;
+				}
+			}
+		} catch (Exception ex) {
+			return false;
+		}
+		return false;
+	}
 
-	  public static Vector VectorUnique(Vector source) {
-	    int i = 0;
-	    int j = 0;
-	    boolean duplicates = false;
-	    Vector v = new Vector();
-	    for (i = 0; i < source.size(); i++) {
-	      duplicates = false;
-	      for (j = (i + 1); j < source.size(); j++) {
-	        if (source.elementAt(i).toString().equalsIgnoreCase(
-	                source.elementAt(j).toString())) {
-	          duplicates = true;
-	        }
+	public static String[] SplitString(String text, String delimiter) {
+		String result[] = null;
+		try {
+			if (text != null) {
+				int lenght = text.length();
+				int first = 0;
+				Vector lista = new Vector();
+				if (text.indexOf(delimiter) != -1) {
+					for (int i = 0; i < lenght; i++) {
+						if (i + delimiter.length() <= lenght) {
+							if (text.substring(i, i + delimiter.length()).equals(delimiter)) {
+								lista.addElement(text.substring(first, i));
+								first = i + delimiter.length();
+							}
+						}
+					}
+					if (!text.endsWith(delimiter)) {
+						lista.addElement(text.substring(first, lenght));
+					}
+				} else {
+					lista.addElement(text);
+				}
+				result = new String[lista.size()];
+				for (int i = 0; i < lista.size(); i++) {
+					result[i] = lista.elementAt(i).toString();
+				}
+			}
+		} catch (Exception ex) {
+			result[0] = "";
+			return result;
+		}
+		return result;
+	}
 
-	      }
-	      if (duplicates == false) {
-	        v.addElement(source.elementAt(i).toString().trim());
-	      }
-	    }
-	    return v;
-	  }
+	public static Vector VectorUnique(Vector source) {
+		int i = 0;
+		int j = 0;
+		boolean duplicates = false;
+		Vector v = new Vector();
+		for (i = 0; i < source.size(); i++) {
+			duplicates = false;
+			for (j = (i + 1); j < source.size(); j++) {
+				if (source.elementAt(i).toString().equalsIgnoreCase(source.elementAt(j).toString())) {
+					duplicates = true;
+				}
 
-	  public static int ArrayMaxValue(int[] value) {
-	    int maximum = value[0];
-	    try {
-	      for (int i = 1; i < value.length; i++) {
-	        if (value[i] > maximum) {
-	          maximum = value[i];
-	        }
-	      }
-	    } catch (Exception Ex) {
-	      return 0;
-	    }
-	    return maximum;
-	  }
+			}
+			if (duplicates == false) {
+				v.addElement(source.elementAt(i).toString().trim());
+			}
+		}
+		return v;
+	}
 
-	  public static String GetErrorLog(String message) {
-	    String result = "";
-	    try {
-	      int infoidx = 1;
-	      StackTraceElement[] Info = new Throwable().fillInStackTrace().getStackTrace();
+	public static int ArrayMaxValue(int[] value) {
+		int maximum = value[0];
+		try {
+			for (int i = 1; i < value.length; i++) {
+				if (value[i] > maximum) {
+					maximum = value[i];
+				}
+			}
+		} catch (Exception Ex) {
+			return 0;
+		}
+		return maximum;
+	}
 
-	      if (Info.length > 3) {
-	        infoidx = 3;
-	      }
-	      for (int i = infoidx; i < Info.length; i++) {
-	        if (Info[i].hashCode() > 0) {
-	          infoidx = i;
-	          break;
-	        }
-	      }
-	      result = "Maaf, sedang terjadi kesalahan, Silahkan ulangi beberapa saat lagi.\n\n"
-	              + Info[infoidx].getClassName() + "." + Info[infoidx].getMethodName()
-	              + " (" + Info[infoidx].getLineNumber() + ") : " + message;
+	public static String GetErrorLog(String message) {
+		String result = "";
+		try {
+			int infoidx = 1;
+			StackTraceElement[] Info = new Throwable().fillInStackTrace().getStackTrace();
 
-	    } catch (Exception ex) {
-	    }
-	    return result;
-	  }
+			if (Info.length > 3) {
+				infoidx = 3;
+			}
+			for (int i = infoidx; i < Info.length; i++) {
+				if (Info[i].hashCode() > 0) {
+					infoidx = i;
+					break;
+				}
+			}
+			result = "Maaf, sedang terjadi kesalahan, Silahkan ulangi beberapa saat lagi.\n\n"
+					+ Info[infoidx].getClassName() + "." + Info[infoidx].getMethodName() + " ("
+					+ Info[infoidx].getLineNumber() + ") : " + message;
 
-	  public static String NumberFormat(String number) {
-	    try {
-	      NumberFormat formatter = new DecimalFormat("###,###,###.##");
-	      return formatter.format(Double.valueOf(number));
-	    } catch (Exception ex) {
-	      return number;
-	    }
-	  }
+		} catch (Exception ex) {
+		}
+		return result;
+	}
 
-	  /**
-	   * format local INDONESIA
-	   * @param number
-	   * @param dec
-	   * @return 
-	   */
-	  public static String NumberFormat(String number, int dec) {
-	    return NumberFormat(Double.parseDouble(number),dec);
-	  }
-	  public static String NumberFormat(Double number, int dec) {
-	    Locale locale = new Locale("in", "IN");
-	    NumberFormat formatter = NumberFormat.getInstance(locale);
-	    formatter.setMaximumFractionDigits(dec);
-	    formatter.setMinimumFractionDigits(dec);
-	    return formatter.format(number) + "";
-	  }
+	public static String NumberFormat(String number) {
+		try {
+			NumberFormat formatter = new DecimalFormat("###,###,###.##");
+			return formatter.format(Double.valueOf(number));
+		} catch (Exception ex) {
+			return number;
+		}
+	}
 
-	  public static String getIPAddress() {
-	    String result = "";
-	    try {
-	      InetAddress address = InetAddress.getLocalHost();
-	      result = address.getHostAddress();
-	    } catch (UnknownHostException ex) {
-	      return "";
-	    }
-	    return result;
-	  }
+	/**
+	 * format local INDONESIA
+	 * 
+	 * @param number
+	 * @param dec
+	 * @return
+	 */
+	public static String NumberFormat(String number, int dec) {
+		return NumberFormat(Double.parseDouble(number), dec);
+	}
 
-	  public static String ScriptEngine(String engine, String eval) {
-	    String result = "";
-	    ScriptEngineManager mgr = new ScriptEngineManager();
-	    ScriptEngine jsEngine = mgr.getEngineByName(engine);
-	    try {
-	      result = jsEngine.eval(eval).toString();
-	    } catch (Exception Ex) {
-	      return "";
-	    }
-	    return result;
-	  }
+	public static String NumberFormat(Double number, int dec) {
+		Locale locale = new Locale("in", "IN");
+		NumberFormat formatter = NumberFormat.getInstance(locale);
+		formatter.setMaximumFractionDigits(dec);
+		formatter.setMinimumFractionDigits(dec);
+		return formatter.format(number) + "";
+	}
 
-	  public static boolean CreditCardValidation(String cc_number) {
-	    try {
-	      cc_number = cc_number.replace(" ", "").trim();
-	      int j = cc_number.length();
+	public static String getIPAddress() {
+		String result = "";
+		try {
+			InetAddress address = InetAddress.getLocalHost();
+			result = address.getHostAddress();
+		} catch (UnknownHostException ex) {
+			return "";
+		}
+		return result;
+	}
 
-	      String[] s1 = new String[j];
-	      for (int i = 0; i < cc_number.length(); i++) {
-	        s1[i] = "" + cc_number.charAt(i);
-	      }
+	public static String ScriptEngine(String engine, String eval) {
+		String result = "";
+		ScriptEngineManager mgr = new ScriptEngineManager();
+		ScriptEngine jsEngine = mgr.getEngineByName(engine);
+		try {
+			result = jsEngine.eval(eval).toString();
+		} catch (Exception Ex) {
+			return "";
+		}
+		return result;
+	}
 
-	      int checksum = 0;
+	public static boolean CreditCardValidation(String cc_number) {
+		try {
+			cc_number = cc_number.replace(" ", "").trim();
+			int j = cc_number.length();
 
-	      for (int i = s1.length - 1; i >= 0; i -= 2) {
-	        int k = 0;
+			String[] s1 = new String[j];
+			for (int i = 0; i < cc_number.length(); i++) {
+				s1[i] = "" + cc_number.charAt(i);
+			}
 
-	        if (i > 0) {
-	          k = Integer.valueOf(s1[i - 1]).intValue() * 2;
-	          if (k > 9) {
-	            String s = "" + k;
-	            k = Integer.valueOf(s.substring(0, 1)).intValue()
-	                    + Integer.valueOf(s.substring(1)).intValue();
-	          }
-	          checksum += Integer.valueOf(s1[i]).intValue() + k;
-	        } else {
-	          checksum += Integer.valueOf(s1[0]).intValue();
-	        }
-	      }
-	      return ((checksum % 10) == 0);
-	    } catch (Exception e) {
-	      return false;
-	    }
-	  }
+			int checksum = 0;
 
-	  public static boolean PingToServer(String url_location, int ping_timeout) {
-	    try {
-	      int timeout = ping_timeout;
-	      InetAddress[] addresses = InetAddress.getAllByName(url_location);
-	      for (InetAddress address : addresses) {
-	        if (address.isReachable(timeout)) {
-	          return true;
-	        } else {
-	          return false;
-	        }
-	      }
-	    } catch (Exception Ex) {
-	      return false;
-	    }
-	    return true;
-	  }
+			for (int i = s1.length - 1; i >= 0; i -= 2) {
+				int k = 0;
 
-	  public static String SendHTTPPost(String url_location, String data_post) {
+				if (i > 0) {
+					k = Integer.valueOf(s1[i - 1]).intValue() * 2;
+					if (k > 9) {
+						String s = "" + k;
+						k = Integer.valueOf(s.substring(0, 1)).intValue() + Integer.valueOf(s.substring(1)).intValue();
+					}
+					checksum += Integer.valueOf(s1[i]).intValue() + k;
+				} else {
+					checksum += Integer.valueOf(s1[0]).intValue();
+				}
+			}
+			return ((checksum % 10) == 0);
+		} catch (Exception e) {
+			return false;
+		}
+	}
 
-	    String result = "";
+	public static boolean PingToServer(String url_location, int ping_timeout) {
+		try {
+			int timeout = ping_timeout;
+			InetAddress[] addresses = InetAddress.getAllByName(url_location);
+			for (InetAddress address : addresses) {
+				if (address.isReachable(timeout)) {
+					return true;
+				} else {
+					return false;
+				}
+			}
+		} catch (Exception Ex) {
+			return false;
+		}
+		return true;
+	}
 
-	    int TIMEOUT_VALUE = 1000;
-	    try {
-	      URL url = new URL(url_location);
-	      long start = System.nanoTime();
-	      URLConnection url_conn = url.openConnection();
-	      url_conn.setDoOutput(true);
-	      url_conn.setConnectTimeout(TIMEOUT_VALUE);
-	      url_conn.setReadTimeout(TIMEOUT_VALUE);
-	      OutputStreamWriter wr = new OutputStreamWriter(url_conn.getOutputStream());
-	      wr.write(data_post);
-	      wr.flush();
-	      BufferedReader rd = new BufferedReader(new InputStreamReader(url_conn.getInputStream()));
-	      String inputLine;
+	public static String SendHTTPPost(String url_location, String data_post) {
 
-	      while ((inputLine = rd.readLine()) != null) {
-	        result += inputLine + "\n";
-	      }
-	      rd.close();
+		String result = "";
 
-	      long elapsed = System.nanoTime() - start;
-	      System.out.println("Elapsed (ms): " + elapsed / 1000000);
-	      System.out.println(result);
-	    } catch (Exception e) {
-	      System.out.println("More than " + TIMEOUT_VALUE + " elapsed.");
-	      return "-1";
-	    }
-	    return result.trim();
-	  }
+		int TIMEOUT_VALUE = 1000;
+		try {
+			URL url = new URL(url_location);
+			long start = System.nanoTime();
+			URLConnection url_conn = url.openConnection();
+			url_conn.setDoOutput(true);
+			url_conn.setConnectTimeout(TIMEOUT_VALUE);
+			url_conn.setReadTimeout(TIMEOUT_VALUE);
+			OutputStreamWriter wr = new OutputStreamWriter(url_conn.getOutputStream());
+			wr.write(data_post);
+			wr.flush();
+			BufferedReader rd = new BufferedReader(new InputStreamReader(url_conn.getInputStream()));
+			String inputLine;
 
-	  public static String md5(String s) {
-	    try {
-	      MessageDigest m = MessageDigest.getInstance("MD5");
-	      m.update(s.getBytes(), 0, s.length());
-	      BigInteger i = new BigInteger(1, m.digest());
-	      return String.format("%1$032x", i);
-	    } catch (NoSuchAlgorithmException e) {
-	      return "";
-	    }
-	  }
+			while ((inputLine = rd.readLine()) != null) {
+				result += inputLine + "\n";
+			}
+			rd.close();
 
-	  public static boolean isValidDate(String inDate) {
-	    if (inDate == null) {
-	      return false;
-	    }
+			long elapsed = System.nanoTime() - start;
+			System.out.println("Elapsed (ms): " + elapsed / 1000000);
+			System.out.println(result);
+		} catch (Exception e) {
+			System.out.println("More than " + TIMEOUT_VALUE + " elapsed.");
+			return "-1";
+		}
+		return result.trim();
+	}
 
-	    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+	public static String md5(String s) {
+		try {
+			MessageDigest m = MessageDigest.getInstance("MD5");
+			m.update(s.getBytes(), 0, s.length());
+			BigInteger i = new BigInteger(1, m.digest());
+			return String.format("%1$032x", i);
+		} catch (NoSuchAlgorithmException e) {
+			return "";
+		}
+	}
 
-	    if (inDate.trim().length() != dateFormat.toPattern().length()) {
-	      return false;
-	    }
+	public static boolean isValidDate(String inDate) {
+		if (inDate == null) {
+			return false;
+		}
 
-	    dateFormat.setLenient(false);
+		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
-	    try {
-	      dateFormat.parse(inDate.trim());
-	    } catch (ParseException pe) {
-	      return false;
-	    }
-	    return true;
-	  }
+		if (inDate.trim().length() != dateFormat.toPattern().length()) {
+			return false;
+		}
 
-	  public static String GetCurrentDirectory() {
-	    String result = "";
-	    File dir = null;
-	    try {
-	      dir = new File(".");
-	      result = dir.getCanonicalPath();
-	    } catch (Exception ex) {
-	      System.out.println(ex.getMessage());
-	      return result = "";
-	    }
-	    return result.trim();
-	  }
+		dateFormat.setLenient(false);
+
+		try {
+			dateFormat.parse(inDate.trim());
+		} catch (ParseException pe) {
+			return false;
+		}
+		return true;
+	}
+
+	public static String GetCurrentDirectory() {
+		String result = "";
+		File dir = null;
+		try {
+			dir = new File(".");
+			result = dir.getCanonicalPath();
+		} catch (Exception ex) {
+			System.out.println(ex.getMessage());
+			return result = "";
+		}
+		return result.trim();
+	}
 
 //	  private static String genISOLogData(String isoData) throws Exception {
 //	      JSONObject jISOLogData =  new JSONObject(isoData);
@@ -644,7 +632,7 @@ public class LibFunctionUtil {
 //	      
 //	      return jISOLogData.toString();
 //	  }
-	  
+
 //	  public static String SocketCliet_Bak(String url, int port, String data) {
 //	    String result = "";
 //	    Socket socket = null;
@@ -698,11 +686,11 @@ public class LibFunctionUtil {
 //
 //	    return result;
 //	  }
-	  
+
 //	  public static String SocketCliet(String url, int port, String data) {
 //	    return SocketCliet(url, port, data, 60000);
 //	  }
-	  
+
 //	  public static String SocketCliet(String url, int port, String data, int timeout) {
 //	    String result = "";
 //	    Socket socket = null;
@@ -831,12 +819,12 @@ public class LibFunctionUtil {
 //	    logger.info(message);
 //	  }
 
-	  public static String getClassInfo() {
-	    String result = "";
-	    StackTraceElement[] info = new Throwable().fillInStackTrace().getStackTrace();
-	    result = info[1].getMethodName() + "(" + info[1].getLineNumber() + ")";
-	    return result;
-	  }
+	public static String getClassInfo() {
+		String result = "";
+		StackTraceElement[] info = new Throwable().fillInStackTrace().getStackTrace();
+		result = info[1].getMethodName() + "(" + info[1].getLineNumber() + ")";
+		return result;
+	}
 
 //	  public static void SendEmail(String trans_ref,
 //	          String mail_to, String subject, String html_content,
@@ -948,7 +936,7 @@ public class LibFunctionUtil {
 //	              EL.elWarning, "Email Error:" + Ex.getMessage());
 //	    }
 //	  }
-	  
+
 //	  private static class EmailSender implements Runnable {
 //	        String trans_ref;
 //	        String mail_to;
@@ -983,7 +971,7 @@ public class LibFunctionUtil {
 //	        }
 //	      
 //	  }
-	  
+
 //	  public static void sendEmailAsync(String trans_ref,
 //	          String mail_to, String subject, String html_content,
 //	          String pdf_content, boolean landscape) {
@@ -992,111 +980,110 @@ public class LibFunctionUtil {
 //	      t.start();
 //	  }
 
-	  public static String SeparateString(int div, String data) {
-	    try {
-	      String result = "";
-	      for (int i = 0; i < data.length(); i++) {
-	        result += data.charAt(i);
-	        if (i == (div - 1)) {
-	          result += " ";
-	          div = div + 4;
-	        }
-	      }
-	      return result;
-	    } catch (Exception Ex) {
-	      return data;
-	    }
-	  }
+	public static String SeparateString(int div, String data) {
+		try {
+			String result = "";
+			for (int i = 0; i < data.length(); i++) {
+				result += data.charAt(i);
+				if (i == (div - 1)) {
+					result += " ";
+					div = div + 4;
+				}
+			}
+			return result;
+		} catch (Exception Ex) {
+			return data;
+		}
+	}
 
-	  public static String GetMacAddress() {
-	    String result = "";
-	    try {
-	      InetAddress ip_address;
-	      ip_address = InetAddress.getLocalHost();
-	      NetworkInterface network = NetworkInterface.getByInetAddress(ip_address);
-	      byte[] mac = network.getHardwareAddress();
-	      StringBuilder sb = new StringBuilder();
-	      for (int i = 0; i < mac.length; i++) {
-	        sb.append(String.format("%02X%s", mac[i], (i < mac.length - 1) ? "" : ""));
-	      }
-	      result = sb.toString();
-	    } catch (UnknownHostException Ex) {
-	      return "Error: " + Ex.getMessage();
-	    } catch (SocketException Ex) {
-	      return "Error: " + Ex.getMessage();
-	    } catch (Exception Ex) {
-	      return "Error: " + Ex.getMessage();
-	    }
-	    return result;
-	  }
-	  
-	  public static String genMaskedMSISDN(String msisdn) {
-	      String maskedMSISDN = "XXX";
-	      
-	      if (msisdn != null && msisdn.length() > 3) {
-	          maskedMSISDN = msisdn.substring(0, msisdn.length() - maskedMSISDN.length()) + maskedMSISDN;
-	      }
-	      
-	      return maskedMSISDN;
-	  }
+	public static String GetMacAddress() {
+		String result = "";
+		try {
+			InetAddress ip_address;
+			ip_address = InetAddress.getLocalHost();
+			NetworkInterface network = NetworkInterface.getByInetAddress(ip_address);
+			byte[] mac = network.getHardwareAddress();
+			StringBuilder sb = new StringBuilder();
+			for (int i = 0; i < mac.length; i++) {
+				sb.append(String.format("%02X%s", mac[i], (i < mac.length - 1) ? "" : ""));
+			}
+			result = sb.toString();
+		} catch (UnknownHostException Ex) {
+			return "Error: " + Ex.getMessage();
+		} catch (SocketException Ex) {
+			return "Error: " + Ex.getMessage();
+		} catch (Exception Ex) {
+			return "Error: " + Ex.getMessage();
+		}
+		return result;
+	}
 
-	  public static String getPINBlock(String key, String PIN) {
-	    if (key == null || key.isEmpty()) {
-	        return "";
-	    }
+	public static String genMaskedMSISDN(String msisdn) {
+		String maskedMSISDN = "XXX";
 
-	    //PIN = padRight(PIN, 16, 'F');
-	    PIN = String.format("%-16s", PIN).replace(" ", "F");
-	    //Log.i(TAG, "setPINBlock: PIN " + PIN);
-	    String pinBlock = "";//null;
+		if (msisdn != null && msisdn.length() > 3) {
+			maskedMSISDN = msisdn.substring(0, msisdn.length() - maskedMSISDN.length()) + maskedMSISDN;
+		}
 
-	    try {
-	        //Log.i("hextobyte KEY", "" + toByte(key).length);
-	        //Log.i("hextobyte PIN", "" + toByte(PIN).length);
+		return maskedMSISDN;
+	}
 
-	        DESKeySpec key_spec = new DESKeySpec(toByte(key));
-	        SecretKeySpec DESKey = new SecretKeySpec(key_spec.getKey(), "DES");
-	        Cipher cipher = Cipher.getInstance("DES/ECB/NoPadding");
-	        cipher.init(Cipher.ENCRYPT_MODE, DESKey);
-	        byte[] encrypted = cipher.doFinal(toByte(PIN));
-	        //Log.i(TAG, "setPINBlock: panjang hasil" + encrypted.length);
-	        pinBlock = toHex(encrypted).toUpperCase();
-	        //Log.i(TAG, "setPINBlock: hasil " + pinBlock);
-	    } 
-	    catch (Exception e) {
-	        e.printStackTrace();
-	    }
+	public static String getPINBlock(String key, String PIN) {
+		if (key == null || key.isEmpty()) {
+			return "";
+		}
 
-	    return pinBlock;
-	  }
-	  
-	  public static byte[] toByte(String hex) {
-	        if (hex == null || hex.length() == 0) {
-	            return null;
-	        }
+		// PIN = padRight(PIN, 16, 'F');
+		PIN = String.format("%-16s", PIN).replace(" ", "F");
+		// Log.i(TAG, "setPINBlock: PIN " + PIN);
+		String pinBlock = "";// null;
 
-	        byte[] ba = new byte[hex.length() / 2];
-	        for (int i = 0; i < ba.length; i++) {
-	            ba[i] = (byte) Integer.parseInt(hex.substring(2 * i, 2 * i + 2), 16);
-	        }
-	        return ba;
-	    }
+		try {
+			// Log.i("hextobyte KEY", "" + toByte(key).length);
+			// Log.i("hextobyte PIN", "" + toByte(PIN).length);
 
-	    // byte[] to hex
-	    public static String toHex(byte[] ba) {
-	        if (ba == null || ba.length == 0) {
-	            return null;
-	        }
+			DESKeySpec key_spec = new DESKeySpec(toByte(key));
+			SecretKeySpec DESKey = new SecretKeySpec(key_spec.getKey(), "DES");
+			Cipher cipher = Cipher.getInstance("DES/ECB/NoPadding");
+			cipher.init(Cipher.ENCRYPT_MODE, DESKey);
+			byte[] encrypted = cipher.doFinal(toByte(PIN));
+			// Log.i(TAG, "setPINBlock: panjang hasil" + encrypted.length);
+			pinBlock = toHex(encrypted).toUpperCase();
+			// Log.i(TAG, "setPINBlock: hasil " + pinBlock);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 
-	        StringBuffer sb = new StringBuffer(ba.length * 2);
-	        String hexNumber;
-	        for (int x = 0; x < ba.length; x++) {
-	            hexNumber = "0" + Integer.toHexString(0xff & ba[x]);
+		return pinBlock;
+	}
 
-	            sb.append(hexNumber.substring(hexNumber.length() - 2));
-	        }
-	        return sb.toString();
-	    }
+	public static byte[] toByte(String hex) {
+		if (hex == null || hex.length() == 0) {
+			return null;
+		}
+
+		byte[] ba = new byte[hex.length() / 2];
+		for (int i = 0; i < ba.length; i++) {
+			ba[i] = (byte) Integer.parseInt(hex.substring(2 * i, 2 * i + 2), 16);
+		}
+		return ba;
+	}
+
+	// byte[] to hex
+	public static String toHex(byte[] ba) {
+		if (ba == null || ba.length == 0) {
+			return null;
+		}
+
+		StringBuffer sb = new StringBuffer(ba.length * 2);
+		String hexNumber;
+		for (int x = 0; x < ba.length; x++) {
+			hexNumber = "0" + Integer.toHexString(0xff & ba[x]);
+
+			sb.append(hexNumber.substring(hexNumber.length() - 2));
+		}
+		return sb.toString();
+	}
 
 //	    private static class SMSSender implements Runnable {
 //	        JSONObject params;
@@ -1174,137 +1161,132 @@ public class LibFunctionUtil {
 //	        }
 //	    }
 
-	    public static String genMSGID(String prefix, String trxId) {
-	        int length = trxId.length();
-	        if ( length > 9)
-	            trxId = trxId.substring(length - 9, length);
-	        
-	        return prefix + new SimpleDateFormat("yyD").format(new Date()) + trxId;
-	    }
-	    
-	    public static String getYearOfMonth(String loanTenor, String language)
-	    {
-	        String returnValue = loanTenor;
-	        int loanTenorInt = Integer.valueOf(loanTenor);
-	        if ("id".equals(language))
-	            returnValue += " Bulan";
-	        else 
-	            returnValue += " Month";
-	        if (loanTenorInt >= 12)
-	        {
-	            int year = loanTenorInt / 12;
-	            int overMonth = loanTenorInt % 12;
-	            if ("id".equals(language))
-	            {
-	                returnValue += " (" + year + " Tahun";
-	                if (overMonth > 0)
-	                    returnValue += " " + overMonth + " Bulan";
-	                returnValue += ")";
-	            }
-	            else 
-	            {
-	                returnValue += " (" + year + " Year";
-	                if (overMonth > 0)
-	                    returnValue += " " + overMonth + " Month";
-	                returnValue += ")";
-	            }
-	        }
-	        return returnValue;
-	    }
+	public static String genMSGID(String prefix, String trxId) {
+		int length = trxId.length();
+		if (length > 9)
+			trxId = trxId.substring(length - 9, length);
 
-	    public String str_pad(String input, int length, String pad, String sense) {
-	        int resto_pad = length - input.length();
-	        String padded = "";
+		return prefix + new SimpleDateFormat("yyD").format(new Date()) + trxId;
+	}
 
-	        if (resto_pad <= 0) {
-	            return input;
-	        }
+	public static String getYearOfMonth(String loanTenor, String language) {
+		String returnValue = loanTenor;
+		int loanTenorInt = Integer.valueOf(loanTenor);
+		if ("id".equals(language))
+			returnValue += " Bulan";
+		else
+			returnValue += " Month";
+		if (loanTenorInt >= 12) {
+			int year = loanTenorInt / 12;
+			int overMonth = loanTenorInt % 12;
+			if ("id".equals(language)) {
+				returnValue += " (" + year + " Tahun";
+				if (overMonth > 0)
+					returnValue += " " + overMonth + " Bulan";
+				returnValue += ")";
+			} else {
+				returnValue += " (" + year + " Year";
+				if (overMonth > 0)
+					returnValue += " " + overMonth + " Month";
+				returnValue += ")";
+			}
+		}
+		return returnValue;
+	}
 
-	        if (sense.equals("STR_PAD_RIGHT")) {
-	            padded = input;
-	            padded += _fill_string(pad, resto_pad);
-	        } else if (sense.equals("STR_PAD_LEFT")) {
-	            padded = _fill_string(pad, resto_pad);
-	            padded += input;
-	        } else // STR_PAD_BOTH
-	        {
-	            int pad_left = (int) Math.ceil(resto_pad / 2);
-	            int pad_right = resto_pad - pad_left;
+	public String str_pad(String input, int length, String pad, String sense) {
+		int resto_pad = length - input.length();
+		String padded = "";
 
-	            padded = _fill_string(pad, pad_left);
-	            padded += input;
-	            padded += _fill_string(pad, pad_right);
-	        }
-	        return padded;
-	    }
+		if (resto_pad <= 0) {
+			return input;
+		}
 
-	    protected String _fill_string(String pad, int resto) {
-	        boolean first = true;
-	        String padded = "";
+		if (sense.equals("STR_PAD_RIGHT")) {
+			padded = input;
+			padded += _fill_string(pad, resto_pad);
+		} else if (sense.equals("STR_PAD_LEFT")) {
+			padded = _fill_string(pad, resto_pad);
+			padded += input;
+		} else // STR_PAD_BOTH
+		{
+			int pad_left = (int) Math.ceil(resto_pad / 2);
+			int pad_right = resto_pad - pad_left;
 
-	        if (resto >= pad.length()) {
-	            for (int i = resto; i >= 0; i = i - pad.length()) {
-	                if (i >= pad.length()) {
-	                    if (first) {
-	                        padded = pad;
-	                    } else {
-	                        padded += pad;
-	                    }
-	                } else {
-	                    if (first) {
-	                        padded = pad.substring(0, i);
-	                    } else {
-	                        padded += pad.substring(0, i);
-	                    }
-	                }
-	                first = false;
-	            }
-	        } else {
-	            padded = pad.substring(0, resto);
-	        }
-	        return padded;
-	    }
+			padded = _fill_string(pad, pad_left);
+			padded += input;
+			padded += _fill_string(pad, pad_right);
+		}
+		return padded;
+	}
 
-	    /* Added by Prasetyo for transfer schedule purpose */
-	    protected static String setTimezone(String formatdatetime, int timezone, String datetime) {
+	protected String _fill_string(String pad, int resto) {
+		boolean first = true;
+		String padded = "";
 
-	        int year = Integer.parseInt(datetime.substring(0, 4));
-	        int month = Integer.parseInt(datetime.substring(5, 7)) - 1;
-	        int day = Integer.parseInt(datetime.substring(8, 10));
-	        int hour = Integer.parseInt(datetime.substring(11, 13));
-	        int minute = Integer.parseInt(datetime.substring(14, 16));
-	        int second = Integer.parseInt(datetime.substring(17, 19));
+		if (resto >= pad.length()) {
+			for (int i = resto; i >= 0; i = i - pad.length()) {
+				if (i >= pad.length()) {
+					if (first) {
+						padded = pad;
+					} else {
+						padded += pad;
+					}
+				} else {
+					if (first) {
+						padded = pad.substring(0, i);
+					} else {
+						padded += pad.substring(0, i);
+					}
+				}
+				first = false;
+			}
+		} else {
+			padded = pad.substring(0, resto);
+		}
+		return padded;
+	}
 
-	        DateFormat dateFormat = new SimpleDateFormat(formatdatetime);
-	        Calendar c = Calendar.getInstance();
-	        c.set(year, month, day, hour, minute, second);
-	        c.add(c.HOUR, timezone);
-	        Date currentAddDate = c.getTime();
+	/* Added by Prasetyo for transfer schedule purpose */
+	protected static String setTimezone(String formatdatetime, int timezone, String datetime) {
 
-	        return dateFormat.format(currentAddDate);
+		int year = Integer.parseInt(datetime.substring(0, 4));
+		int month = Integer.parseInt(datetime.substring(5, 7)) - 1;
+		int day = Integer.parseInt(datetime.substring(8, 10));
+		int hour = Integer.parseInt(datetime.substring(11, 13));
+		int minute = Integer.parseInt(datetime.substring(14, 16));
+		int second = Integer.parseInt(datetime.substring(17, 19));
 
-	    }
+		DateFormat dateFormat = new SimpleDateFormat(formatdatetime);
+		Calendar c = Calendar.getInstance();
+		c.set(year, month, day, hour, minute, second);
+		c.add(c.HOUR, timezone);
+		Date currentAddDate = c.getTime();
 
-	    protected static String formatDateUTC(String tgl) throws ParseException {
-	        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'+0000'");
-	        SimpleDateFormat output = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-	        Date d = sdf.parse(tgl);
-	        String formattedTime = output.format(d);
-	        String formattedTimeZone = setTimezone("yyyy-MM-dd HH:mm:ss", 7, formattedTime);
-	        return formattedTimeZone;
-	    }
+		return dateFormat.format(currentAddDate);
 
-	    protected static String formatIDRCurrency(Double amount) {
-	        DecimalFormat idr = (DecimalFormat) DecimalFormat.getCurrencyInstance();
-	        DecimalFormatSymbols formatRp = new DecimalFormatSymbols();
+	}
 
-	        formatRp.setCurrencySymbol("Rp. ");
-	        formatRp.setMonetaryDecimalSeparator(',');
-	        formatRp.setGroupingSeparator('.');
+	protected static String formatDateUTC(String tgl) throws ParseException {
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'+0000'");
+		SimpleDateFormat output = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		Date d = sdf.parse(tgl);
+		String formattedTime = output.format(d);
+		String formattedTimeZone = setTimezone("yyyy-MM-dd HH:mm:ss", 7, formattedTime);
+		return formattedTimeZone;
+	}
 
-	        idr.setDecimalFormatSymbols(formatRp);
+	public String formatIDRCurrency(Double amount) {
+		DecimalFormat idr = (DecimalFormat) DecimalFormat.getCurrencyInstance();
+		DecimalFormatSymbols formatRp = new DecimalFormatSymbols();
 
-	        return idr.format(amount);
-	    }
-	
+		formatRp.setCurrencySymbol("Rp. ");
+		formatRp.setMonetaryDecimalSeparator(',');
+		formatRp.setGroupingSeparator('.');
+
+		idr.setDecimalFormatSymbols(formatRp);
+
+		return idr.format(amount);
+	}
+
 }

@@ -34,5 +34,6 @@ public class InquiryTrfReq implements Serializable {
 	private String cardAcceptorTerminal;
 	private String cardAcceptorMerchantId;
 	private String currency;
+	private String beneficiaryInstitutionCode;
 	
 }

@@ -14,7 +14,7 @@ public class MbApiConstant {
 
     public static final String DATE_FORMAT = "dd-MM-yyyy";
     
-    public static final String DATE_FORMAT_TRX = "ddMMyyyy";
+    public static final String DATE_FORMAT_TRX = "yyyyMMddHHmmss";
 	
 	public static final String NOT_AVAILABLE = "N/A";
 	

@@ -1,5 +1,7 @@
 package com.bsms.service;
 
+import java.util.List;
+
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.core.HttpHeaders;
 
@@ -13,6 +15,7 @@ import org.springframework.web.client.RestTemplate;
 
 import com.bsms.cons.MbApiConstant;
 import com.bsms.domain.CardMapping;
+import com.bsms.domain.Customer;
 import com.bsms.domain.ErrorMessage;
 import com.bsms.domain.MbApiTxLog;
 import com.bsms.domain.MbAppContent;
@@ -34,7 +37,7 @@ import com.bsms.util.TrxIdUtil;
 import com.google.gson.Gson;
 
 @Service("verify")
-public class VerifyServiceImpl implements MbService {
+public class VerifyServiceImpl extends MbBaseServiceImpl implements MbService {
 
 	@Autowired
 	private MbTxLogRepository txLogRepository;
@@ -56,6 +59,8 @@ public class VerifyServiceImpl implements MbService {
 
 	@Value("${verify.url}")
 	private String url;
+	
+	MbApiResp response;
 
 	@Override
 	public MbApiResp process(HttpHeaders header, ContainerRequestContext requestContext, MbApiReq request)
@@ -129,7 +134,8 @@ public class VerifyServiceImpl implements MbService {
 					mustUpdate = (failedPINCount != 0);
 					failedPINCount = 0;
 
-					msisdn = customerRepository.getDataByID(customerId);
+					long msisdnDb = customerRepository.getMsisdnByID(customerId);
+					msisdn = String.valueOf(msisdnDb);
 					customerRepository.updatePINCountById(failedPINCount, msisdn);
 					
 					verifyPinResp.setResponse("Verify PIN succesfull");
@@ -145,7 +151,8 @@ public class VerifyServiceImpl implements MbService {
 			} else {
 				if ("01".equals(verifyPinResp.getResponseCode())) {
 
-					msisdn = customerRepository.getDataByID(customerId); // update failed PIN count
+					long msisdnDb = customerRepository.getMsisdnByID(customerId);
+					msisdn = String.valueOf(msisdnDb);
 					failedPINCount = customerRepository.getFailedPINCountById(customerId);
 					++failedPINCount;
 					
