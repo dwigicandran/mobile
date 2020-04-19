@@ -245,5 +245,40 @@ public class MbJsonUtil {
 		return response;
 
 	}
+	
+	public static MbApiResp createResponseTrf(String rc,String rm,  MbApiContentResp respContent, String trx_id) {
+
+		MbApiResp response = new MbApiResp();
+
+		response.setResponseCode(rc);
+		response.setResponseMessage(rm);
+		response.setResponseContent(respContent);
+		response.setTransactionId(trx_id);
+		return response;
+
+	}
+	
+	public static MbApiResp createResponseBank(String rc,String rm,  MbApiContentResp respContent) {
+
+		MbApiResp response = new MbApiResp();
+
+		response.setResponseCode(rc);
+		response.setResponseMessage(rm);
+		response.setResponseContent(respContent);
+		return response;
+
+	}
+	
+	public static MbApiResp createResponseTrfMethod(String rc,String rm,  MbApiContentResp respContent) {
+
+		MbApiResp response = new MbApiResp();
+
+		response.setResponseCode(rc);
+		response.setResponseMessage(rm);
+		response.setResponseContent(respContent);
+		return response;
+
+	}
+
 
 }

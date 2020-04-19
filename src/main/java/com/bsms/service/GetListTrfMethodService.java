@@ -25,8 +25,6 @@ import com.bsms.cons.MbApiConstant;
 import com.bsms.repository.MbTxLogRepository;
 import com.bsms.restobj.MbApiReq;
 import com.bsms.restobj.MbApiResp;
-import com.bsms.restobjclient.Bank;
-import com.bsms.restobjclient.BankDispResp;
 import com.bsms.restobjclient.TrfMethod;
 import com.bsms.restobjclient.TrfMethodDispResp;
 import com.bsms.util.MbJsonUtil;
