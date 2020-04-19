@@ -1,5 +1,10 @@
 package com.bsms.service;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,10 +24,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import com.bsms.cons.MbApiConstant;
 import com.bsms.domain.MbApiTxLog;
 import com.bsms.repository.MbTxLogRepository;
 import com.bsms.restobj.MbApiReq;
 import com.bsms.restobj.MbApiResp;
+import com.bsms.restobjclient.Bank;
+import com.bsms.restobjclient.BankDispResp;
 import com.bsms.restobjclient.ContentInqTrf;
 import com.bsms.restobjclient.InquiryTrfDispResp;
 import com.bsms.restobjclient.InquiryTrfReq;
@@ -37,6 +45,9 @@ import com.google.gson.Gson;
 @Service("inquiryOnlineTransfer")
 public class MbInquiryOnlineTrfService extends MbBaseServiceImpl implements MbService  {
 
+	@Value("${sql.conf}")
+	private String connectionUrl;
+	
 	@Value("${core.service.inquiryOnlineTransfer}")
     private String inquiryOnlineTransfer;
 	
@@ -109,8 +120,36 @@ public class MbInquiryOnlineTrfService extends MbBaseServiceImpl implements MbSe
 					trf_method="SKN";
 				}
 				
+				String BankName="";
+				
+				try (Connection con = DriverManager.getConnection(connectionUrl);) 
+		        {
+		        	Statement stmt;
+		        	String SQL;
+		        	
+		        	stmt= con.createStatement();
+		        	SQL= "SELECT Code, Jenis, Name FROM Banks with (NOLOCK) INNER JOIN "
+		        			+ "BankPrior ON Code = IdBank where Code ='"+request.getDestinationBank()+"'";
+		            ResultSet rs = stmt.executeQuery(SQL);
+		            
+		            while (rs.next()) 
+	 	            {
+		            	BankName=rs.getString("Name");
+	 	            }
+		            
+		            rs.close();
+		            stmt.close();
+		 	        con.close();
+		        
+		           
+		        } catch (SQLException e) {
+		        	
+		        	MbLogUtil.writeLogError(log, e, e.toString());
+		        	
+		        }
+				
 				List<ContentInqTrf> content = new ArrayList<>();
-				content.add(new ContentInqTrf("Bank Destination",request.getDestinationBank()));
+				content.add(new ContentInqTrf("Bank Destination",BankName));
 				content.add(new ContentInqTrf("Transfer Method",trf_method));
 				content.add(new ContentInqTrf("Amount",request.getAmount()));
 				content.add(new ContentInqTrf("Description",request.getDescription()));
@@ -148,4 +187,3 @@ public class MbInquiryOnlineTrfService extends MbBaseServiceImpl implements MbSe
 	}
 
 }
-
