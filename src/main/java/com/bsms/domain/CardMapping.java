@@ -18,22 +18,22 @@ public class CardMapping {
 	@JsonProperty("ID")
 	private Long ID;
 	
-	@Column(name = "PinOffset")
+	@Column(name = "pinoffset")
 	private String pinoffset;
 	
-	@Column(name = "AccountNumber")
+	@Column(name = "accountnumber")
 	private String accountnumber;
 	
-	@Column(name ="CardNumber")
+	@Column(name ="cardnumber")
 	private String cardnumber;
 	
 	@Column(name ="customerid")
 	private Long customerid;
 	
-	@Column(name ="AccountType")
+	@Column(name ="accounttype")
 	private String accounttype;
 	
-	@Column(name ="BranchCode")
+	@Column(name ="branchcode")
 	private String branchcode;
 	
 	
