@@ -248,9 +248,12 @@ public class MbActivationServiceImpl extends MbBaseServiceImpl implements MbServ
 								
 								String zpkLmk = pinKeyResp.getZpkLmk();
 								
-								// delete jpa
+								// delete customer by customerId
 								System.out.println(customerId + " ::: cust id di security");
 								securityRepository.deleteByCustId(Long.parseLong(customerId));
+								
+								// delete msisdn dari table mb_activation
+								MbActivationRepository.deleteByMsisdn(smsMsisdn);
 								
 								Timestamp ts=new Timestamp(System.currentTimeMillis());  
 					            Date changeTime=ts;
@@ -278,9 +281,6 @@ public class MbActivationServiceImpl extends MbBaseServiceImpl implements MbServ
 								securitySave.setPrivateKey(private_key);
 								securitySave.setMb_PublicKey(public_key);
 								securityRepository.save(securitySave);
-								
-								// delete msisdn dari table mb_activation
-								 MbActivationRepository.deleteByMsisdn(smsMsisdn);
 								
 								ActivationDispResp activationDispResp = new ActivationDispResp();
 								
