@@ -117,10 +117,6 @@ public class MbActivationServiceImpl extends MbBaseServiceImpl implements MbServ
 
 		try {
 
-			String customerId = request.getCustomer_id();
-			
-			System.out.println(customerId);
-			
 			String req_data = request.getRequest_data(); //TODO: check req data dari depan
 
 			GenACUtil genAcUtil = new GenACUtil();
@@ -176,7 +172,7 @@ public class MbActivationServiceImpl extends MbBaseServiceImpl implements MbServ
 						}
 						
 						List<Customer> cust = customerRepository.getByMsisdn(msisdn1, msisdn2);
-						
+						Long customerId = null;
 						String customerName = null;
 						String email = null;
 						String tak = null;
@@ -186,6 +182,7 @@ public class MbActivationServiceImpl extends MbBaseServiceImpl implements MbServ
 						String isReactivation = null;
 						
 						for(Customer getCust : cust) {
+							customerId = getCust.getId();
 							customerName = getCust.getName();
 							email = getCust.getEmail();
 							tak = getCust.getTak();
@@ -194,7 +191,10 @@ public class MbActivationServiceImpl extends MbBaseServiceImpl implements MbServ
 							oldActivationCode = getCust.getActivationcode();
 						}
 						
-						String pinOffset = cardMappingRepository.getPinoffsetByID(customerId);
+						System.out.println(customerName + " ::: NAMA");
+						System.out.println(email + " ::: EMAIL");
+						
+						String pinOffset = cardMappingRepository.getPinoffsetByID(Long.toString(customerId));
 						if(pinOffset == null) {
 							isReactivation = "0";
 						} else {
@@ -232,7 +232,7 @@ public class MbActivationServiceImpl extends MbBaseServiceImpl implements MbServ
 							PINKeyResp pinKeyResp;
 							
 							PINKeyReq pinKeyReq = new PINKeyReq();
-							pinKeyReq.setCustomerId(customerId);
+							pinKeyReq.setCustomerId(Long.toString(customerId));
 							
 							System.out.println(new Gson().toJson(pinKeyReq));
 							
@@ -250,7 +250,7 @@ public class MbActivationServiceImpl extends MbBaseServiceImpl implements MbServ
 								
 								// delete customer by customerId
 								System.out.println(customerId + " ::: cust id di security");
-								securityRepository.deleteByCustId(Long.parseLong(customerId));
+								securityRepository.deleteByCustId(customerId);
 								
 								// delete msisdn dari table mb_activation
 								MbActivationRepository.deleteByMsisdn(smsMsisdn);
@@ -268,7 +268,7 @@ public class MbActivationServiceImpl extends MbBaseServiceImpl implements MbServ
 
 					            //TODO: mandatory field : customerId, status, changeTime, privateKey
 								Security securitySave = new Security();
-								securitySave.setCustomerId(Long.parseLong(customerId));
+								securitySave.setCustomerId(customerId);
 								securitySave.setZpkLmk(zpkLmk);
 								securitySave.setStatus("1");
 								securitySave.setChangeTime(changeTime);
@@ -291,6 +291,7 @@ public class MbActivationServiceImpl extends MbBaseServiceImpl implements MbServ
 								activationDispResp.setPublicKey(public_key);
 								activationDispResp.setSessionId(sessionId);
 								activationDispResp.setIsReactivation(isReactivation);
+								activationDispResp.setEmail(email);
 								
 								response = MbJsonUtil.createResponse(request, activationDispResp,
 				    					new MbApiStatusResp(MbApiConstant.SUCCESS_CODE, MbApiConstant.OK_MESSAGE), MbApiConstant.SUCCESS_CODE, MbApiConstant.SUCCESS_MSG);
