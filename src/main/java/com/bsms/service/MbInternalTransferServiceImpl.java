@@ -10,7 +10,6 @@ import javax.ws.rs.core.HttpHeaders;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
@@ -20,15 +19,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import com.bsms.cons.MbApiConstant;
 import com.bsms.domain.MbApiTxLog;
 import com.bsms.repository.MbTxLogRepository;
 import com.bsms.restobj.MbApiReq;
 import com.bsms.restobj.MbApiResp;
 import com.bsms.restobjclient.ContentIntTrf;
 import com.bsms.restobjclient.InquiryTrfResp;
-
-import com.bsms.restobj.MbApiStatusResp;
 import com.bsms.restobjclient.InternalTrfDispResp;
 import com.bsms.restobjclient.InternalTrfReq;
 import com.bsms.restobjclient.InternalTrfResp;
@@ -36,7 +32,6 @@ import com.bsms.util.LibFunctionUtil;
 import com.bsms.util.MbJsonUtil;
 import com.bsms.util.MbLogUtil;
 import com.bsms.util.RestUtil;
-import com.dto.onlinestatement.Content;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 
@@ -58,14 +53,13 @@ public class MbInternalTransferServiceImpl extends MbBaseServiceImpl implements 
     @Autowired
     private MbTxLogRepository txLogRepository;
     
+  
     RestTemplate restTemplate = new RestTemplate();
     
     MbApiResp mbApiResp;
     
     Double amount;
     String amount_display,date_trx;
-    
-    String accountNumber = "";
 
     Client client = ClientBuilder.newClient();
     
@@ -92,21 +86,24 @@ public class MbInternalTransferServiceImpl extends MbBaseServiceImpl implements 
         internalTrfReq.setAmount(request.getAmount());
         internalTrfReq.setDescription(request.getDescription());
         internalTrfReq.setPan(request.getPan());
+        internalTrfReq.setCardAcceptorTerminal("00307180");
+        internalTrfReq.setCardAcceptorMerchantId(request.getMsisdn());
+        internalTrfReq.setCurrency("360");
         
         System.out.println(new Gson().toJson(internalTrfReq));
         
         try {
-			
+			//=========== Inquiry Trf ============//
         	HttpEntity<?> req = new HttpEntity(internalTrfReq, RestUtil.getHeaders());
         	RestTemplate restTemps = new RestTemplate();
         	String url = inquiryTransfer;
         	
-        	ResponseEntity<InquiryTrfResp> response = restTemps.exchange(url, HttpMethod.POST, req, InquiryTrfResp.class);
+			ResponseEntity<InquiryTrfResp> response = restTemps.exchange(url, HttpMethod.POST, req, InquiryTrfResp.class);
 			InquiryTrfResp inquiryTrfResp = response.getBody();
-
+			
 			System.out.println("::: Inquiry Trf From Back End :::");
 			System.out.println(new Gson().toJson(response.getBody()));
-
+			
 			//=========== Internal Trf ============//
         	req = new HttpEntity(internalTrfReq, RestUtil.getHeaders());
         	restTemps = new RestTemplate();
@@ -117,8 +114,9 @@ public class MbInternalTransferServiceImpl extends MbBaseServiceImpl implements 
         	
         	System.out.println("::: Internal Trf From Back End :::");
 			System.out.println(new Gson().toJson(response_trf.getBody()));
-
-			
+        	
+        	//InternalTrfDispResp internalTrfDispResp = new InternalTrfDispResp();
+        	
         	if("00".equals(internalTrfResp.getResponseCode())) {
         		
         		amount=Double.parseDouble(request.getAmount());
@@ -142,13 +140,14 @@ public class MbInternalTransferServiceImpl extends MbBaseServiceImpl implements 
         				"Success",
         				internalTrfDispResp,trx_id); 
         		
+
+        		
         	} else {
         		System.out.println(internalTrfResp.getResponseCode() + " <<<========== response code error");
         		
         		mbApiResp = MbJsonUtil.createResponseTrf(internalTrfResp.getResponseCode(),
         				internalTrfResp.getContent().getErrorMessage(),
         				null,""); 
-
         	}
         	
         	
@@ -157,7 +156,6 @@ public class MbInternalTransferServiceImpl extends MbBaseServiceImpl implements 
 					e.toString(),
     				null,""); 
 			MbLogUtil.writeLogError(log, "99", e.toString());
-
 		}
         
         txLog.setResponse(mbApiResp);
