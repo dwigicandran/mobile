@@ -4,8 +4,6 @@ import java.util.Date;
 
 import javax.persistence.*;
 
-import org.hibernate.cfg.ImprovedNamingStrategy;
-
 @Entity
 @Table(name = "Security")
 public class Security {

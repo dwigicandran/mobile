@@ -46,8 +46,8 @@ public class MbBaseServiceImpl {
         response.setResponseCode(errCode);
         response.setResponseMessage(errDesc);
 
-        return response;
-        // return new MbServiceException(MbErrorUtil.createError(errCode, errDesc));
+        // return response;
+        return new MbServiceException(MbErrorUtil.createError(errCode, errDesc));
     }
 	
 }

@@ -22,7 +22,9 @@ public class TrxIdUtil {
 			result += sb.toString();
 			return result;
 		} catch (Exception ex) {
+			ex.printStackTrace();
 			return "fail";
 		}
 	}
+
 }

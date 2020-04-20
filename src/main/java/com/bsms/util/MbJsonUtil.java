@@ -1,6 +1,7 @@
 package com.bsms.util;
 
 import java.util.Date;
+import java.util.List;
 
 import com.bsms.cons.MbApiConstant;
 import com.bsms.cons.MbConstant;
@@ -110,7 +111,6 @@ public class MbJsonUtil {
 
 		response.setResponseTime(MbDateFormatUtil.formatTime(new Date()));
 		response.setResponseCode(responseCode);
-		//response.setResponseDescription(responseDesc);
 		response.setResponseMessage(responseDesc);
 		return response;
 
@@ -184,8 +184,6 @@ public class MbJsonUtil {
 
 		MbApiResp response = new MbApiResp();
 
-//		response.setClientId(MbApiConstant.NOT_AVAILABLE);
-//		response.setTxId(MbApiConstant.NOT_AVAILABLE);
 		response.setResponseTime(MbDateFormatUtil.formatTime(new Date()));
 //		response.setRespContent(null);
 		response.setRespStatus(new MbApiStatusResp(MbConstant.ERROR_NUM_UNKNOWN, e.toString()));
@@ -223,5 +221,64 @@ public class MbJsonUtil {
 		return response;
 
 	}
+	
+	public static MbApiResp createResponseCustom(MbApiReq request, MbApiStatusResp[] mbApiStatusResps) {
+
+		MbApiResp response = new MbApiResp();
+
+		response.setChannelId(request.getChannelId());
+		response.setChannelType(request.getChannelType());
+		response.setTraceNum(request.getTraceNum());
+		response.setResponseTime(MbDateFormatUtil.formatTime(new Date()));
+		
+		String respCode = null;
+		String respDesc = null;
+		
+		for(MbApiStatusResp statusResp : mbApiStatusResps) {
+			respCode = statusResp.getRespCode();
+			respDesc = statusResp.getRespDesc();
+		}
+		
+		response.setResponseCode(respCode);
+		response.setResponseMessage(respDesc);
+
+		return response;
+
+	}
+	
+	public static MbApiResp createResponseTrf(String rc,String rm,  MbApiContentResp respContent, String trx_id) {
+
+		MbApiResp response = new MbApiResp();
+
+		response.setResponseCode(rc);
+		response.setResponseMessage(rm);
+		response.setResponseContent(respContent);
+		response.setTransactionId(trx_id);
+		return response;
+
+	}
+	
+	public static MbApiResp createResponseBank(String rc,String rm,  MbApiContentResp respContent) {
+
+		MbApiResp response = new MbApiResp();
+
+		response.setResponseCode(rc);
+		response.setResponseMessage(rm);
+		response.setResponseContent(respContent);
+		return response;
+
+	}
+	
+	public static MbApiResp createResponseTrfMethod(String rc,String rm,  MbApiContentResp respContent) {
+
+		MbApiResp response = new MbApiResp();
+
+		response.setResponseCode(rc);
+		response.setResponseMessage(rm);
+		response.setResponseContent(respContent);
+		return response;
+
+	}
+
 
 }

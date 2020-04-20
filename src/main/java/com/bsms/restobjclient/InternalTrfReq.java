@@ -29,5 +29,9 @@ public class InternalTrfReq implements Serializable  {
 	private String description;
 	private String stan;
 	private String pan;
+	private String cardAcceptorTerminal;
+	private String cardAcceptorMerchantId;
+	private String currency;
+
 	
 }

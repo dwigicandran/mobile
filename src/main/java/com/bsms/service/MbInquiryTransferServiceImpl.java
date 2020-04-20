@@ -1,9 +1,14 @@
 package com.bsms.service;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.core.HttpHeaders;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -19,12 +24,14 @@ import com.bsms.domain.MbApiTxLog;
 import com.bsms.repository.MbTxLogRepository;
 import com.bsms.restobj.MbApiReq;
 import com.bsms.restobj.MbApiResp;
-import com.bsms.restobj.MbApiStatusResp;
+import com.bsms.restobjclient.ContentInqTrf;
 import com.bsms.restobjclient.InquiryTrfDispResp;
 import com.bsms.restobjclient.InquiryTrfReq;
 import com.bsms.restobjclient.InquiryTrfResp;
 import com.bsms.util.MbJsonUtil;
 import com.bsms.util.RestUtil;
+import com.bsms.util.LibFunctionUtil;
+import com.bsms.util.MbLogUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 
@@ -54,32 +61,34 @@ public class MbInquiryTransferServiceImpl extends MbBaseServiceImpl implements M
     String amount = "";
 
     Client client = ClientBuilder.newClient();
+    
+    private static Logger log = LoggerFactory.getLogger(MbInquiryTransferServiceImpl.class);
 	
 	@Override
 	public MbApiResp process(HttpHeaders header, ContainerRequestContext requestContext, MbApiReq request)
 			throws Exception {
 		
+		LibFunctionUtil libFunct=new LibFunctionUtil();
+		String trx_id=libFunct.getTransactionID(6);
+		
 		MbApiTxLog txLog = new MbApiTxLog();
         txLogRepository.save(txLog);
         
         InquiryTrfReq inquiryTrfReq = new InquiryTrfReq();
-        String trx_id=TrxIdUtil.getTransactionID(6);
         
-        inquiryTrfReq.setCorrelationId(trx_id);//addition by Dodo
-		inquiryTrfReq.setTransactionId(trx_id);//addition by Dodo
-        inquiryTrfReq.setDeliveryChannel("6027");//addition by Dodo
-        inquiryTrfReq.setSourceAccountNumber(request.getAccount_number());//addition by Dodo
-        inquiryTrfReq.setSourceAccountName(request.getSourceAccountName());
+        inquiryTrfReq.setCorrelationId(trx_id);
+		inquiryTrfReq.setTransactionId(trx_id);
+        inquiryTrfReq.setDeliveryChannel("6027");
+        inquiryTrfReq.setSourceAccountNumber(request.getAccount_number());
+        inquiryTrfReq.setSourceAccountName(request.getCustomerName());
         inquiryTrfReq.setDestinationAccountNumber(request.getDestinationAccountNumber());
-        inquiryTrfReq.setDestinationAccountName(request.getDestinationAccountName());
-        //inquiryTrfReq.setEncryptedPinBlock(request.getEncryptedPinBlock());
-        inquiryTrfReq.setAmount(request.getAmount());
+        inquiryTrfReq.setDestinationAccountName("");
+        inquiryTrfReq.setAmount(request.getAmount());	
         inquiryTrfReq.setDescription(request.getDescription());
-        //inquiryTrfReq.setStan(request.getStan());
         inquiryTrfReq.setPan(request.getPan());
-        inquiryTrfReq.setCardAcceptorTerminal("00307180");//addition by Dodo
-        inquiryTrfReq.setCardAcceptorMerchantId(request.getMsisdn());//addition by Dodo
-        inquiryTrfReq.setCurrency("360");//addition by Dodo
+        inquiryTrfReq.setCardAcceptorTerminal("00307180");
+        inquiryTrfReq.setCardAcceptorMerchantId(request.getMsisdn());
+        inquiryTrfReq.setCurrency("360");
 
         System.out.println(new Gson().toJson(inquiryTrfReq));
         
@@ -92,27 +101,42 @@ public class MbInquiryTransferServiceImpl extends MbBaseServiceImpl implements M
 			ResponseEntity<InquiryTrfResp> response = restTemps.exchange(url, HttpMethod.POST, req, InquiryTrfResp.class);
 			InquiryTrfResp inquiryTrfResp = response.getBody();
 			
-			InquiryTrfDispResp inquiryTrfDispResp = new InquiryTrfDispResp();
+			System.out.println("::: Inquiry Trf From Back End :::");
+			System.out.println(new Gson().toJson(response.getBody()));
+
 			
 			if("00".equals(inquiryTrfResp.getResponseCode())) {
 				
-				inquiryTrfDispResp.setCorrelationId(inquiryTrfResp.getCorrelationId());
-        		inquiryTrfDispResp.setTransactionId(inquiryTrfResp.getTransactionId());
-        		inquiryTrfDispResp.setContent(inquiryTrfResp.getContent());
-        		
-        		mbApiResp = MbJsonUtil.createResponse(request, inquiryTrfDispResp,
-    					new MbApiStatusResp(inquiryTrfResp.getResponseCode(), MbApiConstant.OK_MESSAGE)); 
+				List<ContentInqTrf> content = new ArrayList<>();
+				content.add(new ContentInqTrf("Amount",request.getAmount()));
+				content.add(new ContentInqTrf("Description",request.getDescription()));
+				
+				InquiryTrfDispResp inquiryTrfDispResp = new InquiryTrfDispResp(request.getAccount_number(),
+						request.getCustomerName(),
+						request.getDestinationAccountNumber(),
+						inquiryTrfResp.getContent().getDestinationAccountName(),
+								content,trx_id);
+
+				mbApiResp = MbJsonUtil.createResponseTrf(inquiryTrfResp.getResponseCode(),
+        				"Success",
+        				inquiryTrfDispResp,trx_id); 
+
 				 
 				
 			} else {
 				System.out.println(inquiryTrfResp.getResponseCode() + " <<<========== response code error");
-        		String responseCode = inquiryTrfResp.getContent().getErrorCode();
-    			String responseDesc = inquiryTrfResp.getContent().getErrorMessage();
-    			mbApiResp = MbJsonUtil.createResponse(request, new MbApiStatusResp(responseCode, responseDesc));
+				mbApiResp = MbJsonUtil.createResponseTrf(inquiryTrfResp.getResponseCode(),
+    					inquiryTrfResp.getContent().getErrorMessage(),
+        				null,""); 
+
 				
 			}
 		} catch (Exception e) {
-			mbApiResp = MbJsonUtil.createExceptionSL(request, e);
+			mbApiResp = MbJsonUtil.createResponseTrf("99",
+					e.toString(),
+    				null,""); 
+			MbLogUtil.writeLogError(log, "99", e.toString());
+
 		}
 
         txLog.setResponse(mbApiResp);

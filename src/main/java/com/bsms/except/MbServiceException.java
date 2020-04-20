@@ -12,6 +12,12 @@ public class MbServiceException extends RuntimeException {
         super();
         this.errors = errors;
     }
+    
+    public MbServiceException(String responseCode, String responseMessage) {
+        super();
+        this.responseCode = responseCode;
+        this.responseMessage = responseMessage;
+    }
 
     public MbApiStatusResp[] getErrors() {
         return errors;

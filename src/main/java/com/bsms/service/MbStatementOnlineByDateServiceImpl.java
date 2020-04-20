@@ -6,8 +6,6 @@ import java.util.Date;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.core.HttpHeaders;
 
-import org.joda.time.Days;
-import org.joda.time.Period;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
@@ -52,24 +50,24 @@ public class MbStatementOnlineByDateServiceImpl extends MbBaseServiceImpl implem
 
 	@Autowired
 	private MbAppContentRepository mbAppContentRepository;
-	
+
 	SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMdd");
 
 	RestTemplate restTemplate = new RestTemplate();
 
-	private String responseDesc;
-	private String responseCode;
-	private String startDate;
-	private String endDate;
-
-	MbApiResp mbApiResp;
-	
 	public MbApiResp process(HttpHeaders header, ContainerRequestContext requestContext, MbApiReq request)
 			throws Exception {
 
 		MbApiTxLog txLog = new MbApiTxLog();
 		txLogRepository.save(txLog);
 
+		String responseDesc = null;
+		String responseCode = null;
+		String startDate = null;
+		String endDate = null;
+
+		MbApiResp mbApiResp;
+		
 		OnlineStatementReq onlineStatementReq = new OnlineStatementReq();
 
 		onlineStatementReq.setCorrelationId(request.getCorrelation_id());
@@ -80,68 +78,71 @@ public class MbStatementOnlineByDateServiceImpl extends MbBaseServiceImpl implem
 		onlineStatementReq.setAccountNumber(request.getAccount_number());
 		onlineStatementReq.setStartDate(request.getStart_date());
 		onlineStatementReq.setEndDate(request.getEnd_date());
-		
+
 		startDate = request.getStart_date();
 		endDate = request.getEnd_date();
 
 		Date startDates = formatter.parse(startDate);
 		Date endDates = formatter.parse(endDate);
-		
+
 		long diff = endDates.getTime() - startDates.getTime();
 		long diffMonths = (long) (diff / (60 * 60 * 1000 * 24 * 30.41666666));
-		
+
 		System.out.print(diffMonths + " month, ");
-		
-		if(diffMonths >= 1) {
+
+		if (diffMonths >= 1) {
 			// TODO: throw error
-			// throw createSlServiceException("99", "Range Tanggal Tidak Boleh Lebih dari 1 Bulan", txLog, txLogRepository);
+			// throw createSlServiceException("99", "Range Tanggal Tidak Boleh Lebih dari 1
+			// Bulan", txLog, txLogRepository);
 			responseDesc = "Range Tanggal Tidak Boleh Lebih dari 1 Bulan";
 			responseCode = MbApiConstant.ERR_CODE;
 			mbApiResp = MbJsonUtil.createResponseDesc(request, responseCode, responseDesc);
 		} else {
 			System.out.println(new Gson().toJson(onlineStatementReq));
 
-	    	try {
-				
-	    		HttpEntity<?> req = new HttpEntity(onlineStatementReq, RestUtil.getHeaders());
-	        	
-	        	RestTemplate restTemps = new RestTemplate();
+			try {
 
-	        	String url = statementOnline;
-	        	ResponseEntity<OnlineStatementResp> response = restTemps.exchange(url, HttpMethod.POST, req, OnlineStatementResp.class);
-	    		
-	        	OnlineStatementResp onlineStatementResp = response.getBody();
-	        	System.out.println(new Gson().toJson(response.getBody()));
-	        	
-	        	if("00".equals(onlineStatementResp.getResponseCode())) {
-	        		
-	        		OnlineStatementDispResp onlineStatementDispResp = new OnlineStatementDispResp();
-	        		
-	        		onlineStatementDispResp.setTransactionId(TrxIdUtil.getTransactionID(6));
-	        		onlineStatementDispResp.setPeriode(onlineStatementResp.getContent().getPeriode());
-	        		onlineStatementDispResp.setyHEAD1FIX(onlineStatementResp.getContent().getyHEAD1FIX());
-	        		onlineStatementDispResp.setAccountName(onlineStatementResp.getContent().getAccountName());
-	        		onlineStatementDispResp.setCustAdd(onlineStatementResp.getContent().getCustAdd());
-	        		onlineStatementDispResp.setCustAdd2(onlineStatementResp.getContent().getCustAdd2());
-	        		onlineStatementDispResp.setCustAdd3(onlineStatementResp.getContent().getCustAdd3());
-	        		onlineStatementDispResp.setSaldoAwal(onlineStatementResp.getContent().getSaldoAwal());
-	        		onlineStatementDispResp.setTotalDebet(onlineStatementResp.getContent().getTotalDebet());
-	        		onlineStatementDispResp.setTotalKredit(onlineStatementResp.getContent().getTotalKredit());
-	        		onlineStatementDispResp.setSaldoAkhir(onlineStatementResp.getContent().getSaldoAkhir());
-	        		
-	        		onlineStatementDispResp.setDetailTransaksi(onlineStatementResp.getContent().getDetailTransaksi());
-	        		
-	            	mbApiResp = MbJsonUtil.createResponse(request, onlineStatementDispResp,
-	    					new MbApiStatusResp(onlineStatementResp.getResponseCode(), MbApiConstant.OK_MESSAGE), onlineStatementResp.getResponseCode(), MbApiConstant.SUCCESS_MSG);
-	        		
-	        	} else {
-	        		
-	        		MbAppContent mbAppContent = mbAppContentRepository.findByLangIdAndLanguage("60002", "id");
-	    			responseDesc = mbAppContent.getDescription();
-	    			responseCode = MbApiConstant.ERR_CODE;
-	    			mbApiResp = MbJsonUtil.createResponseDesc(request, responseCode, responseDesc);
-	        	}
-	    		
+				HttpEntity<?> req = new HttpEntity(onlineStatementReq, RestUtil.getHeaders());
+
+				RestTemplate restTemps = new RestTemplate();
+
+				String url = statementOnline;
+				ResponseEntity<OnlineStatementResp> response = restTemps.exchange(url, HttpMethod.POST, req,
+						OnlineStatementResp.class);
+
+				OnlineStatementResp onlineStatementResp = response.getBody();
+				System.out.println(new Gson().toJson(response.getBody()));
+
+				if ("00".equals(onlineStatementResp.getResponseCode())) {
+
+					OnlineStatementDispResp onlineStatementDispResp = new OnlineStatementDispResp();
+
+					onlineStatementDispResp.setTransactionId(TrxIdUtil.getTransactionID(6));
+					onlineStatementDispResp.setPeriode(onlineStatementResp.getContent().getPeriode());
+					onlineStatementDispResp.setyHEAD1FIX(onlineStatementResp.getContent().getyHEAD1FIX());
+					onlineStatementDispResp.setAccountName(onlineStatementResp.getContent().getAccountName());
+					onlineStatementDispResp.setCustAdd(onlineStatementResp.getContent().getCustAdd());
+					onlineStatementDispResp.setCustAdd2(onlineStatementResp.getContent().getCustAdd2());
+					onlineStatementDispResp.setCustAdd3(onlineStatementResp.getContent().getCustAdd3());
+					onlineStatementDispResp.setSaldoAwal(onlineStatementResp.getContent().getSaldoAwal());
+					onlineStatementDispResp.setTotalDebet(onlineStatementResp.getContent().getTotalDebet());
+					onlineStatementDispResp.setTotalKredit(onlineStatementResp.getContent().getTotalKredit());
+					onlineStatementDispResp.setSaldoAkhir(onlineStatementResp.getContent().getSaldoAkhir());
+
+					onlineStatementDispResp.setDetailTransaksi(onlineStatementResp.getContent().getDetailTransaksi());
+
+					mbApiResp = MbJsonUtil.createResponse(request, onlineStatementDispResp,
+							new MbApiStatusResp(onlineStatementResp.getResponseCode(), MbApiConstant.OK_MESSAGE),
+							onlineStatementResp.getResponseCode(), MbApiConstant.SUCCESS_MSG);
+
+				} else {
+
+					MbAppContent mbAppContent = mbAppContentRepository.findByLangIdAndLanguage("60002", "id");
+					responseDesc = mbAppContent.getDescription();
+					responseCode = MbApiConstant.ERR_CODE;
+					mbApiResp = MbJsonUtil.createResponseDesc(request, responseCode, responseDesc);
+				}
+
 			} catch (Exception e) {
 				MbAppContent mbAppContent = mbAppContentRepository.findByLangIdAndLanguage("60002", "id");
 				responseDesc = mbAppContent.getDescription();
@@ -149,7 +150,7 @@ public class MbStatementOnlineByDateServiceImpl extends MbBaseServiceImpl implem
 				mbApiResp = MbJsonUtil.createResponseDesc(request, responseCode, responseDesc);
 			}
 		}
-		
+
 		txLog.setResponse(mbApiResp);
 		txLogRepository.save(txLog);
 

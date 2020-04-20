@@ -14,7 +14,7 @@ public class MbApiConstant {
 
     public static final String DATE_FORMAT = "dd-MM-yyyy";
     
-    public static final String DATE_FORMAT_TRX = "ddMMyyyy";
+    public static final String DATE_FORMAT_TRX = "yyyyMMddHHmmss";
 	
 	public static final String NOT_AVAILABLE = "N/A";
 	
@@ -45,6 +45,10 @@ public class MbApiConstant {
     public static final String LOGIN_PATH = "api/services/login";
     
     public static final String LOGOUT_PATH = "api/services/logout";
+    
+    public static final String STATUS_FAILED = "FAIL";
+    
+    public static final String DEFAULT_LANG = "id";
 
     public static char[] CHAR_FOR_RANDOMIZE = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890!@#$^&*+?/".toCharArray();
 
