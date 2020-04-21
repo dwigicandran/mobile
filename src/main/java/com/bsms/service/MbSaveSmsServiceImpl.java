@@ -24,7 +24,7 @@ import com.bsms.restobj.MbApiReq;
 import com.bsms.restobj.MbApiResp;
 import com.bsms.util.MbJsonUtil;
 
-@Service("saveSmsActivation")
+@Service("saveSMSActivation")
 public class MbSaveSmsServiceImpl extends MbBaseServiceImpl implements MbService {
 
 	@Autowired
