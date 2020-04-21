@@ -43,6 +43,11 @@ import com.google.gson.Gson;
 @Service("onlineTransfer")
 public class MbOnlineTransferServiceImpl extends MbBaseServiceImpl implements MbService {
 
+	static int FEAT_SKN = 0x01;
+	  static int FEAT_BERSAMA = 0x02;
+	  static int FEAT_PRIMA = 0x04;
+	  static int FEAT_RTGS = 0x08;
+	  
 	@Value("${sql.conf}")
 	private String connectionUrl;
 	
@@ -76,7 +81,56 @@ public class MbOnlineTransferServiceImpl extends MbBaseServiceImpl implements Mb
 	@Override
 	public MbApiResp process(HttpHeaders header, ContainerRequestContext requestContext, MbApiReq request)
 			throws Exception {
+		String BankName="";
+		String service_code="";
+		String via_atm="";
+		 int feature = 0;
+		 
+		//========== get Bank Data ==============//  
+			try (Connection con = DriverManager.getConnection(connectionUrl);) 
+	        {
+	        	Statement stmt;
+	        	String SQL;
+	        	
+	        	stmt= con.createStatement();
+	        	SQL= "SELECT Code, Jenis,Feature Name FROM Banks with (NOLOCK) INNER JOIN "
+	        			+ "BankPrior ON Code = IdBank where Code ='"+request.getDestinationBank()+"'";
+	            ResultSet rs = stmt.executeQuery(SQL);
+	            
+	            while (rs.next()) 
+		            {
+	            	BankName=rs.getString("Name");
+	            	feature=Integer.parseInt(rs.getString("Feature"));
+		            }
+	            
+	            rs.close();
+	            stmt.close();
+	 	        con.close();
+	        
+	           
+	        } catch (SQLException e) {
+	        	
+	        	MbLogUtil.writeLogError(log, e, e.toString());
+	        	
+	        }
+			
 		
+			//========== define service code ==============//  
+			if (((feature & FEAT_PRIMA) == FEAT_PRIMA)) {
+	            // ATM Prima
+	            service_code = "0500";
+	            via_atm = "Prima";
+	          } else if (((feature & FEAT_BERSAMA) == FEAT_BERSAMA)) {
+	            // ATM Bersama
+	            service_code = "0200";
+	            via_atm = "ATM Bersama";
+	          }
+	          else {
+	            // ATM Prima by Default
+	            service_code = "0500";
+	            via_atm = "Prima";
+	          }
+		 
 		LibFunctionUtil libFunct=new LibFunctionUtil();
 		String trx_id=libFunct.getTransactionID(6);
 		
@@ -98,6 +152,8 @@ public class MbOnlineTransferServiceImpl extends MbBaseServiceImpl implements Mb
         inquiryTrfReq.setCardAcceptorMerchantId(request.getMsisdn());
         inquiryTrfReq.setCurrency("360");
         inquiryTrfReq.setBeneficiaryInstitutionCode(request.getDestinationBank());
+        inquiryTrfReq.setServiceCode(service_code);
+        inquiryTrfReq.setReferenceNumber(request.getRef_no());
         
         System.out.println(new Gson().toJson(inquiryTrfReq));
         
@@ -128,40 +184,13 @@ public class MbOnlineTransferServiceImpl extends MbBaseServiceImpl implements Mb
         		amount_display = libFunct.formatIDRCurrency(amount);
         		date_trx = LibFunctionUtil.getDatetime("dd/MM/yyyy HH:mm:ss");
         		
-        		String BankName="";
-				
-				try (Connection con = DriverManager.getConnection(connectionUrl);) 
-		        {
-		        	Statement stmt;
-		        	String SQL;
-		        	
-		        	stmt= con.createStatement();
-		        	SQL= "SELECT Code, Jenis, Name FROM Banks with (NOLOCK) INNER JOIN "
-		        			+ "BankPrior ON Code = IdBank where Code ='"+request.getDestinationBank()+"'";
-		            ResultSet rs = stmt.executeQuery(SQL);
-		            
-		            while (rs.next()) 
-	 	            {
-		            	BankName=rs.getString("Name");
-	 	            }
-		            
-		            rs.close();
-		            stmt.close();
-		 	        con.close();
-		        
-		           
-		        } catch (SQLException e) {
-		        	
-		        	MbLogUtil.writeLogError(log, e, e.toString());
-		        	
-		        }
-				
         		List<ContentIntTrf> content = new ArrayList<>();
 				content.add(new ContentIntTrf("Status Transaksi","Berhasil",""));
 				content.add(new ContentIntTrf("Dari Rekening",request.getAccount_number()+" - Bank Syariah Mandiri",request.getCustomerName()));
 				content.add(new ContentIntTrf("Ke Rekening",request.getDestinationAccountNumber()+" - "+BankName,inquiryTrfResp.getContent().getDestinationAccountName()));
 				content.add(new ContentIntTrf("Jumlah",amount_display,""));
 				content.add(new ContentIntTrf("Description",request.getDescription(),""));
+				content.add(new ContentIntTrf("Referrence Number",request.getRef_no(),""));
 				
 				OnlineTrfDispResp onlineTrfDispResp = new OnlineTrfDispResp(OnlineTrfResp.getContent().gettransactionReference(),
 						date_trx,
