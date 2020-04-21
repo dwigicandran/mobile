@@ -45,6 +45,11 @@ import com.google.gson.Gson;
 @Service("inquiryOnlineTransfer")
 public class MbInquiryOnlineTrfService extends MbBaseServiceImpl implements MbService  {
 
+	static int FEAT_SKN = 0x01;
+	  static int FEAT_BERSAMA = 0x02;
+	  static int FEAT_PRIMA = 0x04;
+	  static int FEAT_RTGS = 0x08;
+	  
 	@Value("${sql.conf}")
 	private String connectionUrl;
 	
@@ -71,6 +76,57 @@ public class MbInquiryOnlineTrfService extends MbBaseServiceImpl implements MbSe
 	@Override
 	public MbApiResp process(HttpHeaders header, ContainerRequestContext requestContext, MbApiReq request)
 			throws Exception {
+		
+		String BankName="";
+		String service_code="";
+		String via_atm="";
+		 int feature = 0;
+		
+		//========== get Bank Data ==============//  
+		try (Connection con = DriverManager.getConnection(connectionUrl);) 
+        {
+        	Statement stmt;
+        	String SQL;
+        	
+        	stmt= con.createStatement();
+        	SQL= "SELECT Code, Jenis,Feature Name FROM Banks with (NOLOCK) INNER JOIN "
+        			+ "BankPrior ON Code = IdBank where Code ='"+request.getDestinationBank()+"'";
+            ResultSet rs = stmt.executeQuery(SQL);
+            
+            while (rs.next()) 
+	            {
+            	BankName=rs.getString("Name");
+            	feature=Integer.parseInt(rs.getString("Feature"));
+	            }
+            
+            rs.close();
+            stmt.close();
+ 	        con.close();
+        
+           
+        } catch (SQLException e) {
+        	
+        	MbLogUtil.writeLogError(log, e, e.toString());
+        	
+        }
+		
+	
+		//========== define service code ==============//  
+		if (((feature & FEAT_PRIMA) == FEAT_PRIMA)) {
+            // ATM Prima
+            service_code = "0500";
+            via_atm = "Prima";
+          } else if (((feature & FEAT_BERSAMA) == FEAT_BERSAMA)) {
+            // ATM Bersama
+            service_code = "0200";
+            via_atm = "ATM Bersama";
+          }
+          else {
+            // ATM Prima by Default
+            service_code = "0500";
+            via_atm = "Prima";
+          }
+		
 		LibFunctionUtil libFunct=new LibFunctionUtil();
 		String trx_id=libFunct.getTransactionID(6);
 		
@@ -92,6 +148,8 @@ public class MbInquiryOnlineTrfService extends MbBaseServiceImpl implements MbSe
         inquiryTrfReq.setCardAcceptorMerchantId(request.getMsisdn());
         inquiryTrfReq.setCurrency("360");
         inquiryTrfReq.setBeneficiaryInstitutionCode(request.getDestinationBank());
+        inquiryTrfReq.setServiceCode(service_code);
+        inquiryTrfReq.setReferenceNumber(request.getRef_no());
 
     	System.out.println("::: Inquiry Trf Online Request to Back End :::");
         System.out.println(new Gson().toJson(inquiryTrfReq));
@@ -120,39 +178,12 @@ public class MbInquiryOnlineTrfService extends MbBaseServiceImpl implements MbSe
 					trf_method="SKN";
 				}
 				
-				String BankName="";
-				
-				try (Connection con = DriverManager.getConnection(connectionUrl);) 
-		        {
-		        	Statement stmt;
-		        	String SQL;
-		        	
-		        	stmt= con.createStatement();
-		        	SQL= "SELECT Code, Jenis, Name FROM Banks with (NOLOCK) INNER JOIN "
-		        			+ "BankPrior ON Code = IdBank where Code ='"+request.getDestinationBank()+"'";
-		            ResultSet rs = stmt.executeQuery(SQL);
-		            
-		            while (rs.next()) 
-	 	            {
-		            	BankName=rs.getString("Name");
-	 	            }
-		            
-		            rs.close();
-		            stmt.close();
-		 	        con.close();
-		        
-		           
-		        } catch (SQLException e) {
-		        	
-		        	MbLogUtil.writeLogError(log, e, e.toString());
-		        	
-		        }
-				
 				List<ContentInqTrf> content = new ArrayList<>();
 				content.add(new ContentInqTrf("Bank Destination",BankName));
 				content.add(new ContentInqTrf("Transfer Method",trf_method));
 				content.add(new ContentInqTrf("Amount",request.getAmount()));
 				content.add(new ContentInqTrf("Description",request.getDescription()));
+				content.add(new ContentInqTrf("Referrence Number",request.getRef_no()));
 				
 				InquiryTrfDispResp inquiryTrfDispResp = new InquiryTrfDispResp(request.getAccount_number(),
 						request.getCustomerName(),
