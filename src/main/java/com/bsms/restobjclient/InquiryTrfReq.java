@@ -36,4 +36,7 @@ public class InquiryTrfReq implements Serializable {
 	private String currency;
 	private String beneficiaryInstitutionCode;
 	
+	private String serviceCode;
+	private String referenceNumber;
+	
 }

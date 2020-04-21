@@ -103,6 +103,7 @@ public class MbApiReq implements Serializable {
 	private String customer_id;
 	private String destinationBank;
 	private String trf_method;
+	private String ref_no;
 
 	private Object content;
 	private MbApiContentReq reqContent;
