@@ -93,7 +93,7 @@ public class MbOnlineTransferServiceImpl extends MbBaseServiceImpl implements Mb
 	        	String SQL;
 	        	
 	        	stmt= con.createStatement();
-	        	SQL= "SELECT Code, Jenis,Feature Name FROM Banks with (NOLOCK) INNER JOIN "
+	        	SQL= "SELECT Code, Jenis,Feature, Name FROM Banks with (NOLOCK) INNER JOIN "
 	        			+ "BankPrior ON Code = IdBank where Code ='"+request.getDestinationBank()+"'";
 	            ResultSet rs = stmt.executeQuery(SQL);
 	            
