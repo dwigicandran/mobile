@@ -197,9 +197,9 @@ public class MbActivationServiceImpl extends MbBaseServiceImpl implements MbServ
 
 					String pinOffset = cardMappingRepository.getPinoffsetByID(Long.toString(customerId));
 					if (pinOffset == null) {
-						isReactivation = "0";
+						isReactivation = "0"; // activation 2.1 : 
 					} else {
-						isReactivation = "1";
+						isReactivation = "1"; // activation 2.2
 					}
 
 					System.out.println(isReactivation + " ::: pinOffset");
@@ -245,9 +245,21 @@ public class MbActivationServiceImpl extends MbBaseServiceImpl implements MbServ
 						
 						// update data table
 						MbSmsActivation smsActivationUpd = mbSmsActivationRepository.findByMsisdnAndIsverifiedAndDateReceived(smsMsisdn, isVerified, dateReceived);
+						System.out.println(smsActivationUpd.getIsverified() + " ::: CEK IS VERIFIED DARI DB");
+						System.out.println(smsActivationUpd.getMessage() + " ::: CEK MESSAGE DARI DB");
+						
 						smsActivationUpd.setIsverified("1");
 						smsActivationUpd.setDateVerified(dateVerified);
 						mbSmsActivationRepository.save(smsActivationUpd);
+						
+//						String isVerifiedUpd = "1";
+//						mbSmsActivationRepository.updateSmsAct(isVerifiedUpd, dateVerified, smsMsisdn, isVerified, dateReceived);
+						
+						mbSmsActivationRepository.updateSmsAct(dateVerified, smsMsisdn, isVerified, dateReceived);
+						
+						/////////////////////////////////////////////////
+						
+						System.out.println(dateVerified + " ::: date verified ");
 						
 						// request ke hsm pinkeyRetrieval
 						PINKeyResp pinKeyResp;
@@ -267,6 +279,7 @@ public class MbActivationServiceImpl extends MbBaseServiceImpl implements MbServ
 							
 							System.out.println(new Gson().toJson(responseEntity));
 							
+							String clearZPK = pinKeyResp.getClearZPK();
 							String zpkLmk = pinKeyResp.getZpkLmk();
 							
 							// delete customer by customerId
@@ -305,9 +318,9 @@ public class MbActivationServiceImpl extends MbBaseServiceImpl implements MbServ
 							
 							ActivationDispResp activationDispResp = new ActivationDispResp();
 							
-							activationDispResp.setCustomerId(customerId);
+							activationDispResp.setCustomerId(Long.toString(customerId));
 							activationDispResp.setName(customerName);
-							activationDispResp.setClearZPK(zpkLmk);
+							activationDispResp.setClearZpk(clearZPK);
 							activationDispResp.setResponseCode(MbApiConstant.SUCCESS_CODE);
 							activationDispResp.setPublicKey(public_key);
 							activationDispResp.setSessionId(sessionId);

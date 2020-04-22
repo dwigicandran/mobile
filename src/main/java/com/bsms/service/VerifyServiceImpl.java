@@ -81,6 +81,8 @@ public class VerifyServiceImpl extends MbBaseServiceImpl implements MbService {
 		MbApiResp mbApiResp;
 		
 		VerifyPinReq verifyPinReq = new VerifyPinReq();
+		
+		System.out.println(request.getSessionId() + " ::: SESSION ID");
 
 		Security security = securityRepository.findByMbSessionId(request.getSessionId());
 		customerId = security.getCustomerId();
