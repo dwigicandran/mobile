@@ -14,10 +14,11 @@ public interface CardmappingRepository extends CrudRepository<CardMapping, Long>
 	
 	CardMapping findOneByCustomeridAndAccountnumber(Long customerId, String accountNumber);
 	
+	CardMapping findTopByCustomerid(Long customerId);
+	
 	List<CardMapping> findAccountnumberByCustomerid(Long customerId);
 	
 	@Query(value = "select top 1 pinoffset from cardmapping with (nolock) where customerid= :ID", nativeQuery = true)
 	String getPinoffsetByID(@Param("ID") String id);
-	
 	
 }
