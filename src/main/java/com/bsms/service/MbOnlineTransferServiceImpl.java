@@ -66,13 +66,22 @@ public class MbOnlineTransferServiceImpl extends MbBaseServiceImpl implements Mb
     @Autowired
     private MbTxLogRepository txLogRepository;
     
+    @Value("${fee.bersama}")
+    private double fee_bersama;
+    
+    @Value("${fee.prima}")
+    private double fee_prima;
+    
+    @Value("${fee.skn}")
+    private double fee_skn;
+    
   
     RestTemplate restTemplate = new RestTemplate();
     
     MbApiResp mbApiResp;
     
-    Double amount;
-    String amount_display,date_trx;
+    Double amount,fee_admin;
+    String amount_display,date_trx,amount_display_admin;
 
     Client client = ClientBuilder.newClient();
     
@@ -120,15 +129,18 @@ public class MbOnlineTransferServiceImpl extends MbBaseServiceImpl implements Mb
 	            // ATM Prima
 	            service_code = "0500";
 	            via_atm = "Prima";
+	            fee_admin=fee_prima;
 	          } else if (((feature & FEAT_BERSAMA) == FEAT_BERSAMA)) {
 	            // ATM Bersama
 	            service_code = "0200";
 	            via_atm = "ATM Bersama";
+	            fee_admin=fee_bersama;
 	          }
 	          else {
 	            // ATM Prima by Default
 	            service_code = "0500";
 	            via_atm = "Prima";
+	            fee_admin=fee_prima;
 	          }
 		 
 		LibFunctionUtil libFunct=new LibFunctionUtil();
@@ -182,6 +194,7 @@ public class MbOnlineTransferServiceImpl extends MbBaseServiceImpl implements Mb
         		
         		amount=Double.parseDouble(request.getAmount());
         		amount_display = libFunct.formatIDRCurrency(amount);
+        		amount_display_admin = libFunct.formatIDRCurrency(fee_admin);
         		date_trx = LibFunctionUtil.getDatetime("dd/MM/yyyy HH:mm:ss");
         		
         		List<ContentIntTrf> content = new ArrayList<>();
@@ -189,10 +202,11 @@ public class MbOnlineTransferServiceImpl extends MbBaseServiceImpl implements Mb
 				content.add(new ContentIntTrf("Dari Rekening",request.getAccount_number()+" - Bank Syariah Mandiri",request.getCustomerName()));
 				content.add(new ContentIntTrf("Ke Rekening",request.getDestinationAccountNumber()+" - "+BankName,inquiryTrfResp.getContent().getDestinationAccountName()));
 				content.add(new ContentIntTrf("Jumlah",amount_display,""));
+				content.add(new ContentIntTrf("Biaya Admin",amount_display_admin,""));
 				content.add(new ContentIntTrf("Description",request.getDescription(),""));
 				content.add(new ContentIntTrf("Referrence Number",request.getRef_no(),""));
 				
-				OnlineTrfDispResp onlineTrfDispResp = new OnlineTrfDispResp(OnlineTrfResp.getContent().gettransactionReference(),
+				OnlineTrfDispResp onlineTrfDispResp = new OnlineTrfDispResp(OnlineTrfResp.getContent().getcbsRefCode(),
 						date_trx,
 						"Transfer ke Non BSM",
 						"Terimakasih telah menggunakan layanan Mandiri Syariah Mobile, semoga layanan kami mendatangkan berkah bagi Anda.",
