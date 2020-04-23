@@ -77,6 +77,7 @@ public class VerifyServiceImpl extends MbBaseServiceImpl implements MbService {
 		String language = MbApiConstant.DEFAULT_LANG;
 		Long customerId;
 		String msisdn;
+		String msisdns = null;
 
 		MbApiResp mbApiResp;
 		
@@ -88,7 +89,7 @@ public class VerifyServiceImpl extends MbBaseServiceImpl implements MbService {
 		customerId = security.getCustomerId();
 		String ZPK_lmk = security.getZpkLmk();
 
-		CardMapping cardMapping = cardMappingRepository.findByCustomeridAndAccountnumber(customerId, request.getAccount_number());
+		CardMapping cardMapping = cardMappingRepository.findTopByCustomeridAndAccountnumber(customerId, request.getAccount_number());
 
 		String pinOffset = String.format("%-12s", LibCNCrypt.decrypt1(cardMapping.getPinoffset())).replace(" ","F");
 		String cardNumber = cardMapping.getCardnumber();
@@ -119,8 +120,6 @@ public class VerifyServiceImpl extends MbBaseServiceImpl implements MbService {
 			ResponseEntity<VerifyPinResp> response = restTemps.exchange(url, HttpMethod.POST, req, VerifyPinResp.class);
 			VerifyPinResp verifyPinResp = response.getBody();
 
-			long failedPin = customerRepository.countByMsisdn(request.getMsisdn());
-
 			failedPINCount = customerRepository.getFailedPINCountById(customerId);
 			if (failedPINCount == null) {
 				failedPINCount = 0;
@@ -138,7 +137,19 @@ public class VerifyServiceImpl extends MbBaseServiceImpl implements MbService {
 
 					long msisdnDb = customerRepository.getMsisdnByID(customerId);
 					msisdn = String.valueOf(msisdnDb);
-					customerRepository.updatePINCountById(failedPINCount, msisdn);
+					
+					StringBuilder sb = new StringBuilder();
+					sb.append("0");
+					sb.append(msisdn);
+					msisdns = sb.toString();
+					
+//					customerRepository.updatePINCountById(failedPINCount, msisdn);
+					
+					// update via jpa
+					Customer custUpd = customerRepository.findTopByMsisdn(msisdns);
+					custUpd.setFailedpincount(String.valueOf(failedPINCount));
+					customerRepository.save(custUpd);
+					// update via jpa
 					
 					verifyPinResp.setResponse("Verify PIN succesfull");
 					System.out.println(verifyPinResp.getResponse() + " ::: MESSAGE RESPONSE");
@@ -155,10 +166,22 @@ public class VerifyServiceImpl extends MbBaseServiceImpl implements MbService {
 
 					long msisdnDb = customerRepository.getMsisdnByID(customerId);
 					msisdn = String.valueOf(msisdnDb);
+					
+					StringBuilder sb = new StringBuilder();
+					sb.append("0");
+					sb.append(msisdn);
+					msisdns = sb.toString();
+					
 					failedPINCount = customerRepository.getFailedPINCountById(customerId);
 					++failedPINCount;
 					
-					customerRepository.updatePINCountById(failedPINCount, msisdn);
+					// update via jpa
+					Customer custUpd = customerRepository.findTopByMsisdn(msisdns);
+					custUpd.setFailedpincount(String.valueOf(failedPINCount));
+					customerRepository.save(custUpd);
+					// update via jpa
+					
+//					customerRepository.updatePINCountById(failedPINCount, msisdn);
 
 					mustUpdate = true;
 					if (failedPINCount < 3) {

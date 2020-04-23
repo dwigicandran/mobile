@@ -347,7 +347,7 @@ public class MbActivationServiceImpl extends MbBaseServiceImpl implements MbServ
 						
 						// remove dari String sql = "DELETE FROM MB_Activation where msisdn='" + msisdn + "'";
 						
-						MbAppContent mbAppContent = mbAppContentRepository.findByLangIdAndLanguage("60002", "id");
+						MbAppContent mbAppContent = mbAppContentRepository.findByLangIdAndLanguage("600052", "id");
 		    			responseDesc = mbAppContent.getDescription();
 		    			responseCode = MbApiConstant.ERR_CODE;
 		    			response = MbJsonUtil.createResponseDesc(request, responseCode, responseDesc);

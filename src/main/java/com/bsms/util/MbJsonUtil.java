@@ -69,6 +69,7 @@ public class MbJsonUtil {
 		resp.setResponse(response);
 		resp.setTransactionId(transactionId);
 		resp.setResponseCode(responseCode);
+//		resp.setResponseContent(response);
 		
 		return resp;
 

@@ -39,4 +39,6 @@ public class Customer {
 	@Column(name="MACHEX")
 	private String machex;
 	
+	private String failedpincount;
+	
 }
