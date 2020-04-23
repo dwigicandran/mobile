@@ -26,6 +26,7 @@ import com.bsms.repository.MbTxLogRepository;
 import com.bsms.repository.SecurityRepository;
 import com.bsms.restobj.MbApiReq;
 import com.bsms.restobj.MbApiResp;
+import com.bsms.restobj.MbApiStatusResp;
 import com.bsms.restobjclient.VerifyPinReq;
 import com.bsms.restobjclient.VerifyPinResp;
 import com.bsms.util.LibCNCrypt;
@@ -157,7 +158,11 @@ public class VerifyActivationServiceImpl extends MbBaseServiceImpl implements Mb
 					
 					verifyPinResp.setResponse("Verify PIN succesfull");
 					System.out.println(verifyPinResp.getResponse() + " ::: MESSAGE RESPONSE");
-					mbApiResp = MbJsonUtil.createResponse(request, verifyPinResp, verifyPinResp.getResponse(),
+					
+//					mbApiResp = MbJsonUtil.createResponse(request, verifyPinResp, verifyPinResp.getResponse(),
+//							TrxIdUtil.getTransactionID(6), verifyPinResp.getResponseCode());
+					
+					mbApiResp = MbJsonUtil.createResponse(request, verifyPinResp, new MbApiStatusResp(MbApiConstant.SUCCESS_CODE,  verifyPinResp.getResponse()),
 							TrxIdUtil.getTransactionID(6), verifyPinResp.getResponseCode());
 					
 					
