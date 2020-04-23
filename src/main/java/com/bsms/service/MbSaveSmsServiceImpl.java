@@ -18,12 +18,17 @@ import org.springframework.stereotype.Service;
 import com.bsms.cons.MbApiConstant;
 import com.bsms.domain.MbApiTxLog;
 import com.bsms.domain.MbAppContent;
+import com.bsms.domain.MbSmsActivation;
 import com.bsms.repository.MbAppContentRepository;
+import com.bsms.repository.MbSmsActivationRepository;
 import com.bsms.repository.MbTxLogRepository;
 import com.bsms.restobj.MbApiReq;
 import com.bsms.restobj.MbApiResp;
 import com.bsms.util.MbJsonUtil;
 
+import org.springframework.transaction.annotation.Transactional;
+
+@Transactional
 @Service("saveSMSActivation")
 public class MbSaveSmsServiceImpl extends MbBaseServiceImpl implements MbService {
 
@@ -32,6 +37,9 @@ public class MbSaveSmsServiceImpl extends MbBaseServiceImpl implements MbService
 
 	@Autowired
 	private MbAppContentRepository mbAppContentRepository;
+	
+	@Autowired
+	private MbSmsActivationRepository mbSmsActivationRepository;
 
 	@Autowired
 	private DataSource dataSource;
@@ -52,10 +60,6 @@ public class MbSaveSmsServiceImpl extends MbBaseServiceImpl implements MbService
 
 		MbApiResp response = null;
 
-		Connection conn = null;
-		PreparedStatement ps = null;
-		ResultSet rs = null;
-
 		try {
 
 			String requestData = request.getRequest_data();
@@ -68,13 +72,11 @@ public class MbSaveSmsServiceImpl extends MbBaseServiceImpl implements MbService
 			DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
 			Date date = new Date();
 			System.out.println(dateFormat.format(date)); // 2016/11/16 12:08:43
-
-			conn = dataSource.getConnection();
-			ps = conn.prepareStatement("insert into mb_smsactivation(msisdn, message) values(?,?)");
-			ps.setObject(1, phoneNum);
-			ps.setObject(2, message);
-
-			ps.execute();
+			
+			MbSmsActivation mbSmsActivation = new MbSmsActivation();
+			mbSmsActivation.setMsisdn(phoneNum);
+			mbSmsActivation.setMessage(message);
+			mbSmsActivationRepository.saveSms(phoneNum, message);
 
 			MbAppContent mbAppContent = mbAppContentRepository.findByLangIdAndLanguage("600094", language);
 			responseDesc = mbAppContent.getDescription();
@@ -88,20 +90,7 @@ public class MbSaveSmsServiceImpl extends MbBaseServiceImpl implements MbService
 			responseDesc = mbAppContent.getDescription();
 			responseCode = MbApiConstant.ERR_CODE;
 			response = MbJsonUtil.createResponseDesc(request, responseCode, responseDesc);
-		} finally {
-			if (rs != null)
-				try {
-					rs.close();
-				} catch (Exception e) {
-
-				}
-			if (ps != null)
-				try {
-					ps.close();
-				} catch (Exception e) {
-
-				}
-		}
+		} 
 
 		txLog.setResponse(response);
 		txLogRepository.save(txLog);

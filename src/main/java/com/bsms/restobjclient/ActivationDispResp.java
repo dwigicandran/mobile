@@ -19,7 +19,7 @@ public class ActivationDispResp implements Serializable, MbApiContentResp {
 
 	private String customerId;
 	private String name;
-	private String clearZPK;
+	private String clearZpk;
 	private String transactionId;
 	private String responseCode;
 	private String publicKey;
@@ -27,5 +27,6 @@ public class ActivationDispResp implements Serializable, MbApiContentResp {
 	private String response;
 	private String email;
 	private String isReactivation;
+	private String msisdn;
 	
 }
