@@ -10,7 +10,7 @@ import com.bsms.domain.CardMapping;
 
 public interface CardmappingRepository extends CrudRepository<CardMapping, Long> {
 
-	CardMapping findByCustomeridAndAccountnumber(Long customerId, String accountNumber);
+	CardMapping findTopByCustomeridAndAccountnumber(Long customerId, String accountNumber);
 	
 	CardMapping findOneByCustomeridAndAccountnumber(Long customerId, String accountNumber);
 	
