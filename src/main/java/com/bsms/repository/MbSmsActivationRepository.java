@@ -25,4 +25,8 @@ public interface MbSmsActivationRepository extends CrudRepository<MbSmsActivatio
 	void updateSmsAct( @Param("date_verified") String date_verified, @Param("msisdn") String msisdn,
 			@Param("isverified") String isverified, @Param("dateReceived") String dateReceived);
 	
+	@Modifying(clearAutomatically = true)
+	@Query(value = "insert into mb_smsactivation (msisdn, message) values (:msisdn, :message)", nativeQuery = true)
+	void saveSms(@Param("msisdn") String msisdn, @Param("message") String message);
+	
 }

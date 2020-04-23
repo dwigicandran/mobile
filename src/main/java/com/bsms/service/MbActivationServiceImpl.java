@@ -229,6 +229,10 @@ public class MbActivationServiceImpl extends MbBaseServiceImpl implements MbServ
 							System.out.println(sms.getMsisdn());
 							System.out.println(sms.getDateReceived());
 						}
+						
+						if(!"".equals(smsMsisdn)) {
+							break;
+						}
 
 						Thread.sleep(5000);
 						duration = System.currentTimeMillis() - startTime;
@@ -238,7 +242,6 @@ public class MbActivationServiceImpl extends MbBaseServiceImpl implements MbServ
 
 					System.out.println(duration + " ::: durasi loop");
 					System.out.println(timeOut + " ::: timeout");
-					
 					System.out.println(smsMsisdn + " ::: msisdn");
 					
 					if(smsMsisdn != null) {
