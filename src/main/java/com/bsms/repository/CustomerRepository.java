@@ -27,10 +27,12 @@ public interface CustomerRepository extends CrudRepository<Customer, Long> {
 	
 	@Modifying(clearAutomatically = true)
 	@Query(value = "update Customer set failedpincount = :valpin where msisdn = :msisdn")
-	void updatePINCountById(@Param("valpin") Integer valpin, @Param("msisdn") String msisdn);
+	void updatePINCountById(@Param("valpin") int valpin, @Param("msisdn") String msisdn);
 	
-	@Query(value = "SELECT id, name, activationcode, email, msisdn, tak, machex, createotpdate, imei "
+	@Query(value = "SELECT id, name, activationcode, email, msisdn, tak, machex, createotpdate, imei, failedpincount "
 		    		+ "FROM Customer with (NOLOCK) where msisdn in (:msisdn1,:msisdn2)", nativeQuery = true)
 	List<Customer> getByMsisdn(@Param("msisdn1") String msisdn1, @Param("msisdn2") String msisdn2);
+	
+	Customer findTopByMsisdn(String msisdn);
 
 }
