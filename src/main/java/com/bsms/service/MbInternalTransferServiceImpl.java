@@ -8,6 +8,7 @@ import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.core.HttpHeaders;
 
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,12 +33,15 @@ import com.bsms.util.LibFunctionUtil;
 import com.bsms.util.MbJsonUtil;
 import com.bsms.util.MbLogUtil;
 import com.bsms.util.RestUtil;
+import com.bsms.util.TrxLimit;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 
 @Service("internalTransfer")
 public class MbInternalTransferServiceImpl extends MbBaseServiceImpl implements MbService {
-
+	@Value("${sql.conf}")
+    private String sqlconf;
+	
 	@Value("${core.service.inquiryTransfer}")
     private String inquiryTransfer;
 	
@@ -119,6 +123,13 @@ public class MbInternalTransferServiceImpl extends MbBaseServiceImpl implements 
         	
         	if("00".equals(internalTrfResp.getResponseCode())) {
         		
+        		JSONObject value = new JSONObject();
+				TrxLimit trxLimit = new TrxLimit();
+				int trxType = TrxLimit.TRANSFER;
+				
+		        trxLimit.LimitUpdate(request.getMsisdn(), request.getCustomerLimitType(), 
+		        		trxType, Long.parseLong(request.getAmount()), value,sqlconf);
+		        
         		amount=Double.parseDouble(request.getAmount());
         		amount_display = libFunct.formatIDRCurrency(amount);
         		date_trx = LibFunctionUtil.getDatetime("dd/MM/yyyy HH:mm:ss");
@@ -139,6 +150,8 @@ public class MbInternalTransferServiceImpl extends MbBaseServiceImpl implements 
 				mbApiResp = MbJsonUtil.createResponseTrf(internalTrfResp.getResponseCode(),
         				"Success",
         				internalTrfDispResp,trx_id); 
+				
+			
         		
 
         		

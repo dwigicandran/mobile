@@ -13,6 +13,7 @@ import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.core.HttpHeaders;
 
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,12 +38,12 @@ import com.bsms.util.LibFunctionUtil;
 import com.bsms.util.MbJsonUtil;
 import com.bsms.util.MbLogUtil;
 import com.bsms.util.RestUtil;
+import com.bsms.util.TrxLimit;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 
 @Service("onlineTransfer")
 public class MbOnlineTransferServiceImpl extends MbBaseServiceImpl implements MbService {
-
 	static int FEAT_SKN = 0x01;
 	  static int FEAT_BERSAMA = 0x02;
 	  static int FEAT_PRIMA = 0x04;
@@ -192,6 +193,13 @@ public class MbOnlineTransferServiceImpl extends MbBaseServiceImpl implements Mb
         	
         	if("00".equals(OnlineTrfResp.getResponseCode())) {
         		
+        		JSONObject value = new JSONObject();
+				TrxLimit trxLimit = new TrxLimit();
+				int trxType = TrxLimit.TRANSFER_ONLINE;
+				
+				trxLimit.LimitUpdate(request.getMsisdn(), request.getCustomerLimitType(), 
+			        		trxType, Long.parseLong(request.getAmount()), value,connectionUrl);
+				
         		amount=Double.parseDouble(request.getAmount());
         		amount_display = libFunct.formatIDRCurrency(amount);
         		amount_display_admin = libFunct.formatIDRCurrency(fee_admin);
@@ -215,6 +223,8 @@ public class MbOnlineTransferServiceImpl extends MbBaseServiceImpl implements Mb
 				mbApiResp = MbJsonUtil.createResponseTrf(OnlineTrfResp.getResponseCode(),
         				"Success",
         				onlineTrfDispResp,trx_id); 
+				
+				
         		
 
         		
