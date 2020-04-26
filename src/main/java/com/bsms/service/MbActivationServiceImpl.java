@@ -116,10 +116,10 @@ public class MbActivationServiceImpl extends MbBaseServiceImpl implements MbServ
 		String msisdn = request.getMsisdn();
 
 		MbApiResp response = null;
+		
+		String req_data = request.getRequest_data(); // TODO: check req data dari depan
 
 		try {
-
-			String req_data = request.getRequest_data(); // TODO: check req data dari depan
 
 			GenACUtil genAcUtil = new GenACUtil();
 			String act_code = genAcUtil.genAC(request.getMsisdn());
@@ -358,7 +358,7 @@ public class MbActivationServiceImpl extends MbBaseServiceImpl implements MbServ
 			}
 
 		} catch (Exception e) {
-			MbAppContent mbAppContent = mbAppContentRepository.findByLangIdAndLanguage("60002", "id");
+			MbAppContent mbAppContent = mbAppContentRepository.findByLangIdAndLanguage("600052", "id");
 			responseDesc = mbAppContent.getDescription();
 			responseCode = MbApiConstant.ERR_CODE;
 			response = MbJsonUtil.createResponseDesc(request, responseCode, responseDesc);

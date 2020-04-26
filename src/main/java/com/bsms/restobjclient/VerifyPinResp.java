@@ -15,6 +15,7 @@ public class VerifyPinResp implements Serializable, MbApiContentResp {
 	private static final long serialVersionUID = 372836843402235301L;
 	
 	private String response;
+	private String responseMessage;
 	
 	@JsonProperty("transaction_id")
 	private String transactionId;
@@ -39,6 +40,12 @@ public class VerifyPinResp implements Serializable, MbApiContentResp {
 	}
 	public void setResponseCode(String responseCode) {
 		this.responseCode = responseCode;
+	}
+	public String getResponseMessage() {
+		return responseMessage;
+	}
+	public void setResponseMessage(String responseMessage) {
+		this.responseMessage = responseMessage;
 	}
 	
 	
