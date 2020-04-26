@@ -7,9 +7,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.bsms.domain.MbApiTxLog;
+import com.bsms.domain.Security;
 import com.bsms.repository.CardmappingRepository;
 import com.bsms.repository.MbAppContentRepository;
 import com.bsms.repository.MbTxLogRepository;
+import com.bsms.repository.SecurityRepository;
 import com.bsms.restobj.MbApiReq;
 import com.bsms.restobj.MbApiResp;
 
@@ -21,6 +23,9 @@ public class MbCreatePinServiceImpl extends MbBaseServiceImpl implements MbServi
 	
     @Autowired
     private MbTxLogRepository txLogRepository;
+    
+    @Autowired
+    private SecurityRepository securityRepository;
     
     @Autowired
     private CardmappingRepository cardMappingRepository;
@@ -35,26 +40,28 @@ public class MbCreatePinServiceImpl extends MbBaseServiceImpl implements MbServi
 		txLogRepository.save(txLog);
 		
 		String pan = "";
-		String customerId = request.getCustomer_id();
+		String customerId = "";
+		
+		Security security = securityRepository.findByMbSessionId(request.getSessionId());
+		customerId = security.getCustomerId().toString();
+		
+		Integer count = cardMappingRepository.getCountByCustomerId(customerId);
+		System.out.println(count + " ::: count ");
+		if(count > 0) {
+			
+		} else {
+			pan = cardMappingRepository.getCardnumberByCustomerId(customerId);
+			System.out.println(pan + " ::: pan");
+		}
 		
 		try {
 			
-			Integer count = cardMappingRepository.getCountByCustomerId(customerId);
-			System.out.println(count + " ::: count ");
-			if(count > 0) {
-				
-			} else {
-				
-				pan = cardMappingRepository.getCardnumberByCustomerId(customerId);
-				System.out.println(pan + " ::: pan");
-				
-			}
+			// connect to hsm to create pin
 			
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		
-		// TODO Auto-generated method stub
 		return response;
 	}
 
