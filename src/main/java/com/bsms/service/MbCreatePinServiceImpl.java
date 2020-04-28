@@ -31,7 +31,6 @@ import com.bsms.util.RestUtil;
 import com.bsms.util.TrxIdUtil;
 import com.google.gson.Gson;
 
-
 @Service("createPin")
 @Transactional
 public class MbCreatePinServiceImpl extends MbBaseServiceImpl implements MbService {
@@ -94,7 +93,6 @@ public class MbCreatePinServiceImpl extends MbBaseServiceImpl implements MbServi
 		if (!"".equals(pan)) { // validate pin exist or not 
 
 			CreatePinResp createPinResp;
-
 			CreatePinReq createPinReq = new CreatePinReq();
 
 			createPinReq.setZpk(zpk);
@@ -143,7 +141,6 @@ public class MbCreatePinServiceImpl extends MbBaseServiceImpl implements MbServi
 
 			} catch (Exception e) {
 				e.printStackTrace();
-				
 				MbAppContent mbAppContent = mbAppContentRepository.findByLangIdAndLanguage("60002", language);
 				responseDesc = mbAppContent.getDescription();
 				responseCode = MbApiConstant.ERR_CODE;
@@ -151,9 +148,6 @@ public class MbCreatePinServiceImpl extends MbBaseServiceImpl implements MbServi
 			}
 
 		} else {
-//			response = GetLanguage("600002");
-//	          LibFunction.setLogMessage("App Error: " + "No card mapping or PIN exists");
-			
 			MbAppContent mbAppContent = mbAppContentRepository.findByLangIdAndLanguage("60002", language);
 			responseDesc = mbAppContent.getDescription();
 			responseCode = MbApiConstant.ERR_CODE;
