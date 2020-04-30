@@ -157,22 +157,13 @@ public class VerifyServiceImpl extends MbBaseServiceImpl implements MbService {
 					sb.append(msisdn);
 					msisdns = sb.toString();
 					
-//					customerRepository.updatePINCountById(failedPINCount, msisdn);
-					
 					// update via jpa
 					Customer custUpd = customerRepository.findTopByMsisdn(msisdns);
 					custUpd.setFailedpincount(String.valueOf(failedPINCount));
 					customerRepository.save(custUpd);
-					// update via jpa
 					
 					VerifyPinRespDisp display = new VerifyPinRespDisp();
 					display.setTransactionId(TrxIdUtil.getTransactionID(6));
-					
-//					mbApiResp = MbJsonUtil.createResponse(request, verifyPinResp, verifyPinResp.getResponse(),
-//							TrxIdUtil.getTransactionID(6), verifyPinResp.getResponseCode());
-					
-//					mbApiResp = MbJsonUtil.createResponse(request, verifyPinResp, );
-					
 					mbApiResp = MbJsonUtil.createResponse(request, display, verifyPinResp.getResponseCode(), "Verify PIN succesfull");
 					
 				} else {
@@ -199,10 +190,7 @@ public class VerifyServiceImpl extends MbBaseServiceImpl implements MbService {
 					Customer custUpd = customerRepository.findTopByMsisdn(msisdns);
 					custUpd.setFailedpincount(String.valueOf(failedPINCount));
 					customerRepository.save(custUpd);
-					// update via jpa
 					
-//					customerRepository.updatePINCountById(failedPINCount, msisdn);
-
 					mustUpdate = true;
 					if (failedPINCount < 3) {
 						responseCode = "55";

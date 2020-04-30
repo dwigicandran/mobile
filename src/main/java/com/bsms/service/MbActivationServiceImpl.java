@@ -147,20 +147,6 @@ public class MbActivationServiceImpl extends MbBaseServiceImpl implements MbServ
 
 				} else {
 
-//					System.out.println(act_code + " ::: ACT CODE :::");
-//					System.out.println(req_data + " ::: REQ DATA :::");
-//					
-//					MbDecryptDesUtil mbDecryptDesUtil = new MbDecryptDesUtil();
-//					mbDecryptDesUtil.DecryptDes(act_code, req_data);
-
-//					if (!isValidJson(req_data)) {
-//
-//						MbAppContent mbAppContent = mbAppContentRepository.findByLangIdAndLanguage("600019", language);
-//						responseDesc = mbAppContent.getDescription();
-//						responseCode = MbApiConstant.ERR_CODE;
-//						response = MbJsonUtil.createResponseDesc(request, responseCode, responseDesc);
-//					} else {
-
 					String msisdn1, msisdn2;
 
 					if ("0".equals(request.getMsisdn().substring(0, 1))) {
@@ -216,7 +202,6 @@ public class MbActivationServiceImpl extends MbBaseServiceImpl implements MbServ
 					List<MbSmsActivation> smsAct;
 
 					Timestamp getDateVerified = new Timestamp(System.currentTimeMillis());
-
 					long startTime = System.currentTimeMillis();
 					long duration = 0;
 					do {
@@ -226,11 +211,16 @@ public class MbActivationServiceImpl extends MbBaseServiceImpl implements MbServ
 							smsMsisdn = sms.getMsisdn();
 							dateReceived = sms.getDateReceived();
 
-							System.out.println(sms.getMsisdn());
+							if(smsMsisdn != null) {
+								break;
+							}
+							
 							System.out.println(sms.getDateReceived());
 						}
 						
-						if(!"".equals(smsMsisdn)) {
+						System.out.println(smsMsisdn);
+						if(smsMsisdn != null) {
+							System.out.println(smsMsisdn);
 							break;
 						}
 
