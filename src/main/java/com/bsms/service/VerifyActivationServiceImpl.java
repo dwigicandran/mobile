@@ -29,6 +29,7 @@ import com.bsms.restobj.MbApiResp;
 import com.bsms.restobj.MbApiStatusResp;
 import com.bsms.restobjclient.VerifyPinReq;
 import com.bsms.restobjclient.VerifyPinResp;
+import com.bsms.restobjclient.VerifyPinRespDisp;
 import com.bsms.util.LibCNCrypt;
 import com.bsms.util.MbJsonUtil;
 import com.bsms.util.RestUtil;
@@ -52,7 +53,7 @@ public class VerifyActivationServiceImpl extends MbBaseServiceImpl implements Mb
 
 	@Autowired
 	private MbAppContentRepository mbAppContentRepository;
-
+	
 	@Autowired
 	private ErrormsgRepository errormsgRepository;
 
@@ -74,11 +75,12 @@ public class VerifyActivationServiceImpl extends MbBaseServiceImpl implements Mb
 		Integer failedPINCount;
 		Boolean isPINValid = false;
 		boolean mustUpdate = false;
+		Long customerId;
+		
+		String language = MbApiConstant.DEFAULT_LANG;
 		String responseCode = "";
 		String responseDesc = "";
-		String language = MbApiConstant.DEFAULT_LANG;
-		Long customerId;
-		String msisdn;
+		String msisdn = null;
 		String msisdns = null;
 
 		MbApiResp mbApiResp;
@@ -156,14 +158,17 @@ public class VerifyActivationServiceImpl extends MbBaseServiceImpl implements Mb
 					customerRepository.save(custUpd);
 					// update via jpa
 					
-					verifyPinResp.setResponse("Verify PIN succesfull");
-					System.out.println(verifyPinResp.getResponse() + " ::: MESSAGE RESPONSE");
+					VerifyPinRespDisp display = new VerifyPinRespDisp();
+					display.setTransactionId(TrxIdUtil.getTransactionID(6));
 					
+//					verifyPinResp.setTransactionId(TrxIdUtil.getTransactionID(6));
 //					mbApiResp = MbJsonUtil.createResponse(request, verifyPinResp, verifyPinResp.getResponse(),
 //							TrxIdUtil.getTransactionID(6), verifyPinResp.getResponseCode());
 					
-					mbApiResp = MbJsonUtil.createResponse(request, verifyPinResp, new MbApiStatusResp(MbApiConstant.SUCCESS_CODE,  verifyPinResp.getResponse()),
-							TrxIdUtil.getTransactionID(6), verifyPinResp.getResponseCode());
+//					mbApiResp = MbJsonUtil.createResponse(request, verifyPinResp, new MbApiStatusResp(MbApiConstant.SUCCESS_CODE,  verifyPinResp.getResponse()),
+//							TrxIdUtil.getTransactionID(6), verifyPinResp.getResponseCode());
+					
+					mbApiResp = MbJsonUtil.createResponse(request, display, verifyPinResp.getResponseCode(), "Verify PIN succesfull");
 					
 					
 				} else {

@@ -28,8 +28,10 @@ import com.bsms.repository.MbTxLogRepository;
 import com.bsms.repository.SecurityRepository;
 import com.bsms.restobj.MbApiReq;
 import com.bsms.restobj.MbApiResp;
+import com.bsms.restobj.MbApiStatusResp;
 import com.bsms.restobjclient.VerifyPinReq;
 import com.bsms.restobjclient.VerifyPinResp;
+import com.bsms.restobjclient.VerifyPinRespDisp;
 import com.bsms.util.LibCNCrypt;
 import com.bsms.util.MbJsonUtil;
 import com.bsms.util.RestUtil;
@@ -70,21 +72,32 @@ public class VerifyServiceImpl extends MbBaseServiceImpl implements MbService {
 		txLogRepository.save(txLog);
 
 		Integer failedPINCount;
+		
 		Boolean isPINValid = false;
 		boolean mustUpdate = false;
+		
+		Long customerId;
+		
 		String responseCode = "";
 		String responseDesc = "";
 		String language = MbApiConstant.DEFAULT_LANG;
-		Long customerId;
-		String msisdn;
+		String msisdn = null;
 		String msisdns = null;
 
 		MbApiResp mbApiResp;
 		
 		VerifyPinReq verifyPinReq = new VerifyPinReq();
 		
-		System.out.println(request.getSessionId() + " ::: SESSION ID");
-
+		if("".equals(request.getSessionId()) || request.getSessionId() == null) {
+			throw createSlServiceException(MbApiConstant.ERR_CODE, "Session Id cannot be empty value", txLog,
+					txLogRepository);
+		}
+		
+		if("".equals(request.getAccount_number()) || request.getAccount_number() == null) {
+			throw createSlServiceException(MbApiConstant.ERR_CODE, "Account Number cannot be empty value", txLog,
+					txLogRepository);
+		}
+		
 		Security security = securityRepository.findByMbSessionId(request.getSessionId());
 		customerId = security.getCustomerId();
 		String ZPK_lmk = security.getZpkLmk();
@@ -110,6 +123,7 @@ public class VerifyServiceImpl extends MbBaseServiceImpl implements MbService {
 		verifyPinReq.setSessionId(request.getSessionId());
 		verifyPinReq.setModulId(request.getModul_id());
 		verifyPinReq.setSrcAcc(request.getSourceAccountNumber());
+		
 
 		System.out.println(new Gson().toJson(verifyPinReq));
 		
@@ -151,10 +165,16 @@ public class VerifyServiceImpl extends MbBaseServiceImpl implements MbService {
 					customerRepository.save(custUpd);
 					// update via jpa
 					
-					verifyPinResp.setResponse("Verify PIN succesfull");
-					System.out.println(verifyPinResp.getResponse() + " ::: MESSAGE RESPONSE");
-					mbApiResp = MbJsonUtil.createResponse(request, verifyPinResp, verifyPinResp.getResponse(),
-							TrxIdUtil.getTransactionID(6), verifyPinResp.getResponseCode());
+					VerifyPinRespDisp display = new VerifyPinRespDisp();
+					display.setTransactionId(TrxIdUtil.getTransactionID(6));
+					
+//					mbApiResp = MbJsonUtil.createResponse(request, verifyPinResp, verifyPinResp.getResponse(),
+//							TrxIdUtil.getTransactionID(6), verifyPinResp.getResponseCode());
+					
+//					mbApiResp = MbJsonUtil.createResponse(request, verifyPinResp, );
+					
+					mbApiResp = MbJsonUtil.createResponse(request, display, verifyPinResp.getResponseCode(), "Verify PIN succesfull");
+					
 				} else {
 					responseCode = "38";
 					ErrorMessage errMsg = errormsgRepository.findByCodeAndLanguage(responseCode, language);

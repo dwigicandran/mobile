@@ -22,11 +22,8 @@ public class MbJsonUtil {
 		MbApiResp response = new MbApiResp();
 
 		response.setClientId(request.getClientId());
-		response.setBranchId(request.getBranchId());
-		response.setTellerId(request.getTellerId());
 		response.setResponseTime(MbDateFormatUtil.formatTime(new Date()));
 		response.setResponseContent(respContent);
-		// response.setRespStatus(respStatus);
 		return response;
 
 	}
@@ -34,13 +31,26 @@ public class MbJsonUtil {
 	public static MbApiResp createResponse(MbApiReq request, MbApiContentResp respContent, MbApiStatusResp respStatus, String responseCode, String responseMessage) {
 
 		MbApiResp response = new MbApiResp();
-
+		
 		response.setClientId(request.getClientId());
 		response.setResponseCode(responseCode);
 		response.setResponseMessage(responseMessage);
 		response.setResponseTime(MbDateFormatUtil.formatTime(new Date()));
 		response.setResponseContent(respContent);
-		// response.setRespStatus(respStatus);
+		
+		return response;
+
+	}
+	
+	public static MbApiResp createResponse(MbApiReq request, MbApiContentResp respContent, String responseCode, String responseMessage) {
+
+		MbApiResp response = new MbApiResp();
+		
+		response.setResponseCode(responseCode);
+		response.setResponseMessage(responseMessage);
+		response.setResponseTime(MbDateFormatUtil.formatTime(new Date()));
+		response.setResponseContent(respContent);
+		
 		return response;
 
 	}
@@ -52,7 +62,6 @@ public class MbJsonUtil {
 		MbApiResp response = new MbApiResp();
 
 		response.setResponseTime(MbDateFormatUtil.formatTime(new Date()));
-		// response.setRespContent(activationResp);
 		response.setActivationResp(activationResp);
 		response.setRespStatus(respStatus);
 		return response;
@@ -60,20 +69,19 @@ public class MbJsonUtil {
 	}
 
 	// verify PIN
-	public static MbApiResp createResponse(MbApiReq request, VerifyPinResp verifyPinResp,
-			String response, String transactionId, String responseCode) {
-
-		MbApiResp resp = new MbApiResp();
-
-		resp.setResponseTime(MbDateFormatUtil.formatTime(new Date()));
-		resp.setResponse(response);
-		resp.setTransactionId(transactionId);
-		resp.setResponseCode(responseCode);
-//		resp.setResponseContent(response);
-		
-		return resp;
-
-	}
+//	public static MbApiResp createResponse(MbApiReq request, VerifyPinResp verifyPinResp,
+//			String response, String transactionId, String responseCode) {
+//
+//		MbApiResp resp = new MbApiResp();
+//
+//		resp.setResponseTime(MbDateFormatUtil.formatTime(new Date()));
+//		resp.setResponse(response);
+//		resp.setTransactionId(transactionId);
+//		resp.setResponseCode(responseCode);
+//		
+//		return resp;
+//
+//	}
 
 	// pin key retrieval
 	public static MbApiResp createResponse(MbApiReq request, PINKeyResp pinKeyResp, MbApiStatusResp respStatus) {
@@ -89,22 +97,6 @@ public class MbJsonUtil {
 		return response;
 
 	}
-
-	// return balance info
-//	public static MbApiResp createResponse(MbApiReq request, BalanceInquiryDispResp balanceInquiryDispResp,
-//			MbApiStatusResp respStatus) {
-//
-//		MbApiResp response = new MbApiResp();
-//
-//		response.setClientId(request.getClientId());
-//		response.setBranchId(request.getBranchId());
-//		response.setTellerId(request.getTellerId());
-//		response.setRespTime(MbDateFormatUtil.formatTime(new Date()));
-//		response.setBalanceInquiryDispResp(balanceInquiryDispResp);
-//		response.setRespStatus(respStatus);
-//		return response;
-//
-//	}
 
 	public static MbApiResp createResponseDesc(MbApiReq request, String responseCode, String responseDesc) {
 
