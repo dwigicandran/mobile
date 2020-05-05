@@ -7,16 +7,16 @@ import lombok.Setter;
 @Setter
 public class ContentInfoLimit {
 	private String key;
-	private String trxAmtLimit_display;
-	private String dailyAmtLimit_display;
-	private String remainingLimit_display;
+	private String trxAmtLimit;
+	private String dailyAmtLimit;
+	private String remainingLimit;
 	
 	public ContentInfoLimit(String key,String trxAmtLimit_display,String dailyAmtLimit_display,String remainingLimit_display) {
 				
 				this.key=key;
-				this.trxAmtLimit_display=trxAmtLimit_display;
-				this.dailyAmtLimit_display=dailyAmtLimit_display;
-				this.remainingLimit_display=remainingLimit_display;
+				this.trxAmtLimit=trxAmtLimit_display;
+				this.dailyAmtLimit=dailyAmtLimit_display;
+				this.remainingLimit=remainingLimit_display;
 			
 	}
 }
