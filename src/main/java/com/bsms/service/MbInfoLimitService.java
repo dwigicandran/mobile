@@ -164,10 +164,12 @@ public class MbInfoLimitService extends MbBaseServiceImpl implements MbService  
 			     	       	LibFunctionUtil libFunct=new LibFunctionUtil();
 						    String trxAmtLimit_display = libFunct.formatIDRCurrency(trxAmtLimit);
 						    String dailyAmtLimit_display = libFunct.formatIDRCurrency(dailyAmtLimit);
+						    String lastAmount_display = libFunct.formatIDRCurrency(lastAmount);
 						    String remainingLimit_display = libFunct.formatIDRCurrency(remainingLimit);
 
 							content.add(new ContentInfoLimit(trxDesc,"Limit Per Transaksi : "+trxAmtLimit_display,
-									"Limit Per Hari : "+dailyAmtLimit_display,"Sisa Limit Harian : "+remainingLimit_display));
+									"Limit Per Hari : "+dailyAmtLimit_display,"Limit Terpakai : "+lastAmount_display,
+									"Sisa Limit Harian : "+remainingLimit_display));
 			            }
 		          
 		            
