@@ -50,7 +50,7 @@ import com.bsms.util.TrxLimit;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 
-@Service("infolimit")
+@Service("infoLimit")
 public class MbInfoLimitService extends MbBaseServiceImpl implements MbService  {
 	@Value("${sql.conf}")
     private String sqlconf;
@@ -97,7 +97,7 @@ public class MbInfoLimitService extends MbBaseServiceImpl implements MbService  
 		        	SQL= "select * from mb_limit where customer_type="+request.getCustomerLimitType()+" and enabled=1";
 		            rs = stmt.executeQuery(SQL);
 		            
-		            if(rs.next()) 
+		            while(rs.next()) 
 			            {
 		            	 result="00";
 		            	 trxType=rs.getInt("trx_type");
@@ -108,18 +108,25 @@ public class MbInfoLimitService extends MbBaseServiceImpl implements MbService  
 		                 {
 		                 case 0:
 		                	 trxDesc="Transfer BSM";
+		                	 break;
 		                 case 1:
 		                	 trxDesc="Purchase";
+		                	 break;
 		                 case 2:
 		                	 trxDesc="Payment";
+		                	 break;
 		                 case 3:
-		                	 trxDesc="Transfer Online";
+		                	 trxDesc="Transfer Non-BSM";
+		                	 break;
 		                 case 4:
 		                	 trxDesc="Transfer SKN";
+		                	 break;
 		                 case 7:
 		                	 trxDesc="Cashless Withdrawal";
+		                	 break;
 		                 case 8:
 		                	 trxDesc="Top Up E-Money";
+		                	 break;
 		                 }
 		                 
 		                   Calendar calTrxDate = Calendar.getInstance();
@@ -159,13 +166,10 @@ public class MbInfoLimitService extends MbBaseServiceImpl implements MbService  
 						    String dailyAmtLimit_display = libFunct.formatIDRCurrency(dailyAmtLimit);
 						    String remainingLimit_display = libFunct.formatIDRCurrency(remainingLimit);
 
-							content.add(new ContentInfoLimit(trxDesc,trxAmtLimit_display,dailyAmtLimit_display,remainingLimit_display));
+							content.add(new ContentInfoLimit(trxDesc,"Limit Per Transaksi : "+trxAmtLimit_display,
+									"Limit Per Hari : "+dailyAmtLimit_display,"Sisa Limit Harian : "+remainingLimit_display));
 			            }
-		            else
-		            {
-		            	result = "99";
-		            	
-		            }
+		          
 		            
 		            rs.close();
 		            stmt.close();
