@@ -48,6 +48,7 @@ public class PinKeyRetrieval extends MbBaseServiceImpl implements MbService {
 	@Value("${pinkeyretrieval.url}")
 	private String url;
 
+	@SuppressWarnings("unlikely-arg-type")
 	public MbApiResp process(HttpHeaders header, ContainerRequestContext requestContext, MbApiReq request)
 			throws Exception {
 
@@ -85,7 +86,7 @@ public class PinKeyRetrieval extends MbBaseServiceImpl implements MbService {
 			responseDesc = mbAppContent.getDescription();
 			responseCode = "01";
 			response = MbJsonUtil.createResponseDesc(request, responseCode, responseDesc);
-			
+
 		} else {
 			try {
 				HttpEntity<?> req = new HttpEntity(pinKeyReq, RestUtil.getHeaders());
@@ -95,31 +96,28 @@ public class PinKeyRetrieval extends MbBaseServiceImpl implements MbService {
 
 				pinKeyResp = responseEntity.getBody();
 
-				if ("200".equals(responseEntity.getStatusCodeValue())) {
-					String noHp = request.getMsisdn();
-					secure.setZpkLmk(pinKeyResp.getZpkLmk());
-					secure.setStatus("1");
-					secure.setMbToken(request.getToken());
-					secure.setMbDevice(request.getDevice());
-					secure.setMbDeviceType(request.getDevice_type());
-					securityRepository.save(secure);
+				System.out.println(responseEntity.getStatusCodeValue() + " ::: status code");
 
-					long jumlah = notifcglistRepository.countByMsisdn(noHp);
-					if (jumlah == 0) {
+				String noHp = request.getMsisdn();
+				secure.setZpkLmk(pinKeyResp.getZpkLmk());
+				secure.setStatus("1");
+				secure.setMbToken(request.getToken());
+				secure.setMbDevice(request.getDevice());
+				secure.setMbDeviceType(request.getDevice_type());
+				securityRepository.save(secure);
 
-						NotifCGList saveNotifCGList = new NotifCGList();
-						saveNotifCGList.setMsisdn(request.getMsisdn());
-						saveNotifCGList.setIdCg((long) 1);
-						notifcglistRepository.save(saveNotifCGList);
+				long jumlah = notifcglistRepository.countByMsisdn(noHp);
+				if (jumlah == 0) {
 
-					}
-					response = MbJsonUtil.createResponse(request, pinKeyResp.getClearZPK(), pinKeyResp.getResponse(),
-							TrxIdUtil.getTransactionID(6), MbApiConstant.SUCCESS_CODE);
+					NotifCGList saveNotifCGList = new NotifCGList();
+					saveNotifCGList.setMsisdn(request.getMsisdn());
+					saveNotifCGList.setIdCg((long) 1);
+					notifcglistRepository.save(saveNotifCGList);
 
-				} else {
-					response = MbJsonUtil.createResponse(request, pinKeyResp.getClearZPK(), pinKeyResp.getResponse(),
-							TrxIdUtil.getTransactionID(6), MbApiConstant.SUCCESS_CODE);
 				}
+				response = MbJsonUtil.createResponse(request, pinKeyResp.getClearZPK(), pinKeyResp.getResponse(),
+						TrxIdUtil.getTransactionID(6), MbApiConstant.SUCCESS_CODE);
+
 			} catch (Exception e) {
 				MbAppContent mbAppContent = mbAppContentRepository.findByLangIdAndLanguage("60002", "id");
 				responseDesc = mbAppContent.getDescription();
