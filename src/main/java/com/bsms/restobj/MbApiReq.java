@@ -89,6 +89,7 @@ public class MbApiReq implements Serializable {
 	
 	private String correlation_id;
 	private String modul_id;
+	private String sub_modul_id;
 	private String public_key;
 	private String ip_address;
 	private String version_name;
@@ -104,6 +105,14 @@ public class MbApiReq implements Serializable {
 	private String destinationBank;
 	private String trf_method;
 	private String ref_no;
+	private String fav_title;
+	private String id_favorit;
+	private String section_id;
+	
+	//purchase and payment
+	private String billkey1;
+	private String billCode;
+	private String billerid;
 
 	private Object content;
 	private MbApiContentReq reqContent;
