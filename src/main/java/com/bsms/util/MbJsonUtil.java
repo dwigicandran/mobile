@@ -10,13 +10,24 @@ import com.bsms.restobj.MbApiReq;
 import com.bsms.restobj.MbApiResp;
 import com.bsms.restobj.MbApiStatusResp;
 import com.bsms.restobj.ResponseStatus;
-import com.bsms.restobjclient.ActivationResp;
-import com.bsms.restobjclient.BalanceInquiryDispResp;
-import com.bsms.restobjclient.PINKeyResp;
-import com.bsms.restobjclient.VerifyPinResp;
+import com.bsms.restobjclient.account.BalanceInquiryDispResp;
+import com.bsms.restobjclient.authentication.ActivationResp;
+import com.bsms.restobjclient.authentication.PINKeyResp;
+import com.bsms.restobjclient.authentication.VerifyPinResp;
+import com.bsms.restobjclient.base.BaseResponse;
+import com.bsms.restobjclient.payment.Content;
 
 public class MbJsonUtil {
-
+	
+	public static MbApiResp createResponse(BaseResponse baseResponse) {
+		MbApiResp response = new MbApiResp();
+		response.setResponseCode(baseResponse.getResponseCode());
+		response.setResponseMessage(baseResponse.getResponseMessage());
+		response.setResponseContent(baseResponse.getResponseContent());
+		response.setTransactionId(baseResponse.getTransactionId());
+		return response;
+	}
+	
 	public static MbApiResp createResponse(MbApiReq request, MbApiContentResp respContent, MbApiStatusResp respStatus) {
 
 		MbApiResp response = new MbApiResp();
@@ -271,6 +282,25 @@ public class MbJsonUtil {
 		response.setResponseContent(respContent);
 		return response;
 
+	}
+
+	//addition by Dwi S
+	public static MbApiResp createSPMerchantResponse(String message, Content content){
+		MbApiResp response = new MbApiResp();
+		response.setResponseCode("99");
+		response.setResponseMessage(message);
+		response.setContent(content);
+		return response;
+	}
+
+	//addition by Dwi S
+	public static MbApiResp createErrResponse(BaseResponse baseResponse){
+		MbApiResp response = new MbApiResp();
+		response.setResponseCode(baseResponse.getResponseCode());
+		response.setTransactionId(baseResponse.getTransactionId());
+		response.setResponseMessage(baseResponse.getResponseMessage());
+		response.setContent(baseResponse.getContent());
+		return response;
 	}
 
 

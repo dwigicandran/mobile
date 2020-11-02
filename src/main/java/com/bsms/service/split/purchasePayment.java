@@ -1,0 +1,170 @@
+package com.bsms.service.split;
+
+import com.bsms.cons.MbApiConstant;
+import com.bsms.domain.MbApiTxLog;
+import com.bsms.domain.SpMerchant;
+import com.bsms.repository.MbTxLogRepository;
+import com.bsms.repository.SpMerchantRepository;
+import com.bsms.restobj.MbApiReq;
+import com.bsms.restobj.MbApiResp;
+import com.bsms.restobjclient.base.BaseResponse;
+import com.bsms.restobjclient.payment.Content;
+import com.bsms.service.base.MbBaseServiceImpl;
+import com.bsms.service.base.MbService;
+import com.bsms.util.MbJsonUtil;
+import com.bsms.util.MbLogUtil;
+import com.bsms.util.RestUtil;
+import com.google.gson.Gson;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
+import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
+
+import javax.ws.rs.container.ContainerRequestContext;
+import javax.ws.rs.core.HttpHeaders;
+import java.util.List;
+import java.util.Optional;
+
+@Slf4j
+@Service("purchasePayment")
+public class purchasePayment extends MbBaseServiceImpl implements MbService {
+
+    @Autowired
+    SpMerchantRepository spMerchantRepository;
+
+    @Autowired
+    private MbTxLogRepository txLogRepository;
+
+    @Value("${ubp.payment}")
+    private String ubpInquiryUrl;
+
+    @Value("${switcher.prepaid.payment}")
+    private String switcherInquiryUrl;
+
+    @Value("${rest.template.timeout}")
+    private int restTimeout;
+
+    private String errorDefaultId = ", permintaan tidak dapat diproses, silahkan dicoba beberapa saat lagi.";
+    private String errorDefaultEn = ", request can't be process, please try again later.";
+
+    @Override
+    public MbApiResp process(HttpHeaders header, ContainerRequestContext requestContext, MbApiReq request) throws Exception {
+        MbApiResp response;
+        MbApiTxLog txLog = new MbApiTxLog();
+        String billerId = "";
+
+        log.info("Purchase Payment Split Runnning : ");
+        log.info("Purchase Payment Split Request : " + new Gson().toJson(request));
+
+        String errorDefault = "Permintaan tidak dapat diproses, silahkan dicoba beberapa saat lagi.";
+        if (request.getLanguage().equals("en")) {
+            errorDefault = "Request can't be process, please try again later.";
+        }
+
+        Optional<MbApiTxLog> transactionLog = txLogRepository.findById(request.getTransaction_id());
+        MbApiReq inquiryRequest = transactionLog.get().getRequest();
+
+        if (inquiryRequest != null) {
+            log.info("transaction ada");
+            log.info("Biller Code : " + inquiryRequest.getTransactionId());
+
+            billerId = inquiryRequest.getBillerid() != null ? inquiryRequest.getBillerid() : request.getBillerid();
+//            SpMerchant result = spMerchantRepository.findBySpMerchantId(billerId);
+            List<SpMerchant> result = spMerchantRepository.findAllSpMerchantByMerchantId(billerId);
+
+            if (result.get(0).getServiceprovider() == 0) {
+                response = svPayment(request, billerId);
+                log.info("Purchase To Switcher Services");
+            } else {
+                log.info("Purchase TO UBP Services");
+                response = ubpPayment(request, billerId);
+            }
+        } else {
+            Content content = new Content();
+            content.setKey("ErrorCode");
+            content.setValue(errorDefault);
+            response = MbJsonUtil.createSPMerchantResponse(errorDefault, content);
+            MbLogUtil.writeLogError(log, "Unkown Biller", MbApiConstant.NOT_AVAILABLE);
+        }
+
+        txLog.setId(response.getTransactionId());
+        txLog.setResponse(response);
+        txLog.setRequest(request);
+        txLogRepository.save(txLog);
+
+        return response;
+    }
+
+    private MbApiResp ubpPayment(MbApiReq request, String billerId) {
+        log.info("UBP Biller : " + billerId);
+
+        MbApiResp mbApiResp;
+        try {
+            HttpEntity<?> req = new HttpEntity(request, RestUtil.getHeaders());
+            RestTemplate restTemps = new RestTemplate();
+            String url = ubpInquiryUrl;
+
+            log.info("Split UBP url : " + url);
+            log.info("UBP Request : " + req);
+            ResponseEntity<BaseResponse> response = restTemps.exchange(url, HttpMethod.POST, req, BaseResponse.class);
+            ((SimpleClientHttpRequestFactory) restTemps.getRequestFactory()).setConnectTimeout(restTimeout);
+            ((SimpleClientHttpRequestFactory) restTemps.getRequestFactory()).setReadTimeout(restTimeout);
+            BaseResponse paymentInquiryResp = response.getBody();
+
+            log.info("UBP Response : " + new Gson().toJson(response));
+
+            if (paymentInquiryResp.getResponseCode().equals("00")) {
+                mbApiResp = MbJsonUtil.createResponse(response.getBody());
+            } else {
+                mbApiResp = MbJsonUtil.createErrResponse(response.getBody());
+            }
+
+        } catch (Exception e) {
+            String errorDefault = e.getCause().getMessage() + errorDefaultId;
+            if (request.getLanguage().equals("en")) {
+                errorDefault = e.getCause().getMessage() + errorDefaultEn;
+            }
+            mbApiResp = MbJsonUtil.createResponseBank("99", errorDefault, null);
+        }
+        return mbApiResp;
+    }
+
+    private MbApiResp svPayment(MbApiReq request, String billerId) {
+        MbApiResp mbApiResp;
+        try {
+            HttpEntity<?> req = new HttpEntity(request, RestUtil.getHeaders());
+            RestTemplate restTemps = new RestTemplate();
+            ((SimpleClientHttpRequestFactory) restTemps.getRequestFactory()).setConnectTimeout(restTimeout);
+            ((SimpleClientHttpRequestFactory) restTemps.getRequestFactory()).setReadTimeout(restTimeout);
+            String url = switcherInquiryUrl;
+            log.info("Split Switcher url : " + url);
+            log.info("Switcher request : " + new Gson().toJson(request));
+
+            ResponseEntity<BaseResponse> response = restTemps.exchange(url, HttpMethod.POST, req, BaseResponse.class);
+
+            log.info("Switcher Response : " + new Gson().toJson(response));
+
+            BaseResponse paymentInquiryResp = response.getBody();
+            if (paymentInquiryResp.getResponseCode().equals("00")) {
+                mbApiResp = MbJsonUtil.createResponse(response.getBody());
+            } else {
+                mbApiResp = MbJsonUtil.createErrResponse(response.getBody());
+            }
+
+        } catch (Exception e) {
+            String errorDefault = e.getCause().getMessage() + errorDefaultId;
+            if (request.getLanguage().equals("en")) {
+                errorDefault = e.getCause().getMessage() + errorDefaultEn;
+            }
+            mbApiResp = MbJsonUtil.createResponseBank("99", errorDefault, null);
+        }
+
+        return mbApiResp;
+    }
+
+}
