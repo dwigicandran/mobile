@@ -28,6 +28,7 @@ import org.springframework.web.client.RestTemplate;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.core.HttpHeaders;
 
+//By Dwi S - Oktober 2020
 @Slf4j
 @Service("qurbanInquiry")
 public class QurbanInquiry extends MbBaseServiceImpl implements MbService {
@@ -42,6 +43,9 @@ public class QurbanInquiry extends MbBaseServiceImpl implements MbService {
 
     @Value("${sql.conf}")
     private String sqlconf;
+
+    @Value("${rest.template.timeout}")
+    private int restTimeout;
 
     @Override
     public MbApiResp process(HttpHeaders header, ContainerRequestContext requestContext, MbApiReq request) throws Exception {
@@ -70,15 +74,14 @@ public class QurbanInquiry extends MbBaseServiceImpl implements MbService {
             log.info("Limit Check Error : " + e.getMessage());
         }
 
-        log.info("Limit Response : " + limitResponseCode);
-
         if ("00".equals(limitResponseCode)) {
             try {
                 HttpEntity<?> req = new HttpEntity(request, RestUtil.getHeaders());
                 String url = doInquiryUrl;
                 RestTemplate restTemplate = new RestTemplate();
-                ((SimpleClientHttpRequestFactory) restTemplate.getRequestFactory()).setConnectTimeout(30000);
-                ((SimpleClientHttpRequestFactory) restTemplate.getRequestFactory()).setReadTimeout(30000);
+                //set rest template timeout
+                ((SimpleClientHttpRequestFactory) restTemplate.getRequestFactory()).setConnectTimeout(restTimeout);
+                ((SimpleClientHttpRequestFactory) restTemplate.getRequestFactory()).setReadTimeout(restTimeout);
 
                 ResponseEntity<BaseResponse> response = restTemplate.exchange(url, HttpMethod.POST, req, BaseResponse.class);
 
@@ -89,7 +92,7 @@ public class QurbanInquiry extends MbBaseServiceImpl implements MbService {
                 if (response.getBody() != null) {
                     mbApiResp = MbJsonUtil.createResponse(response.getBody());
                 } else {
-                    MbLogUtil.writeLogError(log, "Response body null", MbApiConstant.NOT_AVAILABLE);
+                    MbLogUtil.writeLogError(log, "Response body is empty", MbApiConstant.NOT_AVAILABLE);
                     mbApiResp = MbJsonUtil.createResponseBank("99", errorDefault, null);
                 }
 
@@ -105,7 +108,7 @@ public class QurbanInquiry extends MbBaseServiceImpl implements MbService {
             response_msg = request.getLanguage().equalsIgnoreCase("en") ? MbConstant.ERROR_LIMIT_EXCEED_EN : MbConstant.ERROR_LIMIT_EXCEED_ID;
             mbApiResp = MbJsonUtil.createResponseTrf("02", response_msg, null, "");
         } else {
-            response_msg = request.getLanguage().equalsIgnoreCase("en") ? MbConstant.ERROR_LIMIT_CHECK_EN : MbConstant.ERROR_LIMIT_CHECK_EN;
+            response_msg = request.getLanguage().equalsIgnoreCase("en") ? MbConstant.ERROR_LIMIT_CHECK_EN : MbConstant.ERROR_LIMIT_CHECK_ID;
             mbApiResp = MbJsonUtil.createResponseTrf("03", response_msg, null, "");
         }
 
@@ -114,7 +117,6 @@ public class QurbanInquiry extends MbBaseServiceImpl implements MbService {
         txLog.setResponse(mbApiResp);
         txLog.setRequest(request);
         txLogRepository.save(txLog);
-
 
         return mbApiResp;
     }
