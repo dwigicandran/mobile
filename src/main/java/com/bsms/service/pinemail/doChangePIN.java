@@ -16,6 +16,7 @@ import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.core.HttpHeaders;
 
+import com.bsms.cons.MbConstant;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -63,66 +64,66 @@ import com.google.gson.Gson;
 public class doChangePIN extends MbBaseServiceImpl implements MbService  {
 	@Value("${sql.conf}")
 	private String connectionUrl;
-	
+
 	@Value("${admin.changepin}")
     private String changePIN;
-	
+
 	@Autowired
     private ObjectMapper objMapper;
 
     @Autowired
     private MessageSource msg;
-    
+
     @Autowired
     private MbTxLogRepository txLogRepository;
-    
+
     RestTemplate restTemplate = new RestTemplate();
-    
+
     MbApiResp mbApiResp;
-    
+
     Client client = ClientBuilder.newClient();
-	
+
     private static Logger log = LoggerFactory.getLogger(MbInquiryOnlineTrfService.class);
-    
+
 	@Override
 	public MbApiResp process(HttpHeaders header, ContainerRequestContext requestContext, MbApiReq request)
 			throws Exception {
-		
+
 		ResultSet rs;
         Statement stmt;
         String SQL;
         String pinoffset="";
         String pan="";
         String zpk="";
-        
-	    		MbApiTxLog txLog = new MbApiTxLog();	
+
+	    		MbApiTxLog txLog = new MbApiTxLog();
 	            txLogRepository.save(txLog);
-	            
+
 	            //get pan,zpk,pinoffset
-	            try (Connection con = DriverManager.getConnection(connectionUrl);) 
+	            try (Connection con = DriverManager.getConnection(connectionUrl);)
 		        {
 		        	stmt= con.createStatement();
-		        	
-		        	SQL= "select Security.ZPK_lmk,CardMapping.CardNumber,CardMapping.PinOffset " + 
+
+		        	SQL= "select Security.ZPK_lmk,CardMapping.CardNumber,CardMapping.PinOffset " +
 		        			"from cardmapping inner join Security on cardmapping.CustomerID=Security.CustomerID "
 		        			+ "where cardmapping.customerID ='"+request.getCustomer_id()+"'";
 		            rs = stmt.executeQuery(SQL);
-		            
-		            while(rs.next()) 
+
+		            while(rs.next())
 			            {
 		                 pinoffset=rs.getString("PinOffset");
 		                 pan=rs.getString("CardNumber");
 		                 zpk=rs.getString("ZPK_lmk");
 			            }
-		            
+
 		            rs.close();
 	                stmt.close();
-	                 
+
 	                 //close connection
 	                 con.close();
 
 		        } catch (SQLException e) {
-		        	System.out.println(e.toString());		        	
+		        	System.out.println(e.toString());
 		        }
 
 	            InquiryPINReq InquiryPINReq = new InquiryPINReq();
@@ -133,41 +134,39 @@ public class doChangePIN extends MbBaseServiceImpl implements MbService  {
 	            InquiryPINReq.setPinoffset(pinoffset);
 	            InquiryPINReq.setNewpin(request.getNewpin());
 	            InquiryPINReq.setPan(pan);
-	            
+
 	        	System.out.println("::: ChangePIN Microservices Request :::");
 	            System.out.println(new Gson().toJson(InquiryPINReq));
-	            
+
 		        	 try {
-			    			
+
 			            	HttpEntity<?> req = new HttpEntity(InquiryPINReq, RestUtil.getHeaders());
 			            	RestTemplate restTemps = new RestTemplate();
 			            	String url = changePIN;
-			            	
+
 			    			ResponseEntity<doChangePINResp> response = restTemps.exchange(url, HttpMethod.POST, req, doChangePINResp.class);
 			    			doChangePINResp doChangePINResp = response.getBody();
-			    			
+
 			    			System.out.println("::: ChangePIN Microservices Response :::");
 			    			System.out.println(new Gson().toJson(response.getBody()));
-			    			
-			    			 mbApiResp = MbJsonUtil.createResponseTrf(doChangePINResp.getResponseCode(),doChangePINResp.getResponseMessage(),doChangePINResp.getResponseContent(),doChangePINResp.getTransactionId()); 
-				    			
-			    			
-			    			
+
+			    			 mbApiResp = MbJsonUtil.createResponseTrf(doChangePINResp.getResponseCode(),doChangePINResp.getResponseMessage(),doChangePINResp.getResponseContent(),doChangePINResp.getTransactionId());
+
 			    		} catch (Exception e) {
-			    			mbApiResp = MbJsonUtil.createResponseTrf("99",
-			    					e.toString(),
-			        				null,""); 
+		        	 	String language = request.getLanguage() != null ? request.getLanguage() : "id";
+		        	 	String errorMsg = language.equalsIgnoreCase("en") ? MbConstant.ERROR_REQUEST_EN : MbConstant.ERROR_REQUEST_EN;
+			    			mbApiResp = MbJsonUtil.createResponseTrf("99", errorMsg, null,"");
 			    			MbLogUtil.writeLogError(log, "99", e.toString());
 			    		}
-		      
-	           
+
+
 
 	            txLog.setResponse(mbApiResp);
 	    		txLogRepository.save(txLog);
-	        
-	        
-	
-		
+
+
+
+
 		return  mbApiResp;
 	}
 

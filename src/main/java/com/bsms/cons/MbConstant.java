@@ -2,15 +2,15 @@ package com.bsms.cons;
 
 public class MbConstant {
 
-	public static final String KODE_BANK = "451";
+    public static final String KODE_BANK = "451";
     public static final String HOST_CORE = "CORE";
     public static final String HOST_SL = "MB";
     public static final String ERROR_NUM_HOST_SL = "998";
     public static final String ERROR_NUM_UNKNOWN = "99";
     public static final String CORE_SYSTEM_ID = "SYARIAH";
-    
+
     public static final int LIMIT_GENERAL_TX_ID = 999989;
-    
+
     public static final String SWITCHER_ECHO_TX_ID = "999999";
     public static final String ERROR_SL_GET_TX_ID = "999998";
 
@@ -26,9 +26,7 @@ public class MbConstant {
     public static final String ERROR_LIMIT_FINANCIAL_ID = "Anda belum bisa melakukan transaksi finansial.\nSilahkan datang ke cabang untuk mengaktifkannya.";
     public static final String ERROR_LIMIT_FINANCIAL_EN = "You cannot do financial transactions.\nPlease come to our branch to activate it.";
 
-
-
-
+    public static final String BILLER_CETAK_TOKEN = "0213";
 
 
 }

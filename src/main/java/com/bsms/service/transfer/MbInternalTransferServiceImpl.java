@@ -13,6 +13,7 @@ import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.core.HttpHeaders;
 
+import com.bsms.util.*;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,11 +37,6 @@ import com.bsms.restobjclient.transfer.InternalTrfReq;
 import com.bsms.restobjclient.transfer.InternalTrfResp;
 import com.bsms.service.base.MbBaseServiceImpl;
 import com.bsms.service.base.MbService;
-import com.bsms.util.LibFunctionUtil;
-import com.bsms.util.MbJsonUtil;
-import com.bsms.util.MbLogUtil;
-import com.bsms.util.RestUtil;
-import com.bsms.util.TrxLimit;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 
@@ -217,19 +213,18 @@ public class MbInternalTransferServiceImpl extends MbBaseServiceImpl implements 
 
                 if (internalTrfReq.getLanguage().equals("id")) {
                     content.add(new ContentIntTrf("Status Transaksi", "Berhasil", ""));
-                    content.add(new ContentIntTrf("Dari Rekening", request.getAccount_number() + " - Bank Syariah Mandiri", request.getCustomerName()));
+                    content.add(new ContentIntTrf("Dari Rekening", TextUtil.maskString(request.getAccount_number(), 0, 6, 'X') + " - Bank Syariah Mandiri", request.getCustomerName()));
                     content.add(new ContentIntTrf("Ke Rekening", DestinationAccountNumber + " - Bank Syariah Mandiri", inquiryTrfResp.getContent().getDestinationAccountName()));
                     content.add(new ContentIntTrf("Jumlah", amount_display, ""));
                     content.add(new ContentIntTrf("Keterangan", request.getDescription(), ""));
                 } else { //penambahan resi bahasa inggris oleh Dwi
                     content.add(new ContentIntTrf("Transaction Status", "Successfull", ""));
-                    content.add(new ContentIntTrf("From Account", request.getAccount_number() + " - Bank Syariah Mandiri", request.getCustomerName()));
+                    content.add(new ContentIntTrf("From Account", TextUtil.maskString(request.getAccount_number(), 0, 6, 'X') + " - Bank Syariah Mandiri", request.getCustomerName()));
                     content.add(new ContentIntTrf("To Account", DestinationAccountNumber + " - Bank Syariah Mandiri", inquiryTrfResp.getContent().getDestinationAccountName()));
                     content.add(new ContentIntTrf("Total", amount_display, ""));
                     content.add(new ContentIntTrf("Description", request.getDescription(), ""));
                     title = "Transfer to BSM";
                 }
-
 
                 InternalTrfDispResp internalTrfDispResp = new InternalTrfDispResp(internalTrfResp.getContent().getAdditionalData(),
                         date_trx,
@@ -244,7 +239,6 @@ public class MbInternalTransferServiceImpl extends MbBaseServiceImpl implements 
 
             } else {
                 System.out.println(internalTrfResp.getResponseCode() + " <<<========== response code error");
-
                 mbApiResp = MbJsonUtil.createResponseTrf(internalTrfResp.getResponseCode(),
                         internalTrfResp.getContent().getErrorMessage(),
                         null, "");

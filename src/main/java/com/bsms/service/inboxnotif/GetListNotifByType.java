@@ -23,7 +23,7 @@ import javax.ws.rs.core.HttpHeaders;
 //adding by Dwi S - November 2020
 @Slf4j
 @Service("getListNotif")
-public class GetListNotif extends MbBaseServiceImpl implements MbService {
+public class GetListNotifByType extends MbBaseServiceImpl implements MbService {
 
     @Value("${notif.getList}")
     private String getLisUrl;
