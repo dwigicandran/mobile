@@ -54,7 +54,7 @@ public class GetListNotif extends MbBaseServiceImpl implements MbService {
                 mbApiResp = MbJsonUtil.createErrResponse(response.getBody());
             }
 
-            log.info("GetInfoListSetting Tausiah Response : " + new Gson().toJson(mbApiResp));
+            log.info("GetListNotif Response : " + new Gson().toJson(mbApiResp));
         } catch (Exception e) {
             String errorDefault = e.getCause().getMessage() + ", permintaan tidak dapat diproses, silahkan dicoba beberapa saat lagi.";
             if (request.getLanguage().equals("en")) {
@@ -66,7 +66,6 @@ public class GetListNotif extends MbBaseServiceImpl implements MbService {
 
         return mbApiResp;
     }
-
 
 
 }

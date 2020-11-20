@@ -67,6 +67,7 @@ public class doPaymentInquiry extends MbBaseServiceImpl implements MbService {
         try {
             HttpEntity<?> req = new HttpEntity(request, RestUtil.getHeaders());
             String url = doInquiryPayment;
+            log.info("Inquiry URL : " + url);
             RestTemplate restTemplate = new RestTemplate();
             ((SimpleClientHttpRequestFactory) restTemplate.getRequestFactory()).setConnectTimeout(restTimeout);
             ((SimpleClientHttpRequestFactory) restTemplate.getRequestFactory()).setReadTimeout(restTimeout);

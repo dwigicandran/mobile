@@ -21,20 +21,22 @@ import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.core.HttpHeaders;
 
 //adding by Dwi S - November 2020
-@Slf4j
-@Service("getListNotifByType")
-public class GetListNotifByType extends MbBaseServiceImpl implements MbService {
 
-    @Value("${notif.getListByTpe}")
+@Slf4j
+@Service("getNotifDetail")
+public class getNotifDetail extends MbBaseServiceImpl implements MbService {
+
+    @Value("${notif.getNotifDetail}")
     private String getLisUrl;
 
     @Value("${rest.template.timeout}")
     private int restTimeout;
 
+
     @Override
     public MbApiResp process(HttpHeaders header, ContainerRequestContext requestContext, MbApiReq request) throws Exception {
         MbApiResp mbApiResp;
-        log.info("Inbox Notif - GetListNotifByType");
+        log.info("Inbox Notif - GetListNotifDetail");
         log.info("Get List Request : " + new Gson().toJson(request));
 
         try {
@@ -43,7 +45,7 @@ public class GetListNotifByType extends MbBaseServiceImpl implements MbService {
             ((SimpleClientHttpRequestFactory) restTemps.getRequestFactory()).setConnectTimeout(restTimeout);
             ((SimpleClientHttpRequestFactory) restTemps.getRequestFactory()).setReadTimeout(restTimeout);
             String url = getLisUrl;
-            log.info("GetListNotifByType Url : " + url);
+            log.info("GetListNotifDetail Url : " + url);
 
             ResponseEntity<BaseResponse> response = restTemps.exchange(url, HttpMethod.POST, req, BaseResponse.class);
             BaseResponse paymentInquiryResp = response.getBody();
@@ -54,7 +56,7 @@ public class GetListNotifByType extends MbBaseServiceImpl implements MbService {
                 mbApiResp = MbJsonUtil.createErrResponse(response.getBody());
             }
 
-            log.info("GetListNotifByType Response : " + new Gson().toJson(mbApiResp));
+            log.info("GetListNotifDetail Response : " + new Gson().toJson(mbApiResp));
         } catch (Exception e) {
             String errorDefault = e.getCause().getMessage() + ", permintaan tidak dapat diproses, silahkan dicoba beberapa saat lagi.";
             if (request.getLanguage().equals("en")) {
@@ -66,7 +68,5 @@ public class GetListNotifByType extends MbBaseServiceImpl implements MbService {
 
         return mbApiResp;
     }
-
-
 
 }

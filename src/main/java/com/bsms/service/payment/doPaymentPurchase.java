@@ -20,6 +20,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -56,13 +57,14 @@ public class doPaymentPurchase extends MbBaseServiceImpl implements MbService {
             RestTemplate restTemps = new RestTemplate();
             String url = doPayment;
 
-            System.out.println("dopayment request : " + new Gson().toJson(req.getBody()));
-
+            log.info("dopayment request : " + new Gson().toJson(req.getBody()));
+            ((SimpleClientHttpRequestFactory) restTemps.getRequestFactory()).setConnectTimeout(restTimeout);
+            ((SimpleClientHttpRequestFactory) restTemps.getRequestFactory()).setReadTimeout(restTimeout);
             ResponseEntity<BaseResponse> response = restTemps.exchange(url, HttpMethod.POST, req, BaseResponse.class);
 
-            System.out.println("-----------------------------------------------------------");
-            System.out.println("Response From Switcher : \n" + new Gson().toJson(response));
-            System.out.println("---------------------end Response -------------------------");
+
+            log.info("Response From Switcher : \n" + new Gson().toJson(response));
+
 
             if (response.getBody() != null) {
                 mbApiResp = MbJsonUtil.createResponse(response.getBody());

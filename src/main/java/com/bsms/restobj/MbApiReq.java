@@ -194,6 +194,14 @@ public class MbApiReq implements Serializable {
     //setting
     private String prefix;
 
+    //inbox notif
+    private String nid;
+    private String msgtype;
+    private String mid;
+    private String gmid;
+    private String flag;
+    private String gid;
+
 
     private Object content;
     private MbApiContentReq reqContent;

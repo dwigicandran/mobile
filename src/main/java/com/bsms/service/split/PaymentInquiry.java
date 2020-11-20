@@ -187,45 +187,6 @@ public class PaymentInquiry extends MbBaseServiceImpl implements MbService {
         return mbApiResp;
     }
 
-    private MbApiResp bpjstkInquiry(MbApiReq request, String inquiryUrl) {
-        MbApiResp mbApiResp;
-
-        try {
-            HttpEntity<?> req = new HttpEntity(request, RestUtil.getHeaders());
-            RestTemplate restTemps = new RestTemplate();
-            ((SimpleClientHttpRequestFactory) restTemps.getRequestFactory()).setConnectTimeout(restTimeout);
-            ((SimpleClientHttpRequestFactory) restTemps.getRequestFactory()).setReadTimeout(restTimeout);
-            String url = inquiryUrl;
-
-            log.info("BPJSTK Url : " + url);
-            log.info("request : " + new Gson().toJson(req));
-
-            ResponseEntity<BaseResponse> response = restTemps.exchange(url, HttpMethod.POST, req, BaseResponse.class);
-            log.info("response : " + response);
-
-            BaseResponse paymentInquiryResp = response.getBody();
-            log.info("::: doInquiry BPJSTK Response :::");
-            log.info("response result : " + new Gson().toJson(response));
-            log.info("base response : " + new Gson().toJson(paymentInquiryResp));
-            if (paymentInquiryResp.getResponseCode().equals("00")) {
-                mbApiResp = MbJsonUtil.createResponse(response.getBody());
-            } else {
-                mbApiResp = MbJsonUtil.createErrResponse(response.getBody());
-            }
-
-        } catch (Exception e) {
-            log.info("exception : " + e.getCause().getMessage());
-            String errorDefault = e.getCause().getMessage() + ", permintaan tidak dapat diproses, silahkan dicoba beberapa saat lagi.";
-            if (request.getLanguage().equals("en")) {
-                errorDefault = e.getCause().getMessage() + ", request can't be process, please try again later.";
-            }
-            mbApiResp = MbJsonUtil.createResponseBank("99", errorDefault, null);
-        }
-
-        return mbApiResp;
-    }
-
-
     private MbApiResp bpjstTkInquiry(MbApiReq request, String inquiryUrl) {
         MbApiResp mbApiResp;
 

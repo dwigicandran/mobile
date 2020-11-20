@@ -21,12 +21,13 @@ import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.core.HttpHeaders;
 
 //adding by Dwi S - November 2020
-@Slf4j
-@Service("getListNotifByType")
-public class GetListNotifByType extends MbBaseServiceImpl implements MbService {
 
-    @Value("${notif.getListByTpe}")
-    private String getLisUrl;
+@Slf4j
+@Service("getUpdateReceipt")
+public class GetUpdateReceipt extends MbBaseServiceImpl implements MbService {
+
+    @Value("${notif.getUpdateReceipt}")
+    private String getUpdateReceiptUrl;
 
     @Value("${rest.template.timeout}")
     private int restTimeout;
@@ -34,16 +35,15 @@ public class GetListNotifByType extends MbBaseServiceImpl implements MbService {
     @Override
     public MbApiResp process(HttpHeaders header, ContainerRequestContext requestContext, MbApiReq request) throws Exception {
         MbApiResp mbApiResp;
-        log.info("Inbox Notif - GetListNotifByType");
-        log.info("Get List Request : " + new Gson().toJson(request));
+        log.info("getUpdateReceipt Request : " + new Gson().toJson(request));
 
         try {
             HttpEntity<?> req = new HttpEntity(request, RestUtil.getHeaders());
             RestTemplate restTemps = new RestTemplate();
             ((SimpleClientHttpRequestFactory) restTemps.getRequestFactory()).setConnectTimeout(restTimeout);
             ((SimpleClientHttpRequestFactory) restTemps.getRequestFactory()).setReadTimeout(restTimeout);
-            String url = getLisUrl;
-            log.info("GetListNotifByType Url : " + url);
+            String url = getUpdateReceiptUrl;
+            log.info("getUpdateReceipt Url : " + url);
 
             ResponseEntity<BaseResponse> response = restTemps.exchange(url, HttpMethod.POST, req, BaseResponse.class);
             BaseResponse paymentInquiryResp = response.getBody();
@@ -54,7 +54,7 @@ public class GetListNotifByType extends MbBaseServiceImpl implements MbService {
                 mbApiResp = MbJsonUtil.createErrResponse(response.getBody());
             }
 
-            log.info("GetListNotifByType Response : " + new Gson().toJson(mbApiResp));
+            log.info("getUpdateReceipt Response : " + new Gson().toJson(mbApiResp));
         } catch (Exception e) {
             String errorDefault = e.getCause().getMessage() + ", permintaan tidak dapat diproses, silahkan dicoba beberapa saat lagi.";
             if (request.getLanguage().equals("en")) {
@@ -66,7 +66,5 @@ public class GetListNotifByType extends MbBaseServiceImpl implements MbService {
 
         return mbApiResp;
     }
-
-
 
 }
