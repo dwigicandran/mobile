@@ -1,6 +1,5 @@
-package com.bsms.service.ziswaf;
+package com.bsms.service.pdam;
 
-import com.bsms.domain.MbApiTxLog;
 import com.bsms.restobj.MbApiReq;
 import com.bsms.restobj.MbApiResp;
 import com.bsms.restobjclient.base.BaseResponse;
@@ -22,61 +21,52 @@ import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.core.HttpHeaders;
 
 @Slf4j
-@Service("getListNazhir")
-public class GetListNazhir extends MbBaseServiceImpl implements MbService {
+@Service("pdamPayment")
+public class PdamPayment extends MbBaseServiceImpl implements MbService {
 
-    @Value("${ziswaf.getListNazhir}")
-    private String getListUrl;
+    @Value("${pdam.ubp.payment}")
+    private String pdamUbpPaymentUrl;
 
     @Value("${rest.template.timeout}")
     private int restTimeout;
 
-
     @Override
     public MbApiResp process(HttpHeaders header, ContainerRequestContext requestContext, MbApiReq request) throws Exception {
         MbApiResp mbApiResp;
-
-        log.info("GetList Nazhir runing !");
-        log.info("Request : " + new Gson().toJson(request));
-
-        String requestPath = requestContext.getUriInfo().getPath();
-        String requestParam = requestPath.substring(requestPath.lastIndexOf('/') + 1);
-        String billerId = requestParam != null || !requestParam.equals("") ? requestParam : "0";
+        log.info("PDAM Payment Running");
+        log.info("PDAM Payment Request : " + new Gson().toJson(request));
 
         try {
             HttpEntity<?> req = new HttpEntity(request, RestUtil.getHeaders());
             RestTemplate restTemps = new RestTemplate();
             ((SimpleClientHttpRequestFactory) restTemps.getRequestFactory()).setConnectTimeout(restTimeout);
             ((SimpleClientHttpRequestFactory) restTemps.getRequestFactory()).setReadTimeout(restTimeout);
-            String url = getListUrl + billerId;
-
-            log.info("GetInfoListSetting Nazhir Url : " + url);
-            log.info("Request : " + new Gson().toJson(req));
+            String url = pdamUbpPaymentUrl;
+            log.info("PDAM Payment Url : " + url);
 
             ResponseEntity<BaseResponse> response = restTemps.exchange(url, HttpMethod.POST, req, BaseResponse.class);
-            log.info("response : " + response);
-
             BaseResponse paymentInquiryResp = response.getBody();
-            log.info("::: GetInfoListSetting Nazhir Response :::");
-            log.info("Response Result : " + new Gson().toJson(response));
+
+            System.out.println("Payment Response : " + new Gson().toJson(paymentInquiryResp));
+
             if (paymentInquiryResp.getResponseCode().equals("00")) {
+                System.out.println("run create pdam response ");
                 mbApiResp = MbJsonUtil.createResponse(response.getBody());
             } else {
-                mbApiResp = MbJsonUtil.createErrResponse(response.getBody());
+                System.out.println("run error");
+                mbApiResp = MbJsonUtil.createPdamPaymentErrorResponse(response.getBody(), request.getLanguage());
             }
 
+            log.info("PDAM Payment Response : " + new Gson().toJson(mbApiResp));
         } catch (Exception e) {
-            log.info("exception : " + e.getCause().getMessage());
-            String errorDefault = "permintaan tidak dapat diproses, silahkan dicoba beberapa saat lagi.";
+            String errorDefault = e.getCause().getMessage() + ", permintaan tidak dapat diproses, silahkan dicoba beberapa saat lagi.";
             if (request.getLanguage().equals("en")) {
-                errorDefault = "request can't be process, please try again later.";
+                errorDefault = e.getCause().getMessage() + ", request can't be process, please try again later.";
             }
             mbApiResp = MbJsonUtil.createResponseBank("99", errorDefault, null);
+            log.info("Error : " + e.getCause().getMessage());
         }
-
 
         return mbApiResp;
     }
-
-
 }

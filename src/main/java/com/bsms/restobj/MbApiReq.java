@@ -105,6 +105,7 @@ public class MbApiReq implements Serializable {
     private String request_data;
     private String customer_id;
     private String destinationBank;
+    private String typeBank;
     private String trf_method;
     private String ref_no;
     private String fav_title;
@@ -200,8 +201,14 @@ public class MbApiReq implements Serializable {
     private String mid;
     private String gmid;
     private String flag;
-    private String gid;
 
+    //PDAM
+    private String bcList;
+    private String serviceId;
+
+    //institution
+    private String pay_code;
+    private String category;
 
     private Object content;
     private MbApiContentReq reqContent;

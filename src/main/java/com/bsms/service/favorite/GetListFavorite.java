@@ -84,6 +84,11 @@ public class GetListFavorite extends MbBaseServiceImpl implements MbService{
 		            		favorit.add(new Favorit(rs.getString("billkey1")+";"+rs.getString("billerid"),
 		            				rs.getString("fav_title")+";"+rs.getString("billkey1")));
 		            	}
+		            	else if(request.getSub_modul_id().equalsIgnoreCase("PU05"))
+		            	{
+		            		favorit.add(new Favorit(rs.getString("billkey1")+";"+rs.getString("billerid"),
+		            				rs.getString("fav_title")+";"+rs.getString("billkey1")));
+		            	}
 		            	else if(request.getSub_modul_id().substring(0, 2).equalsIgnoreCase("PU"))
 		            	{
 		            		favorit.add(new Favorit(rs.getString("billkey1"),

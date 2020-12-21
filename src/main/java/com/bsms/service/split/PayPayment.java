@@ -31,7 +31,7 @@ import java.util.List;
 
 @Slf4j
 @Service("payPayment")
-public class payPayment extends MbBaseServiceImpl implements MbService {
+public class PayPayment extends MbBaseServiceImpl implements MbService {
 
     @Autowired
     SpMerchantRepository spMerchantRepository;

@@ -29,4 +29,23 @@ public class MbConstant {
     public static final String BILLER_CETAK_TOKEN = "0213";
 
 
+    //PDAM ERROR
+    public static final String PDAM_ERROR_PAID_OFF = "B8";
+    public static final String PDAM_ERROR_MIN_PAYMENT = "25";
+    public static final String PDAM_ERROR_PASSIVE = "C0";
+
+    public static final String PDAM_ERROR_PAID_OFF_EN = "Already Paid Off";
+    public static final String PDAM_ERROR_PAID_OFF_ID = "Tagihan Sudah Terbayar";
+
+    public static final String PDAM_ERROR_MIN_PAYMENT_ID = "Minimun Pembayaran Tidak Terpenuhi";
+    public static final String PDAM_ERROR_MIN_PAYMENT_EN = "Minimum Payment";
+
+    public static final String PDAM_ERROR_PASSIVE_ID = "Pelanggan Pasif";
+    public static final String PDAM_ERROR_PASSIVE_EN = "Passive Customer";
+
+    public static final String PDAM_ERROR_TIMEOUT = "Timeout/Connection Problem";
+
+    //PDAM ERROR
+
+
 }

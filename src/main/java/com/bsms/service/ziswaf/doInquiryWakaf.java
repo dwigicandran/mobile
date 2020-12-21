@@ -58,9 +58,9 @@ public class doInquiryWakaf extends MbBaseServiceImpl implements MbService {
 
         } catch (Exception e) {
             log.info("exception : " + e.getCause().getMessage());
-            String errorDefault = e.getCause().getMessage() + ", permintaan tidak dapat diproses, silahkan dicoba beberapa saat lagi.";
+            String errorDefault = "permintaan tidak dapat diproses, silahkan dicoba beberapa saat lagi.";
             if (request.getLanguage().equals("en")) {
-                errorDefault = e.getCause().getMessage() + ", request can't be process, please try again later.";
+                errorDefault = "request can't be process, please try again later.";
             }
             mbApiResp = MbJsonUtil.createResponseBank("99", errorDefault, null);
         }

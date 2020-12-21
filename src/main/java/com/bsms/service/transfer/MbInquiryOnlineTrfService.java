@@ -91,6 +91,8 @@ public class MbInquiryOnlineTrfService extends MbBaseServiceImpl implements MbSe
         String DestinationBank = null;
         String DestinationAccountNumber = null;
         String trf_method = null;
+        String bankType = null;
+
 
         //=============== cek limit ================//
         JSONObject value = new JSONObject();
@@ -102,15 +104,20 @@ public class MbInquiryOnlineTrfService extends MbBaseServiceImpl implements MbSe
 
         System.out.println("RC Check Limit : " + response_code);
 
+
         if ("00".equals(response_code)) {
 
             System.out.println("ID Favorit : " + request.getId_favorit());
 
+
             if (request.getId_favorit() == null) {
                 DestinationBank = request.getDestinationBank();
+                bankType = request.getTypeBank();
+
                 DestinationAccountNumber = request.getDestinationAccountNumber();
                 trf_method = request.getTrf_method();
             } else {
+
                 try (Connection con = DriverManager.getConnection(sqlconf);) {
                     Statement stmt;
                     String SQL;
@@ -124,6 +131,7 @@ public class MbInquiryOnlineTrfService extends MbBaseServiceImpl implements MbSe
                         DestinationBank = rs.getString("destinationBank");
                         DestinationAccountNumber = rs.getString("destinationAccountNumber");
                         trf_method = rs.getString("trfMethod");
+                        bankType = rs.getString("typeBank");
                     } else {
                         DestinationBank = request.getDestinationBank();
                         DestinationAccountNumber = request.getDestinationAccountNumber();
@@ -149,9 +157,11 @@ public class MbInquiryOnlineTrfService extends MbBaseServiceImpl implements MbSe
                 Statement stmt;
                 String SQL;
 
+                log.info("banktype : " + bankType);
+
                 stmt = con.createStatement();
                 SQL = "SELECT Code, Jenis,Feature, Name FROM Banks with (NOLOCK) INNER JOIN "
-                        + "BankPrior ON Code = IdBank where Code ='" + DestinationBank + "'";
+                        + "BankPrior ON Code = IdBank where Code ='" + DestinationBank + "' and Jenis='" + bankType + "'";
                 ResultSet rs = stmt.executeQuery(SQL);
 
                 while (rs.next()) {

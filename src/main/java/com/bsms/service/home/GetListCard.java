@@ -1,5 +1,6 @@
 package com.bsms.service.home;
 
+import com.bsms.cons.MbConstant;
 import com.bsms.restobj.MbApiReq;
 import com.bsms.restobj.MbApiResp;
 import com.bsms.restobjclient.base.BaseResponse;
@@ -58,9 +59,10 @@ public class GetListCard extends MbBaseServiceImpl implements MbService {
 
             log.info("RESPONSE : " + new Gson().toJson(mbApiResp));
         } catch (Exception e) {
-            String errorDefault = e.getCause().getMessage() + ", permintaan tidak dapat diproses, silahkan dicoba beberapa saat lagi.";
+//            String errorDefault = e.getCause().getMessage() + ", permintaan tidak dapat diproses, silahkan dicoba beberapa saat lagi.";
+            String errorDefault = MbConstant.ERROR_REQUEST_ID;
             if (request.getLanguage().equals("en")) {
-                errorDefault = e.getCause().getMessage() + ", request can't be process, please try again later.";
+                errorDefault = MbConstant.ERROR_REQUEST_EN;
             }
             mbApiResp = MbJsonUtil.createResponseBank("99", errorDefault, null);
         }

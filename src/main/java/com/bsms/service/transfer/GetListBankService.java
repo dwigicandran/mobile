@@ -34,73 +34,72 @@ import com.bsms.util.MbLogUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Service("listBank")
-public class GetListBankService extends MbBaseServiceImpl implements MbService{
+public class GetListBankService extends MbBaseServiceImpl implements MbService {
 
-	 	@Value("${sql.conf}")
-		private String connectionUrl;
-		
-		@Autowired
-	    private ObjectMapper objMapper;
+    @Value("${sql.conf}")
+    private String connectionUrl;
 
-	    @Autowired
-	    private MessageSource msg;
-	    
-	    @Autowired
-	    private MbTxLogRepository txLogRepository;
-	    
-	    RestTemplate restTemplate = new RestTemplate();
-	    
-	    MbApiResp mbApiResp;
+    @Autowired
+    private ObjectMapper objMapper;
 
-	    Client client = ClientBuilder.newClient();
-	    
-	    private static Logger log = LoggerFactory.getLogger(GetListBankService.class);
-	    
-	    public MbApiResp process(HttpHeaders header, ContainerRequestContext requestContext, MbApiReq request)
-				throws Exception {
-	        
-			try {
-		    
-		        try (Connection con = DriverManager.getConnection(connectionUrl);) 
-		        {
-		        	List<Bank> bank = new ArrayList<>();
+    @Autowired
+    private MessageSource msg;
 
-		        	Statement stmt;
-		        	String SQL;
-		        	
-		        	stmt= con.createStatement();
-		        	SQL= "SELECT Code, Jenis, Name FROM Banks with (NOLOCK) INNER JOIN "
-		        			+ "BankPrior ON Code = IdBank ORDER BY PriorSort";
-		            ResultSet rs = stmt.executeQuery(SQL);
-		            
-		            while (rs.next()) 
-	 	            {
-		            	bank.add(new Bank(rs.getString("Code"),rs.getString("Name")));
-	 	            }
-		            rs.close();
-		            stmt.close();
-		 	        con.close();
-		        	
-		 	       BankDispResp bankDispResp = new BankDispResp(bank);
-		           mbApiResp = MbJsonUtil.createResponseBank("00","Success",bankDispResp);
-		            
-		           
-		        } catch (SQLException e) {
-		        	mbApiResp = MbJsonUtil.createResponseBank("99","List_Bank(), Db Connection Error",null);
-		        	MbLogUtil.writeLogError(log, "List_Bank(), Db Connection Error", MbApiConstant.NOT_AVAILABLE);
-		        	MbLogUtil.writeLogError(log, e, e.toString());
-		        	
-		        }
+    @Autowired
+    private MbTxLogRepository txLogRepository;
 
-			} catch (Exception e) {
-				mbApiResp = MbJsonUtil.createResponseBank("99","List_Bank(), System Error",null);
-				MbLogUtil.writeLogError(log, "List_Bank(), Error System", MbApiConstant.NOT_AVAILABLE);
-	        	MbLogUtil.writeLogError(log, e, e.toString());
-			}
-	       
-			return mbApiResp;
-		}
+    RestTemplate restTemplate = new RestTemplate();
 
-	    
+    MbApiResp mbApiResp;
+
+    Client client = ClientBuilder.newClient();
+
+    private static Logger log = LoggerFactory.getLogger(GetListBankService.class);
+
+    public MbApiResp process(HttpHeaders header, ContainerRequestContext requestContext, MbApiReq request)
+            throws Exception {
+
+        try {
+
+            try (Connection con = DriverManager.getConnection(connectionUrl);) {
+                List<Bank> bank = new ArrayList<>();
+
+                Statement stmt;
+                String SQL;
+
+                stmt = con.createStatement();
+                SQL = "SELECT Code, Jenis, Name FROM Banks with (NOLOCK) INNER JOIN "
+                        + "BankPrior ON Code = IdBank ORDER BY PriorSort";
+                ResultSet rs = stmt.executeQuery(SQL);
+
+                while (rs.next()) {
+                    bank.add(new Bank(rs.getString("Code") + ";" + rs.getString("Jenis"), rs.getString("Name")));
+                }
+
+                rs.close();
+                stmt.close();
+                con.close();
+
+                BankDispResp bankDispResp = new BankDispResp(bank);
+                mbApiResp = MbJsonUtil.createResponseBank("00", "Success", bankDispResp);
+
+
+            } catch (SQLException e) {
+                mbApiResp = MbJsonUtil.createResponseBank("99", "List_Bank(), Db Connection Error", null);
+                MbLogUtil.writeLogError(log, "List_Bank(), Db Connection Error", MbApiConstant.NOT_AVAILABLE);
+                MbLogUtil.writeLogError(log, e, e.toString());
+
+            }
+
+        } catch (Exception e) {
+            mbApiResp = MbJsonUtil.createResponseBank("99", "List_Bank(), System Error", null);
+            MbLogUtil.writeLogError(log, "List_Bank(), Error System", MbApiConstant.NOT_AVAILABLE);
+            MbLogUtil.writeLogError(log, e, e.toString());
+        }
+
+        return mbApiResp;
+    }
+
+
 }
 

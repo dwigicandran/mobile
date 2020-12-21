@@ -225,6 +225,7 @@ public class ApiBaseController {
         } catch (MbServiceException e) {
             throw createException(e, request);
         } catch (Exception e) {
+            log.info("Error : " + e.getMessage());
             String msg;
             msg = request.getLanguage().equals("en") ? "Your request could not be processed, please try again later" : "Permintaan tidak dapat diproses, silahkan dicoba beberapa saat lagi.";
 //            response = MbJsonUtil.createJsonParseExceptionResponse(e, msg);

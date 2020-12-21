@@ -97,12 +97,14 @@ public class MbOnlineTransferServiceImpl extends MbBaseServiceImpl implements Mb
         String DestinationBank = null;
         String DestinationAccountNumber = null;
         String trf_method = null;
+        String bankType = null;
 
         System.out.println("ID Favorit : " + request.getId_favorit());
 
         if (request.getId_favorit() == null) {
             DestinationBank = request.getDestinationBank();
             DestinationAccountNumber = request.getDestinationAccountNumber();
+            bankType = request.getTypeBank();
             trf_method = request.getTrf_method();
         } else {
             try (Connection con = DriverManager.getConnection(connectionUrl);) {
@@ -118,10 +120,12 @@ public class MbOnlineTransferServiceImpl extends MbBaseServiceImpl implements Mb
                     DestinationBank = rs.getString("destinationBank");
                     DestinationAccountNumber = rs.getString("destinationAccountNumber");
                     trf_method = rs.getString("trfMethod");
+                    bankType = rs.getString("typeBank");
                 } else {
                     DestinationBank = request.getDestinationBank();
                     DestinationAccountNumber = request.getDestinationAccountNumber();
                     trf_method = request.getTrf_method();
+                    bankType = request.getTypeBank();
                 }
 
                 con.close();
@@ -139,13 +143,16 @@ public class MbOnlineTransferServiceImpl extends MbBaseServiceImpl implements Mb
         }
 
         //========== get Bank Data ==============//
-        try (Connection con = DriverManager.getConnection(connectionUrl);) {
+        try (Connection con = DriverManager.getConnection(connectionUrl)) {
             Statement stmt;
             String SQL;
 
+            log.info("bank type : " + bankType);
+
+
             stmt = con.createStatement();
             SQL = "SELECT Code, Jenis,Feature, Name FROM Banks with (NOLOCK) INNER JOIN "
-                    + "BankPrior ON Code = IdBank where Code ='" + DestinationBank + "'";
+                    + "BankPrior ON Code = IdBank where Code ='" + DestinationBank + "' and Jenis='" + bankType + "'";
             ResultSet rs = stmt.executeQuery(SQL);
 
             while (rs.next()) {
@@ -220,10 +227,19 @@ public class MbOnlineTransferServiceImpl extends MbBaseServiceImpl implements Mb
             System.out.println("::: Inquiry Online Trf From Back End :::");
             System.out.println(new Gson().toJson(response.getBody()));
 
+            String destinationAccName = response.getBody().getContent().getDestinationAccountName() != null ? response.getBody().getContent().getDestinationAccountName() : request.getDestinationAccountName() != null ? request.getDestinationAccountName() : "";
+            inquiryTrfReq.setDestinationAccountName(destinationAccName);
+
             //=========== Internal Trf ============//
             req = new HttpEntity(inquiryTrfReq, RestUtil.getHeaders());
             restTemps = new RestTemplate();
             url = onlineTransfer;
+
+
+            System.out.println(":: Online Trf Request To Back End ::");
+            System.out.println(new Gson().toJson(req));
+
+
             ResponseEntity<OnlineTrfResp> response_trf = restTemps.exchange(url, HttpMethod.POST, req, OnlineTrfResp.class);
             OnlineTrfResp OnlineTrfResp = response_trf.getBody();
 

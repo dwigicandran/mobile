@@ -1,6 +1,6 @@
-package com.bsms.service.ziswaf;
+package com.bsms.service.pdam;
 
-import com.bsms.domain.MbApiTxLog;
+import com.bsms.cons.MbConstant;
 import com.bsms.restobj.MbApiReq;
 import com.bsms.restobj.MbApiResp;
 import com.bsms.restobjclient.base.BaseResponse;
@@ -22,61 +22,52 @@ import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.core.HttpHeaders;
 
 @Slf4j
-@Service("getListNazhir")
-public class GetListNazhir extends MbBaseServiceImpl implements MbService {
+@Service("listPdam")
+public class GetListPdam extends MbBaseServiceImpl implements MbService {
 
-    @Value("${ziswaf.getListNazhir}")
+
+    @Value("${pdam.ubp.getList}")
     private String getListUrl;
 
     @Value("${rest.template.timeout}")
     private int restTimeout;
 
-
     @Override
     public MbApiResp process(HttpHeaders header, ContainerRequestContext requestContext, MbApiReq request) throws Exception {
         MbApiResp mbApiResp;
 
-        log.info("GetList Nazhir runing !");
+        log.info("Get Institution PDAM Running");
         log.info("Request : " + new Gson().toJson(request));
-
-        String requestPath = requestContext.getUriInfo().getPath();
-        String requestParam = requestPath.substring(requestPath.lastIndexOf('/') + 1);
-        String billerId = requestParam != null || !requestParam.equals("") ? requestParam : "0";
 
         try {
             HttpEntity<?> req = new HttpEntity(request, RestUtil.getHeaders());
             RestTemplate restTemps = new RestTemplate();
             ((SimpleClientHttpRequestFactory) restTemps.getRequestFactory()).setConnectTimeout(restTimeout);
             ((SimpleClientHttpRequestFactory) restTemps.getRequestFactory()).setReadTimeout(restTimeout);
-            String url = getListUrl + billerId;
-
-            log.info("GetInfoListSetting Nazhir Url : " + url);
-            log.info("Request : " + new Gson().toJson(req));
+            String url = getListUrl;
 
             ResponseEntity<BaseResponse> response = restTemps.exchange(url, HttpMethod.POST, req, BaseResponse.class);
-            log.info("response : " + response);
-
             BaseResponse paymentInquiryResp = response.getBody();
-            log.info("::: GetInfoListSetting Nazhir Response :::");
-            log.info("Response Result : " + new Gson().toJson(response));
+
+            log.info("Get PDAM List Url : " + url);
+            log.info("Get PDAM List Response : " + new Gson().toJson(response));
+
             if (paymentInquiryResp.getResponseCode().equals("00")) {
                 mbApiResp = MbJsonUtil.createResponse(response.getBody());
             } else {
                 mbApiResp = MbJsonUtil.createErrResponse(response.getBody());
             }
 
+            log.info("RESPONSE : " + new Gson().toJson(mbApiResp));
         } catch (Exception e) {
-            log.info("exception : " + e.getCause().getMessage());
-            String errorDefault = "permintaan tidak dapat diproses, silahkan dicoba beberapa saat lagi.";
+
+            String errorDefault = MbConstant.ERROR_REQUEST_ID;
             if (request.getLanguage().equals("en")) {
-                errorDefault = "request can't be process, please try again later.";
+                errorDefault = MbConstant.ERROR_REQUEST_EN;
             }
             mbApiResp = MbJsonUtil.createResponseBank("99", errorDefault, null);
         }
-
-
         return mbApiResp;
+
     }
-
-
 }

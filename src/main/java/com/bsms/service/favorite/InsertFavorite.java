@@ -269,8 +269,11 @@ public class InsertFavorite extends MbBaseServiceImpl implements MbService {
                     System.out.println("Online Trf");
                     //========== get Bank Data ==============//
                     stmt3 = con.createStatement();
+//                    SQL3 = "SELECT Code, Jenis,Feature, Name FROM Banks with (NOLOCK) INNER JOIN "
+//                            + "BankPrior ON Code = IdBank where Code ='" + request.getDestinationBank() + "' and Jenis='" + request.getTypeBank() + "'";
+                    //update typeBank field by Dwi S
                     SQL3 = "SELECT Code, Jenis,Feature, Name FROM Banks with (NOLOCK) INNER JOIN "
-                            + "BankPrior ON Code = IdBank where Code ='" + request.getDestinationBank() + "'";
+                            + "BankPrior ON Code = IdBank where Code ='" + request.getDestinationBank() + "' and Jenis='" + request.getTypeBank() + "'";
                     ResultSet rs3 = stmt.executeQuery(SQL3);
 
                     while (rs3.next()) {
@@ -311,6 +314,7 @@ public class InsertFavorite extends MbBaseServiceImpl implements MbService {
                     inquiryTrfReq.setBeneficiaryInstitutionCode(request.getDestinationBank());
                     inquiryTrfReq.setServiceCode(service_code);
                     inquiryTrfReq.setReferenceNumber(request.getRef_no());
+                    inquiryTrfReq.setTypeBank(request.getTypeBank());
 
                     System.out.println("::: Inquiry Trf Online Request to Back End :::");
                     System.out.println(new Gson().toJson(inquiryTrfReq));
@@ -330,11 +334,11 @@ public class InsertFavorite extends MbBaseServiceImpl implements MbService {
                         if ("00".equals(inquiryTrfResp.getResponseCode())) {
                             stmt4 = con.createStatement();
                             SQL4 = "insert into Favorite(id_fav,created,fav_title,msisdn,submodul_id,destinationAccountNumber,"
-                                    + "destinationBank,destinationAccountName,bankName,trfMethod) "
+                                    + "destinationBank,destinationAccountName,bankName,trfMethod, typeBank) "
                                     + "values('" + trx_id + "',GETDATE(),'" + request.getFav_title() + "','" + request.getMsisdn() + "','" + request.getSub_modul_id() + "',"
                                     + "'" + request.getDestinationAccountNumber() + "','" + request.getDestinationBank() + "',"
                                     + "'" + inquiryTrfResp.getContent().getDestinationAccountName() + "','" + BankName + "',"
-                                    + "" + request.getTrf_method() + ")";
+                                    + "" + request.getTrf_method() + "," + request.getTypeBank() + ")";
 
                             stmt4.executeUpdate(SQL4);
 
