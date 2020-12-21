@@ -107,7 +107,6 @@ public class QurbanPayment extends MbBaseServiceImpl implements MbService {
         txLog.setRequest(request);
         txLogRepository.save(txLog);
 
-
         return mbApiResp;
     }
 }
