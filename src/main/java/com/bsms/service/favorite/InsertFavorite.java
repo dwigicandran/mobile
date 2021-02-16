@@ -165,7 +165,6 @@ public class InsertFavorite extends MbBaseServiceImpl implements MbService {
             System.out.println(billCode);
             System.out.println(billerid);
 
-
             stmt = con.createStatement();
             int status = 0;
 
@@ -370,17 +369,21 @@ public class InsertFavorite extends MbBaseServiceImpl implements MbService {
                 } else if (submodul_id.substring(0, 2).equalsIgnoreCase("PU") || submodul_id.substring(0, 2).equalsIgnoreCase("PY")) {
                     System.out.println("::: Favorite Purchase & Payment :::");
 
+                    String billingKey = billkey1 != null ? billkey1 : request.getPayment_id();
+
                     stmt2 = con.createStatement();
+//                    SQL2 = "insert into Favorite(id_fav,created,fav_title,msisdn,submodul_id,billkey1,billCode,billerid) "
+//                            + "values('" + trx_id + "',GETDATE(),'" + request.getFav_title() + "','" + request.getMsisdn() + "','" + request.getSub_modul_id() + "',"
+//                            + "'" + billkey1 + "','" + billCode + "','" + billerid + "')";
                     SQL2 = "insert into Favorite(id_fav,created,fav_title,msisdn,submodul_id,billkey1,billCode,billerid) "
                             + "values('" + trx_id + "',GETDATE(),'" + request.getFav_title() + "','" + request.getMsisdn() + "','" + request.getSub_modul_id() + "',"
-                            + "'" + billkey1 + "','" + billCode + "','" + billerid + "')";
+                            + "'" + billingKey + "','" + billCode + "','" + billerid + "')";
                     stmt2.executeUpdate(SQL2);
 
 
                     mbApiResp = MbJsonUtil.createResponseTrf("00",
                             request.getLanguage().equals("en") ? "Insert Favorite Success" : "Favorit telah dimasukkan.",
                             null, "");
-
 
                 }
 

@@ -87,6 +87,7 @@ public class PayPayment extends MbBaseServiceImpl implements MbService {
         } else {
             if (result.size() != 0) {
                 if (result.get(0).getServiceprovider() == 0) {
+                    request.setBillerid(billerId);
                     response = switcherPayment(request);
                 } else {
                     if (billerId.equals("88999")) { //if bpjstk

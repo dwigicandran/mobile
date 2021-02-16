@@ -1,5 +1,6 @@
 package com.bsms.service.pdam;
 
+import com.bsms.cons.MbConstant;
 import com.bsms.restobj.MbApiReq;
 import com.bsms.restobj.MbApiResp;
 import com.bsms.restobjclient.base.BaseResponse;
@@ -7,8 +8,10 @@ import com.bsms.service.base.MbBaseServiceImpl;
 import com.bsms.service.base.MbService;
 import com.bsms.util.MbJsonUtil;
 import com.bsms.util.RestUtil;
+import com.bsms.util.TrxLimit;
 import com.google.gson.Gson;
 import lombok.extern.slf4j.Slf4j;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
@@ -24,17 +27,21 @@ import javax.ws.rs.core.HttpHeaders;
 @Service("pdamConfirm")
 public class PdamConfirm extends MbBaseServiceImpl implements MbService {
 
-    @Value("${pdam.ubp.confirm}")
+    @Value("${pdam.confirm}")
     private String pdamUbpConfUrl;
 
     @Value("${rest.template.timeout}")
     private int restTimeout;
+
+    @Value("${sql.conf}")
+    private String sqlconf;
 
     @Override
     public MbApiResp process(HttpHeaders header, ContainerRequestContext requestContext, MbApiReq request) throws Exception {
         MbApiResp mbApiResp;
         log.info("PDAM Confirm Running");
         log.info("PDAM Confirm Request : " + new Gson().toJson(request));
+        String response_msg;
 
         try {
             HttpEntity<?> req = new HttpEntity(request, RestUtil.getHeaders());
@@ -48,16 +55,29 @@ public class PdamConfirm extends MbBaseServiceImpl implements MbService {
             BaseResponse paymentInquiryResp = response.getBody();
 
             if (paymentInquiryResp.getResponseCode().equals("00")) {
-                mbApiResp = MbJsonUtil.createResponse(response.getBody());
+
+                String limitResponse = TrxLimit.checkTransLimit(paymentInquiryResp.getAmount(), request.getCustomerLimitType(), request.getMsisdn(), TrxLimit.PAYMENT, sqlconf);
+                System.out.println("Limit Response : " + limitResponse);
+
+                if (limitResponse.equalsIgnoreCase("01")) {
+                    response_msg = request.getLanguage().equalsIgnoreCase("en") ? MbConstant.ERROR_LIMIT_FINANCIAL_EN : MbConstant.ERROR_LIMIT_FINANCIAL_ID;
+                    mbApiResp = MbJsonUtil.createResponseTrf("99", response_msg, null, "");
+                } else if (limitResponse.equalsIgnoreCase("02")) {
+                    response_msg = request.getLanguage().equalsIgnoreCase("en") ? MbConstant.ERROR_LIMIT_FINANCIAL_EN : MbConstant.ERROR_LIMIT_FINANCIAL_ID;
+                    mbApiResp = MbJsonUtil.createResponseTrf("99", response_msg, null, "");
+                } else {
+                    mbApiResp = MbJsonUtil.createResponse(response.getBody());
+                }
+
             } else {
                 mbApiResp = MbJsonUtil.createErrResponse(response.getBody());
             }
 
             log.info("PDAM Confirm Response : " + new Gson().toJson(mbApiResp));
         } catch (Exception e) {
-            String errorDefault = e.getCause().getMessage() + ", permintaan tidak dapat diproses, silahkan dicoba beberapa saat lagi.";
+            String errorDefault = "Permintaan tidak dapat diproses, silahkan dicoba beberapa saat lagi.";
             if (request.getLanguage().equals("en")) {
-                errorDefault = e.getCause().getMessage() + ", request can't be process, please try again later.";
+                errorDefault = "Request can't be process, please try again later.";
             }
             mbApiResp = MbJsonUtil.createResponseBank("99", errorDefault, null);
             log.info("Error : " + e.getCause().getMessage());
@@ -65,4 +85,6 @@ public class PdamConfirm extends MbBaseServiceImpl implements MbService {
 
         return mbApiResp;
     }
+
+
 }

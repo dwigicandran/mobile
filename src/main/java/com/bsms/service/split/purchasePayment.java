@@ -14,8 +14,10 @@ import com.bsms.service.base.MbService;
 import com.bsms.util.MbJsonUtil;
 import com.bsms.util.MbLogUtil;
 import com.bsms.util.RestUtil;
+import com.bsms.util.TrxLimit;
 import com.google.gson.Gson;
 import lombok.extern.slf4j.Slf4j;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
@@ -32,7 +34,7 @@ import java.util.Optional;
 
 @Slf4j
 @Service("purchasePayment")
-public class purchasePayment extends MbBaseServiceImpl implements MbService {
+public class PurchasePayment extends MbBaseServiceImpl implements MbService {
 
     @Autowired
     SpMerchantRepository spMerchantRepository;
@@ -44,10 +46,16 @@ public class purchasePayment extends MbBaseServiceImpl implements MbService {
     private String ubpInquiryUrl;
 
     @Value("${switcher.prepaid.payment}")
-    private String switcherInquiryUrl;
+    private String switcherPepaidPaymentUrl;
+
+    @Value("${switcher.payment}")
+    private String switcherPaymentUrl;
 
     @Value("${rest.template.timeout}")
     private int restTimeout;
+
+    @Value("${sql.conf}")
+    private String sqlconf;
 
     private String errorDefaultId = ", permintaan tidak dapat diproses, silahkan dicoba beberapa saat lagi.";
     private String errorDefaultEn = ", request can't be process, please try again later.";
@@ -70,7 +78,7 @@ public class purchasePayment extends MbBaseServiceImpl implements MbService {
         MbApiReq inquiryRequest = transactionLog.get().getRequest();
 
         if (inquiryRequest != null) {
-            log.info("transaction ada");
+//            log.info("transaction ada");
             log.info("Biller Code : " + inquiryRequest.getTransactionId());
 
             billerId = inquiryRequest.getBillerid() != null ? inquiryRequest.getBillerid() : request.getBillerid();
@@ -119,6 +127,9 @@ public class purchasePayment extends MbBaseServiceImpl implements MbService {
             log.info("UBP Response : " + new Gson().toJson(response));
 
             if (paymentInquiryResp.getResponseCode().equals("00")) {
+
+//                updateLimit(request, paymentInquiryResp);
+
                 mbApiResp = MbJsonUtil.createResponse(response.getBody());
             } else {
                 mbApiResp = MbJsonUtil.createErrResponse(response.getBody());
@@ -141,7 +152,16 @@ public class purchasePayment extends MbBaseServiceImpl implements MbService {
             RestTemplate restTemps = new RestTemplate();
             ((SimpleClientHttpRequestFactory) restTemps.getRequestFactory()).setConnectTimeout(restTimeout);
             ((SimpleClientHttpRequestFactory) restTemps.getRequestFactory()).setReadTimeout(restTimeout);
-            String url = switcherInquiryUrl;
+//            String url = switcherPepaidPaymentUrl;
+            String url;
+
+            //if indiehome
+            if (billerId.equalsIgnoreCase("0902") || billerId.equalsIgnoreCase("6050")) {
+                url = switcherPaymentUrl;
+            } else {
+                url = switcherPepaidPaymentUrl;
+            }
+
             log.info("Split Switcher url : " + url);
             log.info("Switcher request : " + new Gson().toJson(request));
 
@@ -151,6 +171,7 @@ public class purchasePayment extends MbBaseServiceImpl implements MbService {
 
             BaseResponse paymentInquiryResp = response.getBody();
             if (paymentInquiryResp.getResponseCode().equals("00")) {
+                updateLimit(request, paymentInquiryResp);
                 mbApiResp = MbJsonUtil.createResponse(response.getBody());
             } else {
                 mbApiResp = MbJsonUtil.createErrResponse(response.getBody());
@@ -165,6 +186,23 @@ public class purchasePayment extends MbBaseServiceImpl implements MbService {
         }
 
         return mbApiResp;
+    }
+
+    private void updateLimit(MbApiReq request, BaseResponse paymentResponse) {
+        try {
+            JSONObject value = new JSONObject();
+            TrxLimit trxLimit = new TrxLimit();
+            String amount = paymentResponse.getAmount() != null ? paymentResponse.getAmount() : "0";
+
+            int trxType = request.getModul_id().equalsIgnoreCase("PY") ? TrxLimit.PAYMENT : TrxLimit.PURCHASE;
+
+            double d = Double.parseDouble(amount);
+            long amount_convert = (new Double(d)).longValue();
+            trxLimit.LimitUpdate(request.getMsisdn(), request.getCustomerLimitType(), trxType, amount_convert, value, sqlconf);
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.info("Update transaction limit failed :" + e.getMessage());
+        }
     }
 
 }

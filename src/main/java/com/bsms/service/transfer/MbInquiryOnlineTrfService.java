@@ -62,6 +62,9 @@ public class MbInquiryOnlineTrfService extends MbBaseServiceImpl implements MbSe
     @Value("${core.service.inquiryOnlineTransfer}")
     private String inquiryOnlineTransfer;
 
+    @Value("${core.service.inquirySknTransfer}")
+    private String inquirySknTransfer;
+
     @Autowired
     private ObjectMapper objMapper;
 
@@ -97,7 +100,12 @@ public class MbInquiryOnlineTrfService extends MbBaseServiceImpl implements MbSe
         //=============== cek limit ================//
         JSONObject value = new JSONObject();
         TrxLimit trxLimit = new TrxLimit();
-        int trxType = TrxLimit.TRANSFER_ONLINE;
+
+        int trxType = request.getTrf_method().equalsIgnoreCase("1") ? TrxLimit.TRANSFER_ONLINE : TrxLimit.TRANSFER_SKN;
+//        int trxType = TrxLimit.TRANSFER_ONLINE;
+
+        log.info("Transfer melalui : " + trxType);
+
 
         String response_code = trxLimit.checkLimit(request.getMsisdn(), request.getCustomerLimitType(),
                 trxType, Long.parseLong(request.getAmount()), value, sqlconf);
@@ -157,7 +165,7 @@ public class MbInquiryOnlineTrfService extends MbBaseServiceImpl implements MbSe
                 Statement stmt;
                 String SQL;
 
-                log.info("banktype : " + bankType);
+//                log.info("banktype : " + bankType);
 
                 stmt = con.createStatement();
                 SQL = "SELECT Code, Jenis,Feature, Name FROM Banks with (NOLOCK) INNER JOIN "
@@ -180,18 +188,25 @@ public class MbInquiryOnlineTrfService extends MbBaseServiceImpl implements MbSe
 
             }
 
+            log.info("feature" + feature);
 
             //========== define service code ==============//
             if (((feature & FEAT_PRIMA) == FEAT_PRIMA)) {
                 // ATM Prima
+                log.info("prima");
                 service_code = "0500";
                 via_atm = "Prima";
             } else if (((feature & FEAT_BERSAMA) == FEAT_BERSAMA)) {
                 // ATM Bersama
+                log.info("bersama");
                 service_code = "0200";
                 via_atm = "ATM Bersama";
+            } else if (trf_method.equalsIgnoreCase("2")) {
+                log.info("transfer skn method ");
+                service_code = "0400";
             } else {
                 // ATM Prima by Default
+                log.info("else transfer");
                 service_code = "0500";
                 via_atm = "Prima";
             }
@@ -228,10 +243,13 @@ public class MbInquiryOnlineTrfService extends MbBaseServiceImpl implements MbSe
 
                 HttpEntity<?> req = new HttpEntity(inquiryTrfReq, RestUtil.getHeaders());
                 RestTemplate restTemps = new RestTemplate();
-                String url = inquiryOnlineTransfer;
+                String url = service_code.equalsIgnoreCase("0400") ? inquirySknTransfer : inquiryOnlineTransfer;
+//                String url = inquiryOnlineTransfer;
+                System.out.println("url : " + url);
 
                 ResponseEntity<InquiryTrfResp> response = restTemps.exchange(url, HttpMethod.POST, req, InquiryTrfResp.class);
                 InquiryTrfResp inquiryTrfResp = response.getBody();
+
 
                 System.out.println("::: Inquiry Trf Online Response From Back End :::");
                 System.out.println(new Gson().toJson(response.getBody()));

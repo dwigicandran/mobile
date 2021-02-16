@@ -25,8 +25,7 @@ import javax.ws.rs.core.HttpHeaders;
 @Service("listPdam")
 public class GetListPdam extends MbBaseServiceImpl implements MbService {
 
-
-    @Value("${pdam.ubp.getList}")
+    @Value("${pdam.getList}")
     private String getListUrl;
 
     @Value("${rest.template.timeout}")
@@ -46,10 +45,11 @@ public class GetListPdam extends MbBaseServiceImpl implements MbService {
             ((SimpleClientHttpRequestFactory) restTemps.getRequestFactory()).setReadTimeout(restTimeout);
             String url = getListUrl;
 
+            log.info("Get PDAM List Url : " + url);
+
             ResponseEntity<BaseResponse> response = restTemps.exchange(url, HttpMethod.POST, req, BaseResponse.class);
             BaseResponse paymentInquiryResp = response.getBody();
 
-            log.info("Get PDAM List Url : " + url);
             log.info("Get PDAM List Response : " + new Gson().toJson(response));
 
             if (paymentInquiryResp.getResponseCode().equals("00")) {
@@ -58,13 +58,13 @@ public class GetListPdam extends MbBaseServiceImpl implements MbService {
                 mbApiResp = MbJsonUtil.createErrResponse(response.getBody());
             }
 
-            log.info("RESPONSE : " + new Gson().toJson(mbApiResp));
         } catch (Exception e) {
-
-            String errorDefault = MbConstant.ERROR_REQUEST_ID;
-            if (request.getLanguage().equals("en")) {
-                errorDefault = MbConstant.ERROR_REQUEST_EN;
-            }
+            e.printStackTrace();
+            String errorDefault = request.getLanguage().equalsIgnoreCase("en") ? MbConstant.ERROR_REQUEST_EN :  MbConstant.ERROR_REQUEST_ID;
+//            String errorDefault = MbConstant.ERROR_REQUEST_ID;
+//            if (request.getLanguage().equals("en")) {
+//                errorDefault = MbConstant.ERROR_REQUEST_EN;
+//            }
             mbApiResp = MbJsonUtil.createResponseBank("99", errorDefault, null);
         }
         return mbApiResp;

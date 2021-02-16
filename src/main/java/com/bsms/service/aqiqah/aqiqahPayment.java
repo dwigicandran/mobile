@@ -11,8 +11,10 @@ import com.bsms.service.base.MbService;
 import com.bsms.util.MbJsonUtil;
 import com.bsms.util.MbLogUtil;
 import com.bsms.util.RestUtil;
+import com.bsms.util.TrxLimit;
 import com.google.gson.Gson;
 import lombok.extern.slf4j.Slf4j;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
@@ -36,6 +38,9 @@ public class aqiqahPayment extends MbBaseServiceImpl implements MbService {
 
     @Value("${aqiqah.payment}")
     private String doPaymentUrl;
+
+    @Value("${sql.conf}")
+    private String sqlconf;
 
 
     @Override
@@ -68,6 +73,23 @@ public class aqiqahPayment extends MbBaseServiceImpl implements MbService {
             } else {
                 MbLogUtil.writeLogError(log, "Response body null", MbApiConstant.NOT_AVAILABLE);
                 mbApiResp = MbJsonUtil.createResponseBank("99", errorDefault, null);
+            }
+
+
+            //update transaction limit if response code 00
+            if (response.getBody().getResponseCode().equalsIgnoreCase("00")) {
+                try {
+                    JSONObject value = new JSONObject();
+                    TrxLimit trxLimit = new TrxLimit();
+                    int trxType = TrxLimit.PURCHASE;
+
+                    double d = Double.parseDouble(request.getDenomId());
+                    long amount_convert = (new Double(d)).longValue();
+                    trxLimit.LimitUpdate(request.getMsisdn(), request.getCustomerLimitType(), trxType, amount_convert, value, sqlconf);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    log.info("Update transaction limit failed :" + e.getMessage());
+                }
             }
 
         } catch (Exception e) {

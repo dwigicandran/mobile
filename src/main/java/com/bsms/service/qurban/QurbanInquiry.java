@@ -56,7 +56,7 @@ public class QurbanInquiry extends MbBaseServiceImpl implements MbService {
 
         JSONObject value = new JSONObject();
         TrxLimit trxLimit = new TrxLimit();
-        int trxType = TrxLimit.QRIS;
+        int trxType = TrxLimit.PURCHASE;
 
         String limitResponseCode = null;
         String response_msg = null;

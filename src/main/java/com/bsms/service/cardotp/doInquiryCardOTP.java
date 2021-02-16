@@ -107,6 +107,8 @@ public class doInquiryCardOTP extends MbBaseServiceImpl implements MbService  {
 		            	HttpEntity<?> req = new HttpEntity(request, RestUtil.getHeaders());
 		            	RestTemplate restTemps = new RestTemplate();
 		            	String url = doInquiry;
+
+						System.out.println("doInquiry Card OTP Url : " + url);
 		            	
 		    			ResponseEntity<doInquiryCardOTPResp> response = restTemps.exchange(url, HttpMethod.POST, req, doInquiryCardOTPResp.class);
 		    			doInquiryCardOTPResp doInquiryCardOTPResp = response.getBody();

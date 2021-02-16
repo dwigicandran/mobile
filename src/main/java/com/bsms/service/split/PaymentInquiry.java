@@ -1,5 +1,6 @@
 package com.bsms.service.split;
 
+import com.bsms.cons.MbConstant;
 import com.bsms.domain.MbApiTxLog;
 import com.bsms.domain.SpMerchant;
 import com.bsms.repository.MbTxLogRepository;
@@ -12,8 +13,10 @@ import com.bsms.service.base.MbBaseServiceImpl;
 import com.bsms.service.base.MbService;
 import com.bsms.util.MbJsonUtil;
 import com.bsms.util.RestUtil;
+import com.bsms.util.TrxLimit;
 import com.google.gson.Gson;
 import lombok.extern.slf4j.Slf4j;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
@@ -59,6 +62,9 @@ public class PaymentInquiry extends MbBaseServiceImpl implements MbService {
     @Value("${bpjstk.inquiry}")
     private String bpjstkInquiryUrl;
 
+    @Value("${sql.conf}")
+    private String sqlconf;
+
     @Value("${rest.template.timeout}")
     private int restTimeout;
 
@@ -90,9 +96,10 @@ public class PaymentInquiry extends MbBaseServiceImpl implements MbService {
                 log.info("getservice provider : " + result.get(0).getServiceprovider());
 
                 if (result.get(0).getServiceprovider() == 0) {
+                    log.info("biller id " + billerId);
+                    request.setBillerid(billerId);
                     response = switcherInquiry(request);
                 } else {
-
                     if (billerId.equals("88999")) { //jika bpjstk
                         response = bpjstTkInquiry(request, bpjstkInquiryUrl);
                     } else {
@@ -132,7 +139,22 @@ public class PaymentInquiry extends MbBaseServiceImpl implements MbService {
             log.info("response result : " + new Gson().toJson(response));
             log.info("base response : " + new Gson().toJson(paymentInquiryResp));
             if (paymentInquiryResp.getResponseCode().equals("00")) {
-                mbApiResp = MbJsonUtil.createResponse(response.getBody());
+                int trxType = request.getModul_id().equalsIgnoreCase("PU") ? TrxLimit.PURCHASE : TrxLimit.PAYMENT;
+
+                String limitResponse = checkLimit(response.getBody().getAmount(), request.getCustomerLimitType(), request.getMsisdn(), trxType);
+                String response_msg = "";
+
+                if (limitResponse.equalsIgnoreCase("01")) {
+                    response_msg = request.getLanguage().equalsIgnoreCase("en") ? MbConstant.ERROR_LIMIT_FINANCIAL_EN : MbConstant.ERROR_LIMIT_FINANCIAL_ID;
+                    mbApiResp = MbJsonUtil.createResponseTrf("01", response_msg, null, "");
+                } else if (limitResponse.equalsIgnoreCase("02")) {
+                    response_msg = request.getLanguage().equalsIgnoreCase("en") ? MbConstant.ERROR_LIMIT_EXCEED_EN : MbConstant.ERROR_LIMIT_EXCEED_ID;
+                    mbApiResp = MbJsonUtil.createResponseTrf("02", response_msg, null, "");
+                } else {
+                    mbApiResp = MbJsonUtil.createResponse(response.getBody());
+                }
+
+//                mbApiResp = MbJsonUtil.createResponse(response.getBody());
             } else {
                 mbApiResp = MbJsonUtil.createErrResponse(response.getBody());
             }
@@ -231,6 +253,25 @@ public class PaymentInquiry extends MbBaseServiceImpl implements MbService {
         MbService service = (MbService) context.getBean("doPaymentInquiry");
         response = service.process(header, requestContext, request);
         return response;
+    }
+
+
+    private String checkLimit(String amount, int customerLimitType, String msisdn, int trxType) {
+//        String limitResponseCode = MbConstant.ERROR_NUM_UNKNOWN;
+        String limitResponseCode = "00";
+        TrxLimit trxLimit = new TrxLimit();
+        JSONObject value = new JSONObject();
+
+        try {
+            double pdamAmount = Double.parseDouble(amount); //transaction amount
+            long amount_convert = (new Double(pdamAmount)).longValue(); //129
+            limitResponseCode = trxLimit.checkLimit(msisdn, customerLimitType, trxType, amount_convert, value, sqlconf);
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.info("Limit Check Error : " + e.getMessage());
+        }
+
+        return limitResponseCode;
     }
 
 

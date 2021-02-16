@@ -1,6 +1,6 @@
 package com.bsms.service.split;
 
-import com.bsms.cons.MbApiConstant;
+import com.bsms.cons.MbConstant;
 import com.bsms.domain.MbApiTxLog;
 import com.bsms.domain.SpMerchant;
 import com.bsms.repository.MbTxLogRepository;
@@ -12,10 +12,11 @@ import com.bsms.restobjclient.payment.Content;
 import com.bsms.service.base.MbBaseServiceImpl;
 import com.bsms.service.base.MbService;
 import com.bsms.util.MbJsonUtil;
-import com.bsms.util.MbLogUtil;
 import com.bsms.util.RestUtil;
+import com.bsms.util.TrxLimit;
 import com.google.gson.Gson;
 import lombok.extern.slf4j.Slf4j;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
@@ -49,7 +50,13 @@ public class PurchaseInquiry extends MbBaseServiceImpl implements MbService {
     private String ubpInquiryUrl;
 
     @Value("${switcher.prepaid.inquiry}")
+    private String switcherPrepaidInquiryUrl;
+
+    @Value("${switcher.inquiry}")
     private String switcherInquiryUrl;
+
+    @Value("${sql.conf}")
+    private String sqlconf;
 
     @Value("${rest.template.timeout}")
     private int restTimeout;
@@ -69,8 +76,8 @@ public class PurchaseInquiry extends MbBaseServiceImpl implements MbService {
         String requestParam = requestPath.substring(requestPath.lastIndexOf('/') + 1);
         String billerId = requestParam != null && !requestParam.equals("purchaseInquiry") ? requestParam : request.getBillerid();
         log.info("BILLER ID : " + billerId);
-        log.info("Biller Id : " + request.getBillerid());
-        log.info("Param : " + requestParam);
+//        log.info("Biller Id : " + request.getBillerid());
+//        log.info("Param : " + requestParam);
 
 //        SpMerchant result = spMerchantRepository.findBySpMerchantId(billerId);
         List<SpMerchant> result = spMerchantRepository.findAllSpMerchantByMerchantId(billerId);
@@ -78,7 +85,7 @@ public class PurchaseInquiry extends MbBaseServiceImpl implements MbService {
         log.info("SPMerchant result : " + new Gson().toJson(result));
 //        log.info("service provider : " + result.get(0).getServiceprovider());
 
-        log.info("REQUEST PARAM : " + requestParam);
+//        log.info("REQUEST PARAM : " + requestParam);
         log.info("result size : " + result.size());
 
 
@@ -126,7 +133,20 @@ public class PurchaseInquiry extends MbBaseServiceImpl implements MbService {
 
             BaseResponse paymentInquiryResp = response.getBody();
             if (paymentInquiryResp.getResponseCode().equals("00")) {
-                mbApiResp = MbJsonUtil.createResponse(response.getBody());
+                int trxType = request.getModul_id().equalsIgnoreCase("PU") ? TrxLimit.PURCHASE : TrxLimit.PAYMENT;
+                String limitResponse = checkLimit(response.getBody().getAmount(), request.getCustomerLimitType(), request.getMsisdn(), trxType);
+                String response_msg = "";
+
+                if (limitResponse.equalsIgnoreCase("01")) {
+                    response_msg = request.getLanguage().equalsIgnoreCase("en") ? MbConstant.ERROR_LIMIT_FINANCIAL_EN : MbConstant.ERROR_LIMIT_FINANCIAL_ID;
+                    mbApiResp = MbJsonUtil.createResponseTrf("01", response_msg, null, "");
+                } else if (limitResponse.equalsIgnoreCase("02")) {
+                    response_msg = request.getLanguage().equalsIgnoreCase("en") ? MbConstant.ERROR_LIMIT_EXCEED_EN : MbConstant.ERROR_LIMIT_EXCEED_ID;
+                    mbApiResp = MbJsonUtil.createResponseTrf("02", response_msg, null, "");
+                } else {
+                    mbApiResp = MbJsonUtil.createResponse(response.getBody());
+                }
+//                mbApiResp = MbJsonUtil.createResponse(response.getBody());
             } else {
                 mbApiResp = MbJsonUtil.createErrResponse(response.getBody());
             }
@@ -149,7 +169,16 @@ public class PurchaseInquiry extends MbBaseServiceImpl implements MbService {
             RestTemplate restTemps = new RestTemplate();
             ((SimpleClientHttpRequestFactory) restTemps.getRequestFactory()).setConnectTimeout(restTimeout);
             ((SimpleClientHttpRequestFactory) restTemps.getRequestFactory()).setReadTimeout(restTimeout);
-            String url = switcherInquiryUrl + "/" + billerId;
+//            String url = switcherPrepaidInquiryUrl + "/" + billerId;
+            String url;
+
+            //if indiehome
+            if (billerId.equalsIgnoreCase("0902") || billerId.equalsIgnoreCase("6050")) {
+                url = switcherInquiryUrl;
+            } else {
+                url = switcherPrepaidInquiryUrl + "/" + billerId;
+            }
+
             log.info("Split Switcher url : " + url);
             log.info("Split Switcher request : " + new Gson().toJson(request));
 
@@ -159,7 +188,22 @@ public class PurchaseInquiry extends MbBaseServiceImpl implements MbService {
             log.info("Switcher Response : " + new Gson().toJson(response));
 
             if (paymentInquiryResp.getResponseCode().equals("00")) {
-                mbApiResp = MbJsonUtil.createResponse(response.getBody());
+
+                int trxType = request.getModul_id().equalsIgnoreCase("PU") ? TrxLimit.PURCHASE : TrxLimit.PAYMENT;
+                String limitResponse = checkLimit(response.getBody().getAmount(), request.getCustomerLimitType(), request.getMsisdn(), trxType);
+                String response_msg = "";
+
+                if (limitResponse.equalsIgnoreCase("01")) {
+                    response_msg = request.getLanguage().equalsIgnoreCase("en") ? MbConstant.ERROR_LIMIT_FINANCIAL_EN : MbConstant.ERROR_LIMIT_FINANCIAL_ID;
+                    mbApiResp = MbJsonUtil.createResponseTrf("01", response_msg, null, "");
+                } else if (limitResponse.equalsIgnoreCase("02")) {
+                    response_msg = request.getLanguage().equalsIgnoreCase("en") ? MbConstant.ERROR_LIMIT_EXCEED_EN : MbConstant.ERROR_LIMIT_EXCEED_ID;
+                    mbApiResp = MbJsonUtil.createResponseTrf("02", response_msg, null, "");
+                } else {
+                    mbApiResp = MbJsonUtil.createResponse(response.getBody());
+                }
+
+//                mbApiResp = MbJsonUtil.createResponse(response.getBody());
             } else {
                 mbApiResp = MbJsonUtil.createErrResponse(response.getBody());
             }
@@ -171,6 +215,25 @@ public class PurchaseInquiry extends MbBaseServiceImpl implements MbService {
             mbApiResp = MbJsonUtil.createResponseBank("99", errorDefault, null);
         }
         return mbApiResp;
+    }
+
+
+    private String checkLimit(String amount, int customerLimitType, String msisdn, int trxType) {
+//        String limitResponseCode = MbConstant.ERROR_NUM_UNKNOWN;
+        String limitResponseCode = "00";
+        TrxLimit trxLimit = new TrxLimit();
+        JSONObject value = new JSONObject();
+
+        try {
+            double pdamAmount = Double.parseDouble(amount); //transaction amount
+            long amount_convert = (new Double(pdamAmount)).longValue(); //129
+            limitResponseCode = trxLimit.checkLimit(msisdn, customerLimitType, trxType, amount_convert, value, sqlconf);
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.info("Limit Check Error : " + e.getMessage());
+        }
+
+        return limitResponseCode;
     }
 
 

@@ -25,7 +25,7 @@ import javax.ws.rs.core.HttpHeaders;
 @Service("listPdamServices")
 public class GetPdamServices extends MbBaseServiceImpl implements MbService {
 
-    @Value("${pdam.ubp.getServices}")
+    @Value("${pdam.getServices}")
     private String servicesUrl;
 
     @Value("${rest.template.timeout}")

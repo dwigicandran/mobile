@@ -300,6 +300,17 @@ public class MbJsonUtil {
         return response;
     }
 
+    public static MbApiResp createErrorResponse(BaseResponse baseResponse) {
+        MbApiResp response = new MbApiResp();
+        response.setResponseCode(baseResponse.getResponseCode());
+        String rc = baseResponse.getResponseCode() != null ? baseResponse.getResponseCode() : "99";
+
+        response.setTransactionId(baseResponse.getTransactionId());
+        response.setResponseMessage(baseResponse.getResponseMessage());
+        response.setContent(baseResponse.getContent());
+        return response;
+    }
+
     //addition by Dwi S
     public static MbApiResp createPDAMResponse(BaseResponse baseResponse, String language) {
         MbApiResp response = new MbApiResp();
@@ -364,13 +375,13 @@ public class MbJsonUtil {
 
         if (objContent != null) {
             System.out.println("Run Mapper");
-            ObjectMapper objectMapper = new ObjectMapper();
-            com.bsms.restobjclient.pdam.Content content = objectMapper.convertValue(objContent, com.bsms.restobjclient.pdam.Content.class);
-            MbApiResp resp = createPDAMErrorResponse(content, language);
-            if (!content.getErrorCode().equalsIgnoreCase("00")) {
-                response.setResponseCode(resp.getResponseCode());
-                response.setResponseMessage(resp.getResponseMessage());
-            }
+//            ObjectMapper objectMapper = new ObjectMapper();
+//            com.bsms.restobjclient.pdam.Content content = objectMapper.convertValue(objContent, com.bsms.restobjclient.pdam.Content.class);
+//            MbApiResp resp = createPDAMErrorResponse(content, language);
+//            if (!content.getErrorCode().equalsIgnoreCase("00")) {
+//                response.setResponseCode(resp.getResponseCode());
+//                response.setResponseMessage(resp.getResponseMessage());
+//            }
         }
 
         return response;

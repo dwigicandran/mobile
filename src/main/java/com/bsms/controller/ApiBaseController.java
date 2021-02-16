@@ -154,11 +154,10 @@ public class ApiBaseController {
             throw createException(e, request);
 
         } catch (Exception e) {
-//            e.printStackTrace();
+            e.printStackTrace();
             String lang = request.getLanguage() != null ? request.getLanguage() : "en";
             String msg = lang.equals("id") ? "Permintaan tidak dapat diproses, silahkan dicoba beberapa saat lagi." : "Request cannot be process, please try again later.";
             response = MbJsonUtil.createJsonParseExceptionResponse(e, msg);
-//            MbLogUtil.writeLogError(log, e, MbApiConstant.NOT_AVAILABLE);
         }
 
         return response;
@@ -223,8 +222,10 @@ public class ApiBaseController {
             }
 
         } catch (MbServiceException e) {
+            e.printStackTrace();
             throw createException(e, request);
         } catch (Exception e) {
+            e.printStackTrace();
             log.info("Error : " + e.getMessage());
             String msg;
             msg = request.getLanguage().equals("en") ? "Your request could not be processed, please try again later" : "Permintaan tidak dapat diproses, silahkan dicoba beberapa saat lagi.";
@@ -288,9 +289,10 @@ public class ApiBaseController {
                 responseBuilder = Response.ok(mbApiResp).type("application/pdf").header(HttpHeaders.CONTENT_LENGTH, restResponse.getBody().length);
             }
         } catch (Exception e) {
-            String errorDefault = e.getCause().getMessage() + ", permintaan tidak dapat diproses, silahkan dicoba beberapa saat lagi.";
+            e.printStackTrace();
+            String errorDefault = "Permintaan tidak dapat diproses, silahkan dicoba beberapa saat lagi.";
             if (request.getLanguage().equals("en")) {
-                errorDefault = e.getCause().getMessage() + ", request can't be process, please try again later.";
+                errorDefault = "Request can't be process, please try again later.";
             }
             mbApiResp = MbJsonUtil.createJsonParseExceptionResponse(e, errorDefault);
             responseBuilder = Response.ok(mbApiResp).type("application/json");

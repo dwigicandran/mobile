@@ -113,6 +113,7 @@ public class MbApiReq implements Serializable {
     private String section_id;
     private String os_type;
     private String version_code;
+    private String agent_id;
 
     //purchase and payment
     private String billkey1;
@@ -209,6 +210,20 @@ public class MbApiReq implements Serializable {
     //institution
     private String pay_code;
     private String category;
+
+    //acop autosave
+    private String flow_id;
+    private String autosavetype;
+    private String target_amount;
+    private String deposit_amount;
+    private String recurring_type;
+    private String nod;
+    private String account_title;
+    private String account_type;
+    private String availbal;
+    private String totbal;
+    private String autosaveacctno;
+    private String acctname;
 
     private Object content;
     private MbApiContentReq reqContent;

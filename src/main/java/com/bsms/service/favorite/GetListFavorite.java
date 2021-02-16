@@ -34,99 +34,85 @@ import com.bsms.util.MbLogUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Service("listFavorit")
-public class GetListFavorite extends MbBaseServiceImpl implements MbService{
+public class GetListFavorite extends MbBaseServiceImpl implements MbService {
 
-	 	@Value("${sql.conf}")
-		private String connectionUrl;
-		
-		@Autowired
-	    private ObjectMapper objMapper;
+    @Value("${sql.conf}")
+    private String connectionUrl;
 
-	    @Autowired
-	    private MessageSource msg;
-	    
-	    @Autowired
-	    private MbTxLogRepository txLogRepository;
-	    
-	    RestTemplate restTemplate = new RestTemplate();
-	    
-	    MbApiResp mbApiResp;
+    @Autowired
+    private ObjectMapper objMapper;
 
-	    Client client = ClientBuilder.newClient();
-	    
-	    private static Logger log = LoggerFactory.getLogger(GetListFavorite.class);
-	    
-	    public MbApiResp process(HttpHeaders header, ContainerRequestContext requestContext, MbApiReq request)
-				throws Exception {
-	        
-			try {
-		    
-		        try (Connection con = DriverManager.getConnection(connectionUrl);) 
-		        {
-		        	List<Favorit> favorit = new ArrayList<>();
+    @Autowired
+    private MessageSource msg;
 
-		        	Statement stmt;
-		        	String SQL;
-		        	
-		        	stmt= con.createStatement();
-		        	SQL= "SELECT * from Favorite where submodul_id='"+request.getSub_modul_id()+"' and msisdn='"+request.getMsisdn()+"'";
-		            ResultSet rs = stmt.executeQuery(SQL);
-		            
-		            while (rs.next()) 
-	 	            {
-		            	if(request.getSub_modul_id().equalsIgnoreCase("TR01") || request.getSub_modul_id().equalsIgnoreCase("TR02"))
-						{
-							favorit.add(new Favorit(rs.getString("id_fav"),rs.getString("fav_title")+";"+rs.getString("destinationAccountName")+
-									" - "+rs.getString("bankName")+" - "+rs.getString("destinationAccountNumber")));
-						}
-		            	else if(request.getSub_modul_id().equalsIgnoreCase("PU02"))
-		            	{
-		            		favorit.add(new Favorit(rs.getString("billkey1")+";"+rs.getString("billerid"),
-		            				rs.getString("fav_title")+";"+rs.getString("billkey1")));
-		            	}
-		            	else if(request.getSub_modul_id().equalsIgnoreCase("PU05"))
-		            	{
-		            		favorit.add(new Favorit(rs.getString("billkey1")+";"+rs.getString("billerid"),
-		            				rs.getString("fav_title")+";"+rs.getString("billkey1")));
-		            	}
-		            	else if(request.getSub_modul_id().substring(0, 2).equalsIgnoreCase("PU"))
-		            	{
-		            		favorit.add(new Favorit(rs.getString("billkey1"),
-		            				rs.getString("fav_title")+";"+rs.getString("billkey1")));
-		            	}
-		            	else if(request.getSub_modul_id().substring(0, 2).equalsIgnoreCase("PY"))
-		            	{
-		            		favorit.add(new Favorit(rs.getString("billkey1")+";"+rs.getString("billerid"),
-		            				rs.getString("fav_title")+";"+rs.getString("billkey1")));
-		            	}
-		            	
-		            	
-		            	
-	 	            }
-		            rs.close();
-		            stmt.close();
-		 	        con.close();
-		        	
-		 	       FavoritDisp favoritDisp = new FavoritDisp(favorit);
-		           mbApiResp = MbJsonUtil.createResponseBank("00","Success",favoritDisp);
-		            
-		           
-		        } catch (SQLException e) {
-		        	mbApiResp = MbJsonUtil.createResponseBank("99","List_Favorite(), Db Connection Error",null);
-		        	MbLogUtil.writeLogError(log, "List_Favorite(), Db Connection Error", MbApiConstant.NOT_AVAILABLE);
-		        	MbLogUtil.writeLogError(log, e, e.toString());
-		        	
-		        }
+    @Autowired
+    private MbTxLogRepository txLogRepository;
 
-			} catch (Exception e) {
-				mbApiResp = MbJsonUtil.createResponseBank("99","List_Favorite(), System Error",null);
-				MbLogUtil.writeLogError(log, "List_Favorite(), Error System", MbApiConstant.NOT_AVAILABLE);
-	        	MbLogUtil.writeLogError(log, e, e.toString());
-			}
-	       
-			return mbApiResp;
-		}
+    RestTemplate restTemplate = new RestTemplate();
 
-	    
+    MbApiResp mbApiResp;
+
+    Client client = ClientBuilder.newClient();
+
+    private static Logger log = LoggerFactory.getLogger(GetListFavorite.class);
+
+    public MbApiResp process(HttpHeaders header, ContainerRequestContext requestContext, MbApiReq request)
+            throws Exception {
+
+        try {
+
+            try (Connection con = DriverManager.getConnection(connectionUrl);) {
+                List<Favorit> favorit = new ArrayList<>();
+
+                Statement stmt;
+                String SQL;
+
+                stmt = con.createStatement();
+                SQL = "SELECT * from Favorite where submodul_id='" + request.getSub_modul_id() + "' and msisdn='" + request.getMsisdn() + "'";
+                ResultSet rs = stmt.executeQuery(SQL);
+
+                while (rs.next()) {
+                    if (request.getSub_modul_id().equalsIgnoreCase("TR01") || request.getSub_modul_id().equalsIgnoreCase("TR02")) {
+                        favorit.add(new Favorit(rs.getString("id_fav"), rs.getString("fav_title") + ";" + rs.getString("destinationAccountName") +
+                                " - " + rs.getString("bankName") + " - " + rs.getString("destinationAccountNumber")));
+                    } else if (request.getSub_modul_id().equalsIgnoreCase("PU02")) {
+                        favorit.add(new Favorit(rs.getString("billkey1") + ";" + rs.getString("billerid"),
+                                rs.getString("fav_title") + ";" + rs.getString("billkey1")));
+                    } else if (request.getSub_modul_id().substring(0, 2).equalsIgnoreCase("PU")) {
+//		            		log.info("")
+                        favorit.add(new Favorit(rs.getString("billkey1"),
+                                rs.getString("fav_title") + ";" + rs.getString("billkey1")));
+                    } else if (request.getSub_modul_id().substring(0, 2).equalsIgnoreCase("PY")) {
+                        favorit.add(new Favorit(rs.getString("billkey1") + ";" + rs.getString("billerid"),
+                                rs.getString("fav_title") + ";" + rs.getString("fav_title") + " - " + rs.getString("billkey1")));
+                    }
+
+
+                }
+                rs.close();
+                stmt.close();
+                con.close();
+
+                FavoritDisp favoritDisp = new FavoritDisp(favorit);
+                mbApiResp = MbJsonUtil.createResponseBank("00", "Success", favoritDisp);
+
+
+            } catch (SQLException e) {
+                mbApiResp = MbJsonUtil.createResponseBank("99", "List_Favorite(), Db Connection Error", null);
+                MbLogUtil.writeLogError(log, "List_Favorite(), Db Connection Error", MbApiConstant.NOT_AVAILABLE);
+                MbLogUtil.writeLogError(log, e, e.toString());
+
+            }
+
+        } catch (Exception e) {
+            mbApiResp = MbJsonUtil.createResponseBank("99", "List_Favorite(), System Error", null);
+            MbLogUtil.writeLogError(log, "List_Favorite(), Error System", MbApiConstant.NOT_AVAILABLE);
+            MbLogUtil.writeLogError(log, e, e.toString());
+        }
+
+        return mbApiResp;
+    }
+
+
 }
 

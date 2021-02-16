@@ -17,6 +17,15 @@ public class MbConstant {
     public static final String ERROR_REQUEST_ID = "Permintaan tidak dapat diproses, silahkan dicoba beberapa saat lagi.";
     public static final String ERROR_REQUEST_EN = "Request can't be process, please try again later.";
 
+    public static final String ERROR_PAYMENT_REQUEST_ID = "Permintaan tidak dapat diproses, silahkan cek saldo/mutasi sebelum melakukan transaksi lagi.";
+    public static final String ERROR_PAYMENT_REQUEST_EN = "Request can't be process, please check your balance before making a transaction again.";
+
+    public static final String ERROR_TIMEOUT_REQUEST_EN = "Request time out";
+    public static final String ERROR_TIMEOUT_REQUEST_ID = "Permintaan anda kehabisan waktu";
+
+    public static final String ERROR_TIMEOUT_PAYMENT_REQUEST_EN = "Time Out,Please check your balance before making a transaction again";
+    public static final String ERROR_TIMEOUT_PAYMENT_REQUEST_ID = "Transaksi Anda kehabisan waktu. Silahkan cek saldo/mutasi sebelum melakukan transaksi lagi";
+
     public static final String ERROR_LIMIT_EXCEED_EN = "Your transaction has exceeded the limit.";
     public static final String ERROR_LIMIT_EXCEED_ID = "Transaksi Anda melebihi limit.";
 
@@ -44,6 +53,9 @@ public class MbConstant {
     public static final String PDAM_ERROR_PASSIVE_EN = "Passive Customer";
 
     public static final String PDAM_ERROR_TIMEOUT = "Timeout/Connection Problem";
+
+
+
 
     //PDAM ERROR
 

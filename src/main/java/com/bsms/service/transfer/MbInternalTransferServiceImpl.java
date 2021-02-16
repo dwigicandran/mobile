@@ -1,5 +1,6 @@
 package com.bsms.service.transfer;
 
+import java.io.BufferedInputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -20,6 +21,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
@@ -59,6 +61,15 @@ public class MbInternalTransferServiceImpl extends MbBaseServiceImpl implements 
 
     @Autowired
     private MbTxLogRepository txLogRepository;
+    
+    @Value("${template.trf}") 
+	private String templateTRF;
+	
+	@Value("${template.logo}") 
+	private String templateLogo;
+	
+	@Value("${tmp.folder}") 
+	private static String tmp_folder;
 
 
     RestTemplate restTemplate = new RestTemplate();
@@ -208,33 +219,75 @@ public class MbInternalTransferServiceImpl extends MbBaseServiceImpl implements 
                 amount_display = libFunct.formatIDRCurrency(amount);
                 date_trx = LibFunctionUtil.getDatetime("dd/MM/yyyy HH:mm:ss");
 
-                String title = "Transfer Ke BSM";
+                String title = "Transfer Ke BSI";
                 List<ContentIntTrf> content = new ArrayList<>();
 
                 if (internalTrfReq.getLanguage().equals("id")) {
                     content.add(new ContentIntTrf("Status Transaksi", "Berhasil", ""));
-                    content.add(new ContentIntTrf("Dari Rekening", TextUtil.maskString(request.getAccount_number(), 0, 6, 'X') + " - Bank Syariah Mandiri", request.getCustomerName()));
-                    content.add(new ContentIntTrf("Ke Rekening", DestinationAccountNumber + " - Bank Syariah Mandiri", inquiryTrfResp.getContent().getDestinationAccountName()));
+                    content.add(new ContentIntTrf("Dari Rekening", TextUtil.maskString(request.getAccount_number(), 0, 6, 'X') + " - Bank Syariah Indonesia", request.getCustomerName()));
+                    content.add(new ContentIntTrf("Ke Rekening", DestinationAccountNumber + " - Bank Syariah Indonesia", inquiryTrfResp.getContent().getDestinationAccountName()));
                     content.add(new ContentIntTrf("Jumlah", amount_display, ""));
                     content.add(new ContentIntTrf("Keterangan", request.getDescription(), ""));
                 } else { //penambahan resi bahasa inggris oleh Dwi
                     content.add(new ContentIntTrf("Transaction Status", "Successfull", ""));
-                    content.add(new ContentIntTrf("From Account", TextUtil.maskString(request.getAccount_number(), 0, 6, 'X') + " - Bank Syariah Mandiri", request.getCustomerName()));
-                    content.add(new ContentIntTrf("To Account", DestinationAccountNumber + " - Bank Syariah Mandiri", inquiryTrfResp.getContent().getDestinationAccountName()));
+                    content.add(new ContentIntTrf("From Account", TextUtil.maskString(request.getAccount_number(), 0, 6, 'X') + " - Bank Syariah Indonesia", request.getCustomerName()));
+                    content.add(new ContentIntTrf("To Account", DestinationAccountNumber + " - Bank Syariah Indonesia", inquiryTrfResp.getContent().getDestinationAccountName()));
                     content.add(new ContentIntTrf("Total", amount_display, ""));
                     content.add(new ContentIntTrf("Description", request.getDescription(), ""));
-                    title = "Transfer to BSM";
+                    title = "Transfer to BSI";
                 }
 
                 InternalTrfDispResp internalTrfDispResp = new InternalTrfDispResp(internalTrfResp.getContent().getAdditionalData(),
                         date_trx,
                         title,
-                        "Terimakasih telah menggunakan layanan Mandiri Syariah Mobile, semoga layanan kami mendatangkan berkah bagi Anda.",
+                        "Terimakasih telah menggunakan layanan BSI Mobile, semoga layanan kami mendatangkan berkah bagi Anda.",
                         content);
 
                 mbApiResp = MbJsonUtil.createResponseTrf(internalTrfResp.getResponseCode(),
                         "Success",
                         internalTrfDispResp, trx_id);
+                
+                LibFunctionUtil libFunction=new LibFunctionUtil();
+	            
+	            boolean landscape = false;
+	            String template = null;
+	            String templateTrf=null;
+	            String email;
+	            
+	            email=request.getCustomerEmail();
+	            
+	            BufferedInputStream bis = new BufferedInputStream(new ClassPathResource(templateTRF).getInputStream());
+	        	byte[] buffer = new byte [bis.available()];
+	        	bis.read(buffer, 0, buffer.length);
+	        	bis.close();
+	        	
+	        	templateTrf = new String(buffer);
+	        	templateTrf = templateTrf.replace("{image}", new ClassPathResource(templateLogo).getURL().toString());
+	        	
+	        	templateTrf = templateTrf.replace("{status}", "BERHASIL");
+	        	
+	        	templateTrf = templateTrf.replace("{trans_ref}", internalTrfResp.getContent().getAdditionalData());
+	        	templateTrf = templateTrf.replace("{struck}", internalTrfResp.getCorrelationId());
+	        	templateTrf = templateTrf.replace("{terminal}", TextUtil.maskString(request.getMsisdn(), 0, 8, 'X'));
+	        	templateTrf = templateTrf.replace("{date_time}", date_trx);
+	        	
+	        	templateTrf = templateTrf.replace("{name}", request.getCustomerName());
+	        	templateTrf = templateTrf.replace("{account}", TextUtil.maskString(request.getAccount_number(), 0, 6, 'X'));
+	        	
+	        	templateTrf = templateTrf.replace("{payment_id}", DestinationAccountNumber);
+	        	templateTrf = templateTrf.replace("{code_name}", "Bank Syariah Indonesia");
+	        	templateTrf = templateTrf.replace("{beneficiary_name}", inquiryTrfResp.getContent().getDestinationAccountName());
+	        	
+	        	templateTrf = templateTrf.replace("{amount}", amount_display);
+	        	templateTrf = templateTrf.replace("{description}", request.getDescription());
+	        	
+	        	log.info("Transfer Internal BSI template was initialized");
+	        	
+	        	log.info("Generating content...");
+	        	template=templateTrf;
+	        	
+	            libFunction.sendEmailAsync(internalTrfResp.getContent().getAdditionalData(), email, "Transaksi Bank Syariah Indonesia",
+	                      template, template, landscape);
 
 
             } else {

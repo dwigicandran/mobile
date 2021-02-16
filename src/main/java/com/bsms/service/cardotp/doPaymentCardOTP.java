@@ -94,6 +94,8 @@ public class doPaymentCardOTP extends MbBaseServiceImpl implements MbService  {
 	            	HttpEntity<?> req = new HttpEntity(request, RestUtil.getHeaders());
 	            	RestTemplate restTemps = new RestTemplate();
 	            	String url = doPayment;
+
+					System.out.println("doPayment Card OTP Url : " + url);
 	            	
 	    			ResponseEntity<doPaymentCardOTPResp> response = restTemps.exchange(url, HttpMethod.POST, req, doPaymentCardOTPResp.class);
 	    			doPaymentCardOTPResp doPaymentCardOTPResp = response.getBody();

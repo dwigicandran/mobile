@@ -15,8 +15,10 @@ import com.bsms.service.base.MbService;
 import com.bsms.util.MbJsonUtil;
 import com.bsms.util.MbLogUtil;
 import com.bsms.util.RestUtil;
+import com.bsms.util.TrxLimit;
 import com.google.gson.Gson;
 import lombok.extern.slf4j.Slf4j;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
@@ -32,7 +34,7 @@ import java.util.Optional;
 
 @Slf4j
 @Service("prepaidPayment")
-public class prepaidPayment extends MbBaseServiceImpl implements MbService {
+public class PrepaidPayment extends MbBaseServiceImpl implements MbService {
 
     @Autowired
     SpMerchantRepository spMerchantRepository;
@@ -49,6 +51,8 @@ public class prepaidPayment extends MbBaseServiceImpl implements MbService {
     @Value("${token.rePrint}")
     private String reprintUrl;
 
+    @Value("${sql.conf}")
+    private String sqlconf;
 
     @Value("${rest.template.timeout}")
     private int restTimeout;
@@ -124,6 +128,7 @@ public class prepaidPayment extends MbBaseServiceImpl implements MbService {
 
             BaseResponse paymentInquiryResp = response.getBody();
             if (paymentInquiryResp.getResponseCode().equals("00")) {
+//                updateLimit(request, paymentInquiryResp);
                 mbApiResp = MbJsonUtil.createResponse(response.getBody());
             } else {
                 mbApiResp = MbJsonUtil.createErrResponse(response.getBody());
@@ -155,6 +160,9 @@ public class prepaidPayment extends MbBaseServiceImpl implements MbService {
 
             BaseResponse paymentInquiryResp = response.getBody();
             if (paymentInquiryResp.getResponseCode().equals("00")) {
+
+                updateLimit(request, paymentInquiryResp);
+
                 mbApiResp = MbJsonUtil.createResponse(response.getBody());
             } else {
                 mbApiResp = MbJsonUtil.createErrResponse(response.getBody());
@@ -201,6 +209,23 @@ public class prepaidPayment extends MbBaseServiceImpl implements MbService {
         }
 
         return mbApiResp;
+    }
+
+    private void updateLimit(MbApiReq request, BaseResponse paymentResponse) {
+        try {
+            JSONObject value = new JSONObject();
+            TrxLimit trxLimit = new TrxLimit();
+            String amount = paymentResponse.getAmount() != null ? paymentResponse.getAmount() : "0";
+
+            int trxType = request.getModul_id().equalsIgnoreCase("PY") ? TrxLimit.PAYMENT : TrxLimit.PURCHASE;
+
+            double d = Double.parseDouble(amount);
+            long amount_convert = (new Double(d)).longValue();
+            trxLimit.LimitUpdate(request.getMsisdn(), request.getCustomerLimitType(), trxType, amount_convert, value, sqlconf);
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.info("Update transaction limit failed :" + e.getMessage());
+        }
     }
 
 

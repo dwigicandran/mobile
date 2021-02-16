@@ -1,5 +1,6 @@
 package com.bsms.service.transfer;
 
+import java.io.BufferedInputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -20,6 +21,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
@@ -73,6 +75,15 @@ public class MbOnlineTransferServiceImpl extends MbBaseServiceImpl implements Mb
 
     @Value("${fee.skn}")
     private double fee_skn;
+
+    @Value("${template.trf.online}")
+    private String templateTRF;
+
+    @Value("${template.logo}")
+    private String templateLogo;
+
+    @Value("${tmp.folder}")
+    private static String tmp_folder;
 
 
     RestTemplate restTemplate = new RestTemplate();
@@ -182,6 +193,11 @@ public class MbOnlineTransferServiceImpl extends MbBaseServiceImpl implements Mb
             service_code = "0200";
             via_atm = "ATM Bersama";
             fee_admin = fee_bersama;
+        } else if (((feature & FEAT_SKN) == FEAT_SKN)) {
+            // SKN
+            service_code = "0400";
+            via_atm = "SNK";
+            fee_admin = fee_skn;
         } else {
             // ATM Prima by Default
             service_code = "0500";
@@ -265,7 +281,7 @@ public class MbOnlineTransferServiceImpl extends MbBaseServiceImpl implements Mb
 
                 if (inquiryTrfReq.getLanguage().equals("id")) {
                     content.add(new ContentIntTrf("Status Transaksi", "Berhasil", ""));
-                    content.add(new ContentIntTrf("Dari Rekening", TextUtil.maskString(request.getAccount_number(), 0, 6, 'X') + " - Bank Syariah Mandiri", request.getCustomerName()));
+                    content.add(new ContentIntTrf("Dari Rekening", TextUtil.maskString(request.getAccount_number(), 0, 6, 'X') + " - Bank Syariah Indonesia", request.getCustomerName()));
                     content.add(new ContentIntTrf("Ke Rekening", DestinationAccountNumber + " - " + BankName, inquiryTrfResp.getContent().getDestinationAccountName()));
                     content.add(new ContentIntTrf("Jumlah", amount_display, ""));
                     content.add(new ContentIntTrf("Biaya Admin", amount_display_admin, ""));
@@ -273,7 +289,7 @@ public class MbOnlineTransferServiceImpl extends MbBaseServiceImpl implements Mb
                     content.add(new ContentIntTrf("No Referensi", request.getRef_no(), ""));
                 } else {  // penambahan receipt bahasa inggris by Dwi
                     content.add(new ContentIntTrf("Transaction Status", "Successful", ""));
-                    content.add(new ContentIntTrf("From Account", TextUtil.maskString(request.getAccount_number(), 0, 6, 'X') + " - Bank Syariah Mandiri", request.getCustomerName()));
+                    content.add(new ContentIntTrf("From Account", TextUtil.maskString(request.getAccount_number(), 0, 6, 'X') + " - Bank Syariah Indonesia", request.getCustomerName()));
                     content.add(new ContentIntTrf("To Account", DestinationAccountNumber + " - " + BankName, inquiryTrfResp.getContent().getDestinationAccountName()));
                     content.add(new ContentIntTrf("Total", amount_display, ""));
                     content.add(new ContentIntTrf("Admin Fee", amount_display_admin, ""));
@@ -285,12 +301,56 @@ public class MbOnlineTransferServiceImpl extends MbBaseServiceImpl implements Mb
                 OnlineTrfDispResp onlineTrfDispResp = new OnlineTrfDispResp(OnlineTrfResp.getContent().getcbsRefCode(),
                         date_trx,
                         title,
-                        "Terimakasih telah menggunakan layanan Mandiri Syariah Mobile, semoga layanan kami mendatangkan berkah bagi Anda.",
+                        "Terimakasih telah menggunakan layanan BSI Mobile, semoga layanan kami mendatangkan berkah bagi Anda.",
                         content);
 
                 mbApiResp = MbJsonUtil.createResponseTrf(OnlineTrfResp.getResponseCode(),
                         "Success",
                         onlineTrfDispResp, trx_id);
+
+                LibFunctionUtil libFunction = new LibFunctionUtil();
+
+                boolean landscape = false;
+                String template = null;
+                String templateTrf = null;
+                String email;
+
+                email = request.getCustomerEmail();
+
+                BufferedInputStream bis = new BufferedInputStream(new ClassPathResource(templateTRF).getInputStream());
+                byte[] buffer = new byte[bis.available()];
+                bis.read(buffer, 0, buffer.length);
+                bis.close();
+
+                templateTrf = new String(buffer);
+                templateTrf = templateTrf.replace("{image}", new ClassPathResource(templateLogo).getURL().toString());
+
+                templateTrf = templateTrf.replace("{via_atm}", via_atm);
+                templateTrf = templateTrf.replace("{status}", "BERHASIL");
+
+                templateTrf = templateTrf.replace("{trans_ref}", OnlineTrfResp.getContent().getcbsRefCode());
+                templateTrf = templateTrf.replace("{struck}", OnlineTrfResp.getCorrelationId());
+                templateTrf = templateTrf.replace("{terminal}", TextUtil.maskString(request.getMsisdn(), 0, 8, 'X'));
+                templateTrf = templateTrf.replace("{date_time}", date_trx);
+
+                templateTrf = templateTrf.replace("{name}", request.getCustomerName());
+                templateTrf = templateTrf.replace("{account}", TextUtil.maskString(request.getAccount_number(), 0, 6, 'X'));
+
+                templateTrf = templateTrf.replace("{payment_id}", DestinationAccountNumber);
+                templateTrf = templateTrf.replace("{code_name}", BankName);
+                templateTrf = templateTrf.replace("{beneficiary_name}", inquiryTrfResp.getContent().getDestinationAccountName());
+
+                templateTrf = templateTrf.replace("{amount}", amount_display);
+                templateTrf = templateTrf.replace("{description}", request.getDescription());
+
+                log.info("Customer Email : " + email);
+                log.info("Transfer Online BSM template was initialized");
+
+                log.info("Generating content...");
+                template = templateTrf;
+
+                libFunction.sendEmailAsync(OnlineTrfResp.getContent().getcbsRefCode(), email, "Transaksi Bank Syariah Indonesia (NON BSI)",
+                        template, template, landscape);
 
             } else {
                 System.out.println(OnlineTrfResp.getResponseCode() + " <<<========== response code error");

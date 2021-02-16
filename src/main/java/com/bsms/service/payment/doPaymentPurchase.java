@@ -12,7 +12,9 @@ import com.bsms.service.transfer.MbInquiryOnlineTrfService;
 import com.bsms.util.MbJsonUtil;
 import com.bsms.util.MbLogUtil;
 import com.bsms.util.RestUtil;
+import com.bsms.util.TrxLimit;
 import com.google.gson.Gson;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,6 +43,9 @@ public class doPaymentPurchase extends MbBaseServiceImpl implements MbService {
     @Autowired
     private MbTxLogRepository txLogRepository;
 
+    @Value("${sql.conf}")
+    private String sqlconf;
+
     private MbApiResp mbApiResp;
 
     private static Logger log = LoggerFactory.getLogger(MbInquiryOnlineTrfService.class);
@@ -65,13 +70,37 @@ public class doPaymentPurchase extends MbBaseServiceImpl implements MbService {
 
             log.info("Response From Switcher : \n" + new Gson().toJson(response));
 
+            BaseResponse paymentResp = response.getBody();
 
-            if (response.getBody() != null) {
+            if (paymentResp.getResponseCode().equals("00")) {
+                //update transaction limit if response code 00
+                if (response.getBody().getResponseCode().equalsIgnoreCase("00")) {
+                    try {
+                        JSONObject value = new JSONObject();
+                        TrxLimit trxLimit = new TrxLimit();
+                        String amount = paymentResp.getAmount() != null ? paymentResp.getAmount() : "0";
+                        int trxType = TrxLimit.PAYMENT;
+
+                        double d = Double.parseDouble(amount);
+                        long amount_convert = (new Double(d)).longValue();
+                        trxLimit.LimitUpdate(request.getMsisdn(), request.getCustomerLimitType(), trxType, amount_convert, value, sqlconf);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        log.info("Update transaction limit failed :" + e.getMessage());
+                    }
+                }
                 mbApiResp = MbJsonUtil.createResponse(response.getBody());
             } else {
-                MbLogUtil.writeLogError(log, "Response body null", MbApiConstant.NOT_AVAILABLE);
-                mbApiResp = MbJsonUtil.createResponseBank("99", errorDefault, null);
+                System.out.println("run error");
+                mbApiResp = MbJsonUtil.createPdamPaymentErrorResponse(response.getBody(), request.getLanguage());
             }
+
+//            if (response.getBody() != null) {
+//                mbApiResp = MbJsonUtil.createResponse(response.getBody());
+//            } else {
+//                MbLogUtil.writeLogError(log, "Response body null", MbApiConstant.NOT_AVAILABLE);
+//                mbApiResp = MbJsonUtil.createResponseBank("99", errorDefault, null);
+//            }
         } catch (Exception e) {
             mbApiResp = MbJsonUtil.createResponseBank("99", errorDefault, null);
             MbLogUtil.writeLogError(log, "99", e.toString());

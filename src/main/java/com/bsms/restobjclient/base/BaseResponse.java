@@ -1,7 +1,7 @@
 package com.bsms.restobjclient.base;
 
 import com.bsms.restobjclient.info.GetInfoListSetting;
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.bsms.service.infocenter.GetListSetting;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Getter;
@@ -20,10 +20,9 @@ public class BaseResponse implements Serializable {
     private String responseCode;
     private String responseMessage;
     private String stan;
-    @JsonIgnore
-    private String amount;
     private Object responseContent;
     private Object content;
     private String rc;
+    private String amount;
     private List<GetInfoListSetting> list;
 }
