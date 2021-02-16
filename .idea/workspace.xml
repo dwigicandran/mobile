@@ -19,69 +19,19 @@
     <select />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="e2d53055-62e6-4c27-9118-185d39dff8fe" name="Default Changelist" comment="commit">
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/bsms/service/acop/autosave/AutoSaveOpening.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/bsms/service/acop/autosave/AutosaveInquiry.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/bsms/service/acop/autosave/ConfirmBreak.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/bsms/service/acop/autosave/DoBreak.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/bsms/service/acop/autosave/GetListAccount.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/bsms/service/acop/autosave/GetListAccountType.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/bsms/service/acop/qurbanautosave/GetListAccountType.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/bsms/service/cardotp/GetListAgentCardOtp.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/bsms/service/institution/GetListInstitutionAkademik.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/bsms/service/institution/InstitusionAkademikPayment.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/bsms/service/institution/InstitutionAkademikInquiry.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/bsms/service/mpn/MpnGetListLayanan.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/bsms/service/mpn/MpnInquiry.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/bsms/service/mpn/MpnPayment.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/template/academic.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/template/academic.html.bak" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/template/aqiqah_purchase.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/template/bpjs_mubp_payment.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/template/bsm_acop.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/template/cw.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/template/cw2.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/template/d20k_payment.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/template/default_payment.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/template/esia_prepaid.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/template/fp_hu.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/template/garuda.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/template/indosat.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/template/indosat.html.bak" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/template/indosat_matrix.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/template/infaq.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/template/logo.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/template/mabrur_acop.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/template/mpn_dja.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/template/mpn_djbc.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/template/mpn_djp.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/template/mubp_payment.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/template/pln_post.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/template/pln_pre.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/template/pln_pre_advice.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/template/pln_status.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/template/qa_purchase.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/template/qrpay.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/template/qrpaynotif.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/template/takaful.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/template/telkom.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/template/telkom_flexy.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/template/telkomsel.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/template/telkomsel_halo.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/template/topup_emoney.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/template/transfer_bsm.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/template/transfer_other.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/template/transfer_wesel.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/template/umrah.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/template/umrah_insurance.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/template/wadiah_acop.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/template/wakaf.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/template/wakaf.html.bak" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/template/wakaf2.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/template/wesel_status.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/template/zakat.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/bsms/cons/MbConstant.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bsms/cons/MbConstant.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/bsms/controller/ApiBaseController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bsms/controller/ApiBaseController.java" afterDir="false" />
+    <list default="true" id="215074e9-6e4c-4575-8afb-69d59b06fa13" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/.idea/.name" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/libraries/Maven__com_itextpdf_itextpdf_5_5_13_2.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/libraries/Maven__com_itextpdf_tool_xmlworker_5_5_13_2.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/libraries/Maven__javax_mail_mail_1_5_0_b01.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/encodings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/encodings.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/logs/mobile_api.log" beforeDir="false" afterPath="$PROJECT_DIR$/logs/mobile_api.log" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/mobile_api.iml" beforeDir="false" afterPath="$PROJECT_DIR$/mobile_api.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/bsms/controller/BckController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bsms/controller/BckController.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/bsms/domain/CardMapping.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bsms/domain/CardMapping.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/bsms/domain/Customer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bsms/domain/Customer.java" afterDir="false" />
@@ -158,8 +108,6 @@
       <change beforePath="$PROJECT_DIR$/src/main/java/com/bsms/service/account/MbListAccountServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bsms/service/account/MbListAccountServiceImpl.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/bsms/service/account/MbStatementOnlineByDateServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bsms/service/account/MbStatementOnlineByDateServiceImpl.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/bsms/service/account/MbStatementOnlineByTrxServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bsms/service/account/MbStatementOnlineByTrxServiceImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/bsms/service/aqiqah/aqiqahInquiry.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bsms/service/aqiqah/aqiqahInquiry.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/bsms/service/aqiqah/aqiqahPayment.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bsms/service/aqiqah/aqiqahPayment.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/bsms/service/authentication/MbActivationServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bsms/service/authentication/MbActivationServiceImpl.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/bsms/service/authentication/MbCreatePinServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bsms/service/authentication/MbCreatePinServiceImpl.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/bsms/service/authentication/MbSaveSmsServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bsms/service/authentication/MbSaveSmsServiceImpl.java" afterDir="false" />
@@ -168,29 +116,17 @@
       <change beforePath="$PROJECT_DIR$/src/main/java/com/bsms/service/authentication/VerifyActivationServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bsms/service/authentication/VerifyActivationServiceImpl.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/bsms/service/base/MyServiceImpl1.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bsms/service/base/MyServiceImpl1.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/bsms/service/cardotp/doInquiryCardOTP.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bsms/service/cardotp/doInquiryCardOTP.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/bsms/service/cardotp/doPaymentCardOTP.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bsms/service/cardotp/doPaymentCardOTP.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/bsms/service/favorite/DeleteFavorite.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bsms/service/favorite/DeleteFavorite.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/bsms/service/favorite/EditFavorite.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bsms/service/favorite/EditFavorite.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/bsms/service/favorite/GetFavoriteManagement.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bsms/service/favorite/GetFavoriteManagement.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/bsms/service/favorite/GetListFavorite.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bsms/service/favorite/GetListFavorite.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/bsms/service/favorite/InsertFavorite.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bsms/service/favorite/InsertFavorite.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/bsms/service/home/GetListBanner.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bsms/service/home/GetListBanner.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/bsms/service/institution/GetListInstitution.java" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/bsms/service/limit/MbInfoLimitService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bsms/service/limit/MbInfoLimitService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/bsms/service/payment/doPaymentInquiry.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bsms/service/payment/doPaymentInquiry.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/bsms/service/payment/doPaymentPurchase.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bsms/service/payment/doPaymentPurchase.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/bsms/service/pdam/GetListPdam.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bsms/service/pdam/GetListPdam.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/bsms/service/pdam/GetPdamServices.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bsms/service/pdam/GetPdamServices.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/bsms/service/pdam/PdamConfirm.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bsms/service/pdam/PdamConfirm.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/bsms/service/pdam/PdamInquiry.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bsms/service/pdam/PdamInquiry.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/bsms/service/pdam/PdamPayment.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bsms/service/pdam/PdamPayment.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/bsms/service/qris/doPaymentQRIS.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bsms/service/qris/doPaymentQRIS.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/bsms/service/qurban/QurbanInquiry.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bsms/service/qurban/QurbanInquiry.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/bsms/service/qurban/QurbanPayment.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bsms/service/qurban/QurbanPayment.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/bsms/service/split/PayPayment.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bsms/service/split/PayPayment.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/bsms/service/split/PaymentInquiry.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bsms/service/split/PaymentInquiry.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/bsms/service/split/PurchaseInquiry.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bsms/service/split/PurchaseInquiry.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/bsms/service/split/prepaidPayment.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bsms/service/split/prepaidPayment.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/bsms/service/split/purchasePayment.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bsms/service/split/purchasePayment.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/bsms/service/split/PurchaseConfirm.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bsms/service/split/PurchaseConfirm.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/bsms/service/split/prepaidPayment.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bsms/service/split/PrepaidPayment.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/bsms/service/split/purchasePayment.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bsms/service/split/PurchasePayment.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/bsms/service/transfer/GetListBankService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bsms/service/transfer/GetListBankService.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/bsms/service/transfer/GetListTrfMethodService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bsms/service/transfer/GetListTrfMethodService.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/bsms/service/transfer/MbInquiryOnlineTrfService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bsms/service/transfer/MbInquiryOnlineTrfService.java" afterDir="false" />
@@ -202,7 +138,6 @@
       <change beforePath="$PROJECT_DIR$/src/main/java/com/bsms/util/LibDESUtil.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bsms/util/LibDESUtil.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/bsms/util/LibFunctionUtil.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bsms/util/LibFunctionUtil.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/bsms/util/MbDecryptDesUtil.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bsms/util/MbDecryptDesUtil.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/bsms/util/MbJsonUtil.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bsms/util/MbJsonUtil.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/bsms/util/MbLibRSA.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bsms/util/MbLibRSA.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/bsms/util/MbVerifyPinUtil.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bsms/util/MbVerifyPinUtil.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/bsms/util/RestConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bsms/util/RestConfig.java" afterDir="false" />
@@ -216,180 +151,51 @@
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
-  <component name="FileTemplateManagerImpl">
-    <option name="RECENT_TEMPLATES">
-      <list>
-        <option value="Class" />
-      </list>
-    </option>
-  </component>
   <component name="Git.Settings">
-    <favorite-branches>
-      <branch-storage>
-        <map>
-          <entry type="REMOTE">
-            <value>
-              <list>
-                <branch-info repo="$PROJECT_DIR$" source="origin/dwisutrisno" />
-              </list>
-            </value>
-          </entry>
-        </map>
-      </branch-storage>
-    </favorite-branches>
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="8df75679a6693328bb2d502ce769485d83574d5c" />
+        <entry key="$PROJECT_DIR$" value="master" />
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="NamedScopeManager">
-    <scope name="Dwi" pattern="" />
-  </component>
-  <component name="ProjectId" id="1lwpFj4nnkq7FRaF4JDnVSXbFXE" />
-  <component name="ProjectLevelVcsManager" settingsEditedManually="true">
-    <ConfirmationsSetting value="2" id="Add" />
-  </component>
+  <component name="ProjectId" id="1oYHgBDh4e35JBMTU6FzSfwC3h1" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
   <component name="PropertiesComponent">
-    <property name="ASKED_ADD_EXTERNAL_FILES" value="true" />
     <property name="RequestMappingsPanelOrder0" value="0" />
     <property name="RequestMappingsPanelOrder1" value="1" />
     <property name="RequestMappingsPanelWidth0" value="75" />
     <property name="RequestMappingsPanelWidth1" value="75" />
+    <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
+    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="aspect.path.notification.shown" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/../SwitcherService" />
-    <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
-    <property name="nodejs_npm_path_reset_for_default_project" value="true" />
-    <property name="project.structure.last.edited" value="Project" />
-    <property name="project.structure.proportion" value="0.15" />
-    <property name="project.structure.side.proportion" value="0.28125" />
-    <property name="settings.editor.selected.configurable" value="preferences.pluginManager" />
-  </component>
-  <component name="RecentsManager">
-    <key name="CopyClassDialog.RECENTS_KEY">
-      <recent name="com.bsms.service.inboxnotif" />
-    </key>
-    <key name="CopyFile.RECENT_KEYS">
-      <recent name="C:\Users\Nepatyaz\Desktop\mobile-api-hsm\src\main\resources" />
-    </key>
   </component>
   <component name="RunManager">
-    <configuration default="true" type="Application" factoryName="Application">
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration default="true" type="JUnit" factoryName="JUnit">
-      <option name="TEST_OBJECT" value="class" />
-      <option name="WORKING_DIRECTORY" value="%MODULE_WORKING_DIR%" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="MobileApiApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" temporary="true" nameIsGenerated="true">
+    <configuration name="MobileApiApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
       <module name="mobile_api" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="com.bsms.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
       <option name="SPRING_BOOT_MAIN_CLASS" value="com.bsms.MobileApiApplication" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration default="true" type="TestNG">
-      <option name="TEST_OBJECT" value="CLASS" />
-      <option name="WORKING_DIRECTORY" value="%MODULE_WORKING_DIR%" />
-      <properties />
-      <listeners />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <recent_temporary>
-      <list>
-        <item itemvalue="Spring Boot.MobileApiApplication" />
-      </list>
-    </recent_temporary>
   </component>
   <component name="SvnConfiguration">
     <configuration />
   </component>
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
-      <changelist id="250cb461-9b55-494a-becf-2f16cf5ca253" name="Default" comment="" />
-      <created>1604282651655</created>
+      <changelist id="215074e9-6e4c-4575-8afb-69d59b06fa13" name="Default Changelist" comment="" />
+      <created>1613456712708</created>
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
-      <updated>1604282651655</updated>
-      <workItem from="1604282652913" duration="749000" />
-      <workItem from="1604385380042" duration="342000" />
-      <workItem from="1604385828030" duration="7995000" />
-      <workItem from="1604455206646" duration="10223000" />
-      <workItem from="1604542977018" duration="5692000" />
-      <workItem from="1604557862081" duration="5193000" />
-      <workItem from="1604612327960" duration="4093000" />
-      <workItem from="1604658342488" duration="251000" />
-      <workItem from="1604892753817" duration="8123000" />
-      <workItem from="1604973580218" duration="3138000" />
-      <workItem from="1604998951578" duration="2241000" />
-      <workItem from="1605010103553" duration="1751000" />
-      <workItem from="1605060452660" duration="612000" />
-      <workItem from="1605067323917" duration="625000" />
-      <workItem from="1605078110431" duration="32726000" />
-      <workItem from="1605225381555" duration="15393000" />
-      <workItem from="1605496281535" duration="6801000" />
-      <workItem from="1605579789388" duration="5552000" />
-      <workItem from="1605782242233" duration="83000" />
-      <workItem from="1605853836144" duration="8235000" />
-      <workItem from="1606098073666" duration="20011000" />
-      <workItem from="1606184910338" duration="6218000" />
-      <workItem from="1606270783292" duration="8389000" />
-      <workItem from="1606330205196" duration="4909000" />
-      <workItem from="1606448345424" duration="3505000" />
-      <workItem from="1606704737837" duration="4590000" />
-      <workItem from="1606788172069" duration="15437000" />
-      <workItem from="1606875012996" duration="14272000" />
-      <workItem from="1606983771338" duration="680000" />
-      <workItem from="1607065222814" duration="7453000" />
-      <workItem from="1607672496123" duration="2888000" />
-      <workItem from="1607911666480" duration="2386000" />
-      <workItem from="1607952238007" duration="567000" />
-      <workItem from="1608089387026" duration="766000" />
-      <workItem from="1608090606814" duration="2855000" />
-      <workItem from="1608170153856" duration="6969000" />
-      <workItem from="1608517915163" duration="1651000" />
-      <workItem from="1608519635464" duration="263000" />
-      <workItem from="1608520208421" duration="83000" />
-      <workItem from="1608520309377" duration="505000" />
-      <workItem from="1608520877640" duration="1485000" />
-      <workItem from="1608537516309" duration="2800000" />
+      <updated>1613456712708</updated>
+      <workItem from="1613456715614" duration="1312000" />
     </task>
-    <task id="LOCAL-00001" summary="commit">
-      <created>1604282726949</created>
-      <option name="number" value="00001" />
-      <option name="presentableId" value="LOCAL-00001" />
-      <option name="project" value="LOCAL" />
-      <updated>1604282726949</updated>
-    </task>
-    <task id="LOCAL-00002" summary="commit">
-      <created>1604283130750</created>
-      <option name="number" value="00002" />
-      <option name="presentableId" value="LOCAL-00002" />
-      <option name="project" value="LOCAL" />
-      <updated>1604283130750</updated>
-    </task>
-    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -405,76 +211,47 @@
         </entry>
       </map>
     </option>
-    <option name="oldMeFiltersMigrated" value="true" />
-  </component>
-  <component name="VcsManagerConfiguration">
-    <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
-    <MESSAGE value="commit" />
-    <option name="LAST_COMMIT_MESSAGE" value="commit" />
   </component>
   <component name="WindowStateProjectService">
-    <state x="312" y="88" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1608520237528">
+    <state width="1397" height="222" key="GridCell.Tab.0.bottom" timestamp="1613457768445">
       <screen x="0" y="0" width="1440" height="860" />
     </state>
-    <state x="312" y="88" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1440.860@0.0.1440.860" timestamp="1608520237528" />
-    <state x="345" y="0" key="CommitChangelistDialog2" timestamp="1613443558584">
+    <state width="1397" height="222" key="GridCell.Tab.0.bottom/0.0.1440.860@0.0.1440.860" timestamp="1613457768445" />
+    <state width="1397" height="222" key="GridCell.Tab.0.center" timestamp="1613457768444">
       <screen x="0" y="0" width="1440" height="860" />
     </state>
-    <state x="345" y="0" key="CommitChangelistDialog2/1440.0.1920.1040/0.0.1440.860@0.0.1440.860" timestamp="1613443558584" />
-    <state x="500" y="185" key="FileChooserDialogImpl" timestamp="1608521463481">
+    <state width="1397" height="222" key="GridCell.Tab.0.center/0.0.1440.860@0.0.1440.860" timestamp="1613457768444" />
+    <state width="1397" height="222" key="GridCell.Tab.0.left" timestamp="1613457768444">
       <screen x="0" y="0" width="1440" height="860" />
     </state>
-    <state x="500" y="185" key="FileChooserDialogImpl/0.0.1440.860@0.0.1440.860" timestamp="1608521463481" />
-    <state width="1397" height="201" key="GridCell.Tab.0.bottom" timestamp="1608522713862">
+    <state width="1397" height="222" key="GridCell.Tab.0.left/0.0.1440.860@0.0.1440.860" timestamp="1613457768444" />
+    <state width="1397" height="222" key="GridCell.Tab.0.right" timestamp="1613457768444">
       <screen x="0" y="0" width="1440" height="860" />
     </state>
-    <state width="1397" height="201" key="GridCell.Tab.0.bottom/0.0.1440.860@0.0.1440.860" timestamp="1608522713862" />
-    <state width="1397" height="201" key="GridCell.Tab.0.center" timestamp="1608522713861">
+    <state width="1397" height="222" key="GridCell.Tab.0.right/0.0.1440.860@0.0.1440.860" timestamp="1613457768444" />
+    <state width="1397" height="222" key="GridCell.Tab.1.bottom" timestamp="1613457768445">
       <screen x="0" y="0" width="1440" height="860" />
     </state>
-    <state width="1397" height="201" key="GridCell.Tab.0.center/0.0.1440.860@0.0.1440.860" timestamp="1608522713861" />
-    <state width="1397" height="201" key="GridCell.Tab.0.left" timestamp="1608522713861">
+    <state width="1397" height="222" key="GridCell.Tab.1.bottom/0.0.1440.860@0.0.1440.860" timestamp="1613457768445" />
+    <state width="1397" height="222" key="GridCell.Tab.1.center" timestamp="1613457768445">
       <screen x="0" y="0" width="1440" height="860" />
     </state>
-    <state width="1397" height="201" key="GridCell.Tab.0.left/0.0.1440.860@0.0.1440.860" timestamp="1608522713861" />
-    <state width="1397" height="201" key="GridCell.Tab.0.right" timestamp="1608522713861">
+    <state width="1397" height="222" key="GridCell.Tab.1.center/0.0.1440.860@0.0.1440.860" timestamp="1613457768445" />
+    <state width="1397" height="222" key="GridCell.Tab.1.left" timestamp="1613457768445">
       <screen x="0" y="0" width="1440" height="860" />
     </state>
-    <state width="1397" height="201" key="GridCell.Tab.0.right/0.0.1440.860@0.0.1440.860" timestamp="1608522713861" />
-    <state width="1397" height="201" key="GridCell.Tab.1.bottom" timestamp="1608521531260">
+    <state width="1397" height="222" key="GridCell.Tab.1.left/0.0.1440.860@0.0.1440.860" timestamp="1613457768445" />
+    <state width="1397" height="222" key="GridCell.Tab.1.right" timestamp="1613457768445">
       <screen x="0" y="0" width="1440" height="860" />
     </state>
-    <state width="1397" height="201" key="GridCell.Tab.1.bottom/0.0.1440.860@0.0.1440.860" timestamp="1608521531260" />
-    <state width="1397" height="201" key="GridCell.Tab.1.center" timestamp="1608521531259">
+    <state width="1397" height="222" key="GridCell.Tab.1.right/0.0.1440.860@0.0.1440.860" timestamp="1613457768445" />
+    <state x="250" y="85" key="Maven.ArtifactSearchDialog" timestamp="1613456996605">
       <screen x="0" y="0" width="1440" height="860" />
     </state>
-    <state width="1397" height="201" key="GridCell.Tab.1.center/0.0.1440.860@0.0.1440.860" timestamp="1608521531259" />
-    <state width="1397" height="201" key="GridCell.Tab.1.left" timestamp="1608521531259">
+    <state x="250" y="85" key="Maven.ArtifactSearchDialog/0.0.1440.860@0.0.1440.860" timestamp="1613456996605" />
+    <state x="499" y="143" key="git4idea.branch.GitSmartOperationDialog" timestamp="1613456725131">
       <screen x="0" y="0" width="1440" height="860" />
     </state>
-    <state width="1397" height="201" key="GridCell.Tab.1.left/0.0.1440.860@0.0.1440.860" timestamp="1608521531259" />
-    <state width="1397" height="201" key="GridCell.Tab.1.right" timestamp="1608521531260">
-      <screen x="0" y="0" width="1440" height="860" />
-    </state>
-    <state width="1397" height="201" key="GridCell.Tab.1.right/0.0.1440.860@0.0.1440.860" timestamp="1608521531260" />
-    <state x="250" y="85" key="Maven.ArtifactSearchDialog" timestamp="1608520251118">
-      <screen x="0" y="0" width="1440" height="860" />
-    </state>
-    <state x="250" y="85" key="Maven.ArtifactSearchDialog/0.0.1440.860@0.0.1440.860" timestamp="1608520251118" />
-    <state x="200" y="4" width="1146" height="851" key="SettingsEditor" timestamp="1608521598357">
-      <screen x="0" y="0" width="1440" height="860" />
-    </state>
-    <state x="200" y="4" width="1146" height="851" key="SettingsEditor/0.0.1440.860@0.0.1440.860" timestamp="1608521598357" />
-  </component>
-  <component name="XDebuggerManager">
-    <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" type="java-field">
-          <url>file://$PROJECT_DIR$/src/main/java/com/bsms/MobileApiApplication.java</url>
-          <line>19</line>
-          <properties field="jdbcTemplate" class="com.bsms.MobileApiApplication" />
-        </line-breakpoint>
-      </breakpoints>
-    </breakpoint-manager>
+    <state x="499" y="143" key="git4idea.branch.GitSmartOperationDialog/0.0.1440.860@0.0.1440.860" timestamp="1613456725131" />
   </component>
 </project>

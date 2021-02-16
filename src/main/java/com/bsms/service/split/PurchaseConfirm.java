@@ -27,7 +27,6 @@ import org.springframework.web.client.RestTemplate;
 
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.core.HttpHeaders;
-import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
