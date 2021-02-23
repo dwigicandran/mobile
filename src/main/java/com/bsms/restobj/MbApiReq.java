@@ -227,6 +227,10 @@ public class MbApiReq implements Serializable {
     private String card_no;
     private String card_info;
 
+    //cardotp odc
+    private String card_info;
+    private String card_no;
+
     private Object content;
     private MbApiContentReq reqContent;
     private MbApiContentReq reqData;
