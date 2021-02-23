@@ -76,7 +76,7 @@ public class PayPayment extends MbBaseServiceImpl implements MbService {
         log.info("biller id : " + billerId);
 
 //        SpMerchant result = spMerchantRepository.findBySpMerchantId(billerId);
-        List<SpMerchant> result = spMerchantRepository.findAllSpMerchantByMerchantId(billerId);
+        List<SpMerchant> result = spMerchantRepository.findAllBySpMerchantId(billerId);
 
         String paymentType = request.getPayment_type() != null ? request.getPayment_type() : null;
 

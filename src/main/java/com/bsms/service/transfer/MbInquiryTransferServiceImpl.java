@@ -208,12 +208,13 @@ public class MbInquiryTransferServiceImpl extends MbBaseServiceImpl implements M
                         content.add(new ContentInqTrf("Jumlah", request.getAmount()));
                         content.add(new ContentInqTrf("Keterangan", request.getDescription()));
                     }
+                    String info = null;
 
                     InquiryTrfDispResp inquiryTrfDispResp = new InquiryTrfDispResp(request.getAccount_number(),
                             request.getCustomerName(),
                             DestinationAccountNumber,
                             inquiryTrfResp.getContent().getDestinationAccountName(),
-                            content, trx_id);
+                            content, trx_id, info);
 
                     mbApiResp = MbJsonUtil.createResponseTrf(inquiryTrfResp.getResponseCode(),
                             "Success",

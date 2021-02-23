@@ -13,6 +13,11 @@ import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.core.HttpHeaders;
 
+import com.bsms.domain.MbMerchant;
+import com.bsms.domain.SpMerchant;
+import com.bsms.repository.MbMerchantRepository;
+import com.bsms.repository.SpMerchantRepository;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +43,12 @@ public class GetListFavorite extends MbBaseServiceImpl implements MbService {
 
     @Value("${sql.conf}")
     private String connectionUrl;
+
+    @Autowired
+    private SpMerchantRepository spMerchantRepository;
+
+    @Autowired
+    private MbMerchantRepository mbMerchantRepository;
 
     @Autowired
     private ObjectMapper objMapper;
@@ -71,20 +82,24 @@ public class GetListFavorite extends MbBaseServiceImpl implements MbService {
                 SQL = "SELECT * from Favorite where submodul_id='" + request.getSub_modul_id() + "' and msisdn='" + request.getMsisdn() + "'";
                 ResultSet rs = stmt.executeQuery(SQL);
 
+                String billName;
+
                 while (rs.next()) {
+                    billName = getBillName(rs.getString("billerid"));
+
                     if (request.getSub_modul_id().equalsIgnoreCase("TR01") || request.getSub_modul_id().equalsIgnoreCase("TR02")) {
                         favorit.add(new Favorit(rs.getString("id_fav"), rs.getString("fav_title") + ";" + rs.getString("destinationAccountName") +
                                 " - " + rs.getString("bankName") + " - " + rs.getString("destinationAccountNumber")));
                     } else if (request.getSub_modul_id().equalsIgnoreCase("PU02")) {
                         favorit.add(new Favorit(rs.getString("billkey1") + ";" + rs.getString("billerid"),
-                                rs.getString("fav_title") + ";" + rs.getString("billkey1")));
+                                rs.getString("fav_title") + ";" + billName + rs.getString("billkey1")));
                     } else if (request.getSub_modul_id().substring(0, 2).equalsIgnoreCase("PU")) {
 //		            		log.info("")
                         favorit.add(new Favorit(rs.getString("billkey1"),
-                                rs.getString("fav_title") + ";" + rs.getString("billkey1")));
+                                rs.getString("fav_title") + ";" + billName + rs.getString("billkey1")));
                     } else if (request.getSub_modul_id().substring(0, 2).equalsIgnoreCase("PY")) {
                         favorit.add(new Favorit(rs.getString("billkey1") + ";" + rs.getString("billerid"),
-                                rs.getString("fav_title") + ";" + rs.getString("fav_title") + " - " + rs.getString("billkey1")));
+                                rs.getString("fav_title") + ";" + billName + rs.getString("billkey1")));
                     }
 
 
@@ -111,6 +126,27 @@ public class GetListFavorite extends MbBaseServiceImpl implements MbService {
         }
 
         return mbApiResp;
+    }
+
+    //add by Dwi S
+    private String getBillName(String billerId) {
+        //enhancemt favorite, penambahana billname di value response
+        String billName;
+        try {
+
+            if (billerId.equalsIgnoreCase("200194")) {
+                //khusu
+                billName = "Link Aja - ";
+            } else {
+                SpMerchant spMerchant = spMerchantRepository.findBySpMerchantId(billerId);
+                MbMerchant mbMerchant = mbMerchantRepository.findByCode(spMerchant.getMerchantCode());
+                billName = mbMerchant.getFavTitle() + " - ";
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            billName = "";
+        }
+        return billName;
     }
 
 

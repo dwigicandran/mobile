@@ -80,7 +80,7 @@ public class PurchaseInquiry extends MbBaseServiceImpl implements MbService {
 //        log.info("Param : " + requestParam);
 
 //        SpMerchant result = spMerchantRepository.findBySpMerchantId(billerId);
-        List<SpMerchant> result = spMerchantRepository.findAllSpMerchantByMerchantId(billerId);
+        List<SpMerchant> result = spMerchantRepository.findAllBySpMerchantId(billerId);
 
         log.info("SPMerchant result : " + new Gson().toJson(result));
 //        log.info("service provider : " + result.get(0).getServiceprovider());
