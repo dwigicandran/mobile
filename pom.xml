@@ -118,11 +118,11 @@
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-api</artifactId>
-			<!-- <version>1.7.19</version> -->
-		</dependency>
+		<!--<dependency>-->
+			<!--<groupId>org.slf4j</groupId>-->
+			<!--<artifactId>slf4j-api</artifactId>-->
+			<!--&lt;!&ndash; <version>1.7.19</version> &ndash;&gt;-->
+		<!--</dependency>-->
 		<dependency>
 			<groupId>org.apache.logging.log4j</groupId>
 			<artifactId>log4j-slf4j-impl</artifactId>
@@ -200,12 +200,34 @@
 			<artifactId>ezmorph</artifactId>
 			<version>1.0.6</version>
 		</dependency>
-		<!-- https://mvnrepository.com/artifact/top.jfunc.json/Json-Jsonlib -->
+
 		<dependency>
 			<groupId>top.jfunc.json</groupId>
 			<artifactId>Json-Jsonlib</artifactId>
 			<version>1.0</version>
 		</dependency>
+
+		<dependency>
+			<groupId>com.itextpdf</groupId>
+			<artifactId>itextpdf</artifactId>
+			<version>5.5.13.2</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.itextpdf.tool</groupId>
+			<artifactId>xmlworker</artifactId>
+			<version>5.5.13.2</version>
+		</dependency>
+
+		<dependency>
+			<groupId>javax.mail</groupId>
+			<artifactId>mail</artifactId>
+			<version>1.5.0-b01</version>
+		</dependency>
+
+
+
+
 
 	</dependencies>
 
