@@ -28,7 +28,7 @@ import com.bsms.profile.Customer;
 import com.bsms.profile.CustomerActivation;
 import com.bsms.restobj.MbApiReq;
 import com.bsms.restobj.MbApiResp;
-import com.bsms.service.MbService;
+import com.bsms.service.base.MbService;
 import com.bsms.trx.TrxLog;
 import com.bsms.util.MbDateFormatUtil;
 import com.bsms.util.MbErrorUtil;

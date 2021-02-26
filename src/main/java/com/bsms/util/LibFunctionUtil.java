@@ -47,6 +47,7 @@ import javax.activation.FileDataSource;
 import javax.crypto.Cipher;
 import javax.crypto.spec.DESKeySpec;
 import javax.crypto.spec.SecretKeySpec;
+
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 
@@ -57,7 +58,189 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Random;
 
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.mail.MailException;
+
+import org.springframework.mail.javamail.JavaMailSender;
+
+import javax.activation.DataHandler;
+import javax.activation.DataSource;
+import javax.activation.FileDataSource;
+import javax.mail.Message;
+import javax.mail.Multipart;
+import javax.mail.PasswordAuthentication;
+import javax.mail.Session;
+import javax.mail.Transport;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeBodyPart;
+import javax.mail.internet.MimeMessage;
+import javax.mail.internet.MimeMultipart;
+
+import com.itextpdf.text.BaseColor;
+import com.itextpdf.text.Document;
+import com.itextpdf.text.Element;
+import com.itextpdf.text.Font;
+import com.itextpdf.text.FontFactory;
+import com.itextpdf.text.PageSize;
+import com.itextpdf.text.Paragraph;
+import com.itextpdf.text.Phrase;
+import com.itextpdf.text.pdf.ColumnText;
+import com.itextpdf.text.pdf.PdfPCell;
+import com.itextpdf.text.pdf.PdfPTable;
+import com.itextpdf.text.pdf.PdfPageEventHelper;
+import com.itextpdf.text.pdf.PdfWriter;
+import com.itextpdf.tool.xml.XMLWorkerHelper;
+
 public class LibFunctionUtil {
+	
+	//========== Email Method Added By Dodo ===================//
+	 public static void sendEmailAsync(String trans_ref,
+	          String mail_to, String subject, String html_content,
+	          String pdf_content, boolean landscape) {
+	      
+	      Thread t = new Thread(new EmailSender(trans_ref, mail_to, subject, html_content, pdf_content, 
+	    		  landscape));
+	      t.start();
+	  }
+	 
+	 private static class EmailSender implements Runnable {
+	        String trans_ref;
+	        String mail_to;
+	        String subject;
+	        String html_content;
+	        String pdf_content; 
+	        boolean landscape;
+	        String tmp_folder;
+	        
+	        public EmailSender(String trans_ref,
+	          String mail_to, String subject, String html_content,
+	          String pdf_content, boolean landscape) {
+	            this.trans_ref = trans_ref;
+	            this.mail_to = mail_to;
+	            this.subject = subject;
+	            this.html_content = html_content;
+	            this.pdf_content = pdf_content;
+	            this.landscape = landscape;
+	         
+	        }
+
+	        @Override
+	        public void run() {
+	            try {
+	                SendEmail(trans_ref,
+	                          mail_to, 
+	                          subject, 
+	                          html_content,
+	                          pdf_content, landscape);
+	            }
+	            catch (Exception e) {
+	            	System.out.println(e.getMessage());
+	            }
+	        }
+	      
+	  }
+	 
+	 public static void SendEmail(String trans_ref,
+	          String mail_to, String subject, String html_content,
+	          String pdf_content, boolean landscape) throws IOException {
+
+	    String dir_name = "/tmp/" + getDatetime("yyyyMMdd");
+	   
+		
+	    CreateDir(dir_name);
+	    
+	    String file_path = dir_name + "/" + trans_ref + ".pdf";
+	    
+	    try {
+	    	
+	      System.out.println("Sending email to: " + mail_to);
+
+	      Date tempDate = new Date();
+
+	      Properties props = new Properties();
+	      props.put("10.250.48.151", "BSM MAIL Server");
+	      props.put("mail.smtp.port", "25");
+	      props.put("mail.smtp.host", "10.250.48.151");
+	      props.put("mail.smtp.auth", "false");
+	      //props.put("mail.smtp.auth", "true");
+	      //props.put("mail.smtp.starttls.enable", true);
+	      props.put("mail.smtp.starttls.enable", false);
+	      props.put("mail.smtp.connectiontimeout", "30000");
+	      props.put("mail.smtp.timeout", "30000"); 
+
+	      Session session = Session.getInstance(props, null);
+	      session.setDebug(true);
+
+	      MimeMessage msg = new MimeMessage(session);
+
+	      msg.setFrom("mobile@syariahmandiri.co.id");
+	      //msg.setRecipients(Message.RecipientType.TO, mail_to);
+	      if (mail_to.contains(","))
+	          msg.setRecipients(Message.RecipientType.TO, InternetAddress.parse(mail_to));
+	      else
+	          msg.setRecipients(Message.RecipientType.TO, mail_to);
+	      msg.setSubject(subject);
+	      msg.setSentDate(new Date());
+
+//	      OutputStream pdf_file = new FileOutputStream(new File(file_path));
+
+	     Document document;
+	      if (landscape == true) {
+	        document = new Document(PageSize.LETTER.rotate());
+	      } else {
+	        document = new Document();
+	      }
+
+//	      PdfWriter.getInstance(document, pdf_file);
+//	      document.open();
+//	      HTMLWorker htmlWorker = new HTMLWorker(document);
+//	      htmlWorker.parse(new StringReader(pdf_content));
+//	      document.close();
+	//
+//	      pdf_file.close();
+	      
+	      OutputStream pdf_file = new FileOutputStream(new File(file_path));
+	      PdfWriter writer = PdfWriter.getInstance(document, pdf_file);
+	      writer.setFullCompression();
+	      document.open();
+	      InputStream is = new ByteArrayInputStream(pdf_content.getBytes());
+	      XMLWorkerHelper.getInstance().parseXHtml(writer, document, is);
+	      document.close();
+
+	      pdf_file.close();
+
+	      MimeMultipart multipart = new MimeMultipart("alternative");
+	      MimeBodyPart messageBodyPart = new MimeBodyPart();
+	      messageBodyPart.setContent(html_content, "text/html");
+	      multipart.addBodyPart(messageBodyPart);
+
+	      String fileName = trans_ref + ".pdf";
+	      messageBodyPart = new MimeBodyPart();
+	      DataSource source = new FileDataSource(file_path);
+	      messageBodyPart.setDataHandler(new DataHandler(source));
+	      messageBodyPart.setFileName(fileName);
+	      multipart.addBodyPart(messageBodyPart);
+
+	      msg.setContent(multipart);
+	      msg.saveChanges();
+
+	     
+	      Transport.send(msg);
+
+	      tempDate = new Date();
+	      
+	      //logger.info("Email sent to: " + mail_to + " on " + tempDate);
+	      
+	      System.out.println("Email sent to: " + mail_to + " on " + tempDate);
+	     
+	    } 
+	    catch (Exception e) {
+       	System.out.println(e.getMessage());
+       }
+	  }
+
+	//=========== End Email Method ===========================//
 
 	public static String log_message = "";
 //	  private static Logger logger = LogManager.getLogger("bsm-service");
