@@ -85,7 +85,6 @@ spring.datasource.password=admin
 spring.datasource.driverClassName=com.microsoft.sqlserver.jdbc.SQLServerDriver
 #spring.jpa.show-sql=true
 #spring.jpa.hibernate.dialect=org.hibernate.dialect.SQLServer2012Dialect
-#spring.jpa.hibernate.ddl-auto = create-drop
 
 transaction.service=test,balanceInquiry,inquiryTransfer,internalTransfer,onlineStatementByDate,inquiryOnlineTransfer,onlineTransfer,infoLimit,insertFavorite,doPaymentEMoney,doInquiryEMoney,doInquiryQRIS,doPaymentQRIS,doConfirmationQRIS,doInquiryZiswaf,doPaymentZiswaf,doInquiryCardOTP,doPaymentCardOTP,doPaymentInquiry,doInquiryMabrur,doInquiryMudharabah,doOpeningMudharabah,doInquiryWadiah,doOpeningWadiah,doPaymentPurchase,paymentInquiry,payPayment,prepaidInquiry,purchaseInquiry,aqiqahInquiry,aqiqahPayment,qurbanInquiry,qurbanPayment
 fintrx.service=test,internalTransfer,onlineStatementByDate,onlineTransfer,infoLimit,insertFavorite,doInquiryEMoney,doPaymentEMoney,doInquiryQRIS,doPaymentQRIS,doConfirmationQRIS,doInquiryZiswaf,doPaymentZiswaf,doInquiryCardOTP,doPaymentCardOTP,doPaymentInquiry,doInquiryMabrur,doInquiryMudharabah,doOpeningMudharabah,doInquiryWadiah,doOpeningWadiah,doPaymentPurchase,paymentInquiry,payPayment,prepaidInquiry,purchaseInquiry,aqiqahInquiry,aqiqahPayment,qurbanInquiry,qurbanPayment
@@ -201,6 +200,6 @@ qurban.payment=http://purchase-msm-purchasesvc.10.0.117.124.nip.io/api/services/
 
 #ListMerchant
 #list.merchant=http://ubpservice-ubpservice.10.0.117.124.nip.io/api/purchase/merchant/getlist
-list.merchant=http://10.250.34.51:8080/api/split/listMerchant 
+list.merchant=http://10.250.34.51:8080/api/split/listMerchant
 
 
