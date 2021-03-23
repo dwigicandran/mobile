@@ -13,6 +13,7 @@ import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.core.HttpHeaders;
 
+import com.bsms.restobjclient.emoney.doInquiryEmoneyReq;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -85,12 +86,32 @@ public class doPaymentEmoney extends MbBaseServiceImpl implements MbService  {
 	    		MbApiTxLog txLog = new MbApiTxLog();	
 	            txLogRepository.save(txLog);
 
+				LibFunctionUtil libFunct = new LibFunctionUtil();
+				String trx_id = libFunct.getTransactionID(6);
+
 	        	System.out.println("::: doPayment E-Money Microservices Request :::");
 	            System.out.println(new Gson().toJson(request));
+
+				doInquiryEmoneyReq doinquiryemoneyreq = new doInquiryEmoneyReq();
+
+				doinquiryemoneyreq.setCorrelationId(trx_id);
+				doinquiryemoneyreq.setTransactionId(trx_id);
+				doinquiryemoneyreq.setDeliveryChannel("6027");
+				doinquiryemoneyreq.setSourceAccountNumber(request.getAccount_number());
+				doinquiryemoneyreq.setSourceAccountName(request.getCustomerName());
+				doinquiryemoneyreq.setCardNo(request.getBillkey1());
+				doinquiryemoneyreq.setAmount(request.getAmount());
+				doinquiryemoneyreq.setDescription(request.getDescription());
+				doinquiryemoneyreq.setPan(request.getPan());
+				doinquiryemoneyreq.setCardAcceptorTerminal("00307180");
+				doinquiryemoneyreq.setCardAcceptorMerchantId(request.getMsisdn());
+				doinquiryemoneyreq.setCurrency("360");
+
+		System.out.println(new Gson().toJson(doinquiryemoneyreq));
 	            
 	            try {
 	    			
-	            	HttpEntity<?> req = new HttpEntity(request, RestUtil.getHeaders());
+	            	HttpEntity<?> req = new HttpEntity(doinquiryemoneyreq, RestUtil.getHeaders());
 	            	RestTemplate restTemps = new RestTemplate();
 	            	String url = doPaymentEMoney;
 	            	
@@ -111,6 +132,7 @@ public class doPaymentEmoney extends MbBaseServiceImpl implements MbService  {
 	    					
 	    				 trxLimit.LimitUpdate(request.getMsisdn(), request.getCustomerLimitType(), 
 	    			        		trxType, Long.parseLong(request.getAmount()), value,sqlconf);
+	    				 //favorit
 	    			 }
 	    			
 	    		} catch (Exception e) {
