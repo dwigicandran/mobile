@@ -4,14 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="82acaae8-5d72-42b0-9fcf-0f39484ed1fc" name="Default" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/logs/mobile_api.log" beforeDir="false" afterPath="$PROJECT_DIR$/logs/mobile_api.log" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/mobile_api.iml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/bsms/service/emoney/doInquiryEmoney.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bsms/service/emoney/doInquiryEmoney.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/bsms/service/emoney/doPaymentEmoney.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bsms/service/emoney/doPaymentEmoney.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/bsms/service/emoney/doUpdateEmoney.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bsms/service/emoney/doUpdateEmoney.java" afterDir="false" />
-    </list>
+    <list default="true" id="82acaae8-5d72-42b0-9fcf-0f39484ed1fc" name="Default" comment="commit" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -174,6 +167,14 @@
       <workItem from="1614068802366" duration="812000" />
       <workItem from="1614069951816" duration="104000" />
     </task>
+    <task id="LOCAL-00001" summary="commit">
+      <created>1616487199783</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1616487199783</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -192,7 +193,8 @@
     <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="VcsManagerConfiguration">
-    <option name="LAST_COMMIT_MESSAGE" value="" />
+    <MESSAGE value="commit" />
+    <option name="LAST_COMMIT_MESSAGE" value="commit" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
