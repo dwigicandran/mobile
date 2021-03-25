@@ -12,31 +12,35 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import lombok.Getter;
 import lombok.Setter;
 
-@JsonIgnoreProperties(ignoreUnknown=true)
+@JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(Include.NON_NULL)
 @Getter
 @Setter
 public class InquiryTrfDispResp implements MbApiContentResp, Serializable {
-	
-	private static final long serialVersionUID = 5074717308798811211L;
-	private String accountId;
-	private String accountName;
-	private String paymentId;
-	private String paymentName;
-	private String transactionId;
 
-	private List<ContentInqTrf> content=null;
-	
-	public InquiryTrfDispResp(String accountId,String accountName,String paymentId,String paymentName,
-			List<ContentInqTrf> content,String trx_id) {
-				
-				this.accountId=accountId;
-				this.accountName=accountName;
-				this.paymentId=paymentId;
-				this.paymentName=paymentName;
-				this.content=content;
-				this.transactionId=trx_id;
-				
-	}
-	
+    private static final long serialVersionUID = 5074717308798811211L;
+    private String accountId;
+    private String accountName;
+    private String paymentId;
+    private String paymentName;
+    private String transactionId;
+
+    //add properties for skn transfer
+    private String info;
+
+    private List<ContentInqTrf> content = null;
+
+    public InquiryTrfDispResp(String accountId, String accountName, String paymentId, String paymentName,
+                              List<ContentInqTrf> content, String trx_id, String info) {
+
+        this.accountId = accountId;
+        this.accountName = accountName;
+        this.paymentId = paymentId;
+        this.paymentName = paymentName;
+        this.content = content;
+        this.transactionId = trx_id;
+        this.info = info;
+
+    }
+
 }

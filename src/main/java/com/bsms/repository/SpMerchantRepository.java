@@ -22,4 +22,7 @@ public interface SpMerchantRepository extends JpaRepository<SpMerchant, String> 
     @Query(value = "SELECT * FROM SuperApp.dbo.SP_Merchant WHERE  sp_merchant_id = :merchantId", nativeQuery = true)
     List<SpMerchant> findAllSpMerchantByMerchantId(@Param("merchantId") String merchantId);
 
+    List<SpMerchant> findAllBySpMerchantId(String merchantId);
+
+
 }

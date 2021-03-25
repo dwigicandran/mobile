@@ -30,6 +30,7 @@ import com.bsms.domain.MbApiTxLog;
 import com.bsms.repository.MbTxLogRepository;
 import com.bsms.restobj.MbApiReq;
 import com.bsms.restobj.MbApiResp;
+import com.bsms.restobjclient.emoney.doInquiryEmoneyReq;
 import com.bsms.restobjclient.emoney.doInquiryEmoneyResp;
 import com.bsms.restobjclient.limit.InfoLimitDispResp;
 import com.bsms.restobjclient.transfer.Bank;
@@ -80,7 +81,10 @@ public class doInquiryEmoney extends MbBaseServiceImpl implements MbService  {
 	@Override
 	public MbApiResp process(HttpHeaders header, ContainerRequestContext requestContext, MbApiReq request)
 			throws Exception {
-		
+
+				LibFunctionUtil libFunct = new LibFunctionUtil();
+				String trx_id = libFunct.getTransactionID(6);
+
 	    		MbApiTxLog txLog = new MbApiTxLog();	
 	            txLogRepository.save(txLog);
 
@@ -100,31 +104,112 @@ public class doInquiryEmoney extends MbBaseServiceImpl implements MbService  {
 		        {
 		        	System.out.println("::: doInquiry E-Money Microservices Request :::");
 		            System.out.println(new Gson().toJson(request));
-		            
-		            try {
-		    			
-		            	HttpEntity<?> req = new HttpEntity(request, RestUtil.getHeaders());
-		            	RestTemplate restTemps = new RestTemplate();
-		            	String url = doInquiryEmoney;
-		            	
-		    			ResponseEntity<doInquiryEmoneyResp> response = restTemps.exchange(url, HttpMethod.POST, req, doInquiryEmoneyResp.class);
-		    			doInquiryEmoneyResp doInquiryEmoneyResp = response.getBody();
-		    			
-		    			System.out.println("::: doInquiry E-Money Microservices Response :::");
-		    			System.out.println(new Gson().toJson(response.getBody()));
-		    			
-		    			
-		    			 mbApiResp = MbJsonUtil.createResponseTrf(doInquiryEmoneyResp.getResponseCode(),doInquiryEmoneyResp.getResponseMessage(),doInquiryEmoneyResp.getResponseContent(),doInquiryEmoneyResp.getTransactionId()); 
-		    			
-		    			
-		    			
-		    		} catch (Exception e) {
-		    			mbApiResp = MbJsonUtil.createResponseTrf("99",
-		    					e.toString(),
-		        				null,""); 
-		    			MbLogUtil.writeLogError(log, "99", e.toString());
-		    		}
-		        }
+
+					doInquiryEmoneyReq doinquiryemoneyreq = new doInquiryEmoneyReq();
+
+					System.out.println("ID Favorit : " + request.getId_favorit());
+
+					if (request.getId_favorit() == null){
+						try {
+							doinquiryemoneyreq.setCorrelationId(trx_id);
+							doinquiryemoneyreq.setTransactionId(trx_id);
+							doinquiryemoneyreq.setDeliveryChannel("6027");
+							doinquiryemoneyreq.setSourceAccountNumber(request.getAccount_number());
+							doinquiryemoneyreq.setSourceAccountName(request.getCustomerName());
+							doinquiryemoneyreq.setCardNo(request.getBillkey1());
+							doinquiryemoneyreq.setAmount(request.getAmount());
+							doinquiryemoneyreq.setDescription(request.getDescription());
+							doinquiryemoneyreq.setPan(request.getPan());
+							doinquiryemoneyreq.setCardAcceptorTerminal("00307180");
+							doinquiryemoneyreq.setCardAcceptorMerchantId(request.getMsisdn());
+							doinquiryemoneyreq.setCurrency("360");
+
+							System.out.println(new Gson().toJson(doinquiryemoneyreq));
+
+							HttpEntity<?> req = new HttpEntity(doinquiryemoneyreq, RestUtil.getHeaders());
+							RestTemplate restTemps = new RestTemplate();
+							String url = doInquiryEmoney;
+
+							ResponseEntity<doInquiryEmoneyResp> response = restTemps.exchange(url, HttpMethod.POST, req, doInquiryEmoneyResp.class);
+							doInquiryEmoneyResp doInquiryEmoneyResp = response.getBody();
+
+							System.out.println("::: doInquiry E-Money Microservices Response :::");
+							System.out.println(new Gson().toJson(response.getBody()));
+
+
+							mbApiResp = MbJsonUtil.createResponseTrf(doInquiryEmoneyResp.getResponseCode(),doInquiryEmoneyResp.getResponseMessage(),doInquiryEmoneyResp.getResponseContent(),doInquiryEmoneyResp.getTransactionId());
+
+
+
+						} catch (Exception e) {
+							mbApiResp = MbJsonUtil.createResponseTrf("99",
+									e.toString(),
+									null,"");
+							MbLogUtil.writeLogError(log, "99", e.toString());
+						}
+					}else {
+						// isi pake class request
+						try (Connection con = DriverManager.getConnection(sqlconf);) {
+							Statement stmt;
+							String SQL;
+
+							//============================= check favorite exist or no =================//
+							stmt = con.createStatement();
+							SQL = "SELECT * from Favorite where id_fav='" + request.getId_favorit() + "'";
+							ResultSet rs = stmt.executeQuery(SQL);
+
+								doinquiryemoneyreq.setCorrelationId(trx_id);
+								doinquiryemoneyreq.setTransactionId(trx_id);
+								doinquiryemoneyreq.setDeliveryChannel("6027");
+								doinquiryemoneyreq.setSourceAccountNumber(request.getAccount_number());
+								doinquiryemoneyreq.setSourceAccountName(request.getCustomerName());
+								doinquiryemoneyreq.setCardNo(request.getBillkey1());
+								doinquiryemoneyreq.setAmount(request.getAmount());
+								doinquiryemoneyreq.setDescription(request.getDescription());
+								doinquiryemoneyreq.setPan(request.getPan());
+								doinquiryemoneyreq.setCardAcceptorTerminal("00307180");
+								doinquiryemoneyreq.setCardAcceptorMerchantId(request.getMsisdn());
+								doinquiryemoneyreq.setCurrency("360");
+
+							con.close();
+
+						}catch (SQLException e) {
+
+							MbLogUtil.writeLogError(log, e, e.toString());
+
+							mbApiResp = MbJsonUtil.createResponseTrf("99",
+									"Inquiry Transfer Failed",
+									null, "");
+						}
+					}
+
+					System.out.println(new Gson().toJson(doinquiryemoneyreq));
+
+					try {
+
+						HttpEntity<?> req = new HttpEntity(doinquiryemoneyreq, RestUtil.getHeaders());
+						RestTemplate restTemps = new RestTemplate();
+						String url = doInquiryEmoney;
+
+						ResponseEntity<doInquiryEmoneyResp> response = restTemps.exchange(url, HttpMethod.POST, req, doInquiryEmoneyResp.class);
+						doInquiryEmoneyResp doInquiryEmoneyResp = response.getBody();
+
+						System.out.println("::: doInquiry E-Money Microservices Response :::");
+						System.out.println(new Gson().toJson(response.getBody()));
+
+
+						mbApiResp = MbJsonUtil.createResponseTrf(doInquiryEmoneyResp.getResponseCode(),doInquiryEmoneyResp.getResponseMessage(),doInquiryEmoneyResp.getResponseContent(),doInquiryEmoneyResp.getTransactionId());
+
+
+
+					} catch (Exception e) {
+						mbApiResp = MbJsonUtil.createResponseTrf("99",
+								e.toString(),
+								null,"");
+						MbLogUtil.writeLogError(log, "99", e.toString());
+					}
+
+				}
 else if ("01".equals(response_code)) {
 		            
 		        	if(request.getLanguage().equalsIgnoreCase("en"))    		

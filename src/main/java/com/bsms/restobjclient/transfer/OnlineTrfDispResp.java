@@ -23,6 +23,7 @@ public class OnlineTrfDispResp implements MbApiContentResp, Serializable {
 	private String date;
 	private String title;
 	private String footer;
+
 	
 	private List<ContentIntTrf> content=null;
 	

@@ -55,8 +55,14 @@ public class MbOnlineTransferServiceImpl extends MbBaseServiceImpl implements Mb
     @Value("${core.service.inquiryOnlineTransfer}")
     private String inquiryTransferOnline;
 
+    @Value("${core.service.inquirySknTransfer}")
+    private String inquirySknTransferOnline;
+
     @Value("${core.service.onlineTransfer}")
     private String onlineTransfer;
+
+    @Value("${core.service.SKNTransfer}")
+    private String sknTransfer;
 
     @Autowired
     private ObjectMapper objMapper;
@@ -160,7 +166,6 @@ public class MbOnlineTransferServiceImpl extends MbBaseServiceImpl implements Mb
 
             log.info("bank type : " + bankType);
 
-
             stmt = con.createStatement();
             SQL = "SELECT Code, Jenis,Feature, Name FROM Banks with (NOLOCK) INNER JOIN "
                     + "BankPrior ON Code = IdBank where Code ='" + DestinationBank + "' and Jenis='" + bankType + "'";
@@ -175,35 +180,40 @@ public class MbOnlineTransferServiceImpl extends MbBaseServiceImpl implements Mb
             stmt.close();
             con.close();
 
-
         } catch (SQLException e) {
-
             MbLogUtil.writeLogError(log, e, e.toString());
-
         }
 
         //========== define service code ==============//
-        if (((feature & FEAT_PRIMA) == FEAT_PRIMA)) {
-            // ATM Prima
-            service_code = "0500";
-            via_atm = "Prima";
-            fee_admin = fee_prima;
-        } else if (((feature & FEAT_BERSAMA) == FEAT_BERSAMA)) {
-            // ATM Bersama
-            service_code = "0200";
-            via_atm = "ATM Bersama";
-            fee_admin = fee_bersama;
-        } else if (((feature & FEAT_SKN) == FEAT_SKN)) {
-            // SKN
+
+        if (trf_method.equalsIgnoreCase("1")) {
+            if (((feature & FEAT_PRIMA) == FEAT_PRIMA)) {
+                // ATM Prima
+                service_code = "0500";
+                via_atm = "Prima";
+                fee_admin = fee_prima;
+            } else if (((feature & FEAT_BERSAMA) == FEAT_BERSAMA)) {
+                // ATM Bersama
+                service_code = "0200";
+                via_atm = "ATM Bersama";
+                fee_admin = fee_bersama;
+            } else if (trf_method.equalsIgnoreCase("2")) {
+                // SKN
+                service_code = "0400";
+                via_atm = "SNK";
+                fee_admin = fee_skn;
+            } else {
+                // ATM Prima by Default
+                service_code = "0500";
+                via_atm = "Prima";
+                fee_admin = fee_prima;
+            }
+        } else {
             service_code = "0400";
             via_atm = "SNK";
             fee_admin = fee_skn;
-        } else {
-            // ATM Prima by Default
-            service_code = "0500";
-            via_atm = "Prima";
-            fee_admin = fee_prima;
         }
+
 
         LibFunctionUtil libFunct = new LibFunctionUtil();
         String trx_id = libFunct.getTransactionID(6);
@@ -236,7 +246,7 @@ public class MbOnlineTransferServiceImpl extends MbBaseServiceImpl implements Mb
             //=========== Inquiry Trf Online ============//
             HttpEntity<?> req = new HttpEntity(inquiryTrfReq, RestUtil.getHeaders());
             RestTemplate restTemps = new RestTemplate();
-            String url = inquiryTransferOnline;
+            String url = service_code.equalsIgnoreCase("0400") ? inquirySknTransferOnline : inquiryTransferOnline;
             ResponseEntity<InquiryTrfResp> response = restTemps.exchange(url, HttpMethod.POST, req, InquiryTrfResp.class);
             InquiryTrfResp inquiryTrfResp = response.getBody();
 
@@ -249,7 +259,7 @@ public class MbOnlineTransferServiceImpl extends MbBaseServiceImpl implements Mb
             //=========== Internal Trf ============//
             req = new HttpEntity(inquiryTrfReq, RestUtil.getHeaders());
             restTemps = new RestTemplate();
-            url = onlineTransfer;
+            url = service_code.equalsIgnoreCase("0400") ? sknTransfer : onlineTransfer;
 
 
             System.out.println(":: Online Trf Request To Back End ::");
@@ -266,7 +276,7 @@ public class MbOnlineTransferServiceImpl extends MbBaseServiceImpl implements Mb
 
                 JSONObject value = new JSONObject();
                 TrxLimit trxLimit = new TrxLimit();
-                int trxType = TrxLimit.TRANSFER_ONLINE;
+                int trxType = service_code.equalsIgnoreCase("0400") ? TrxLimit.TRANSFER_SKN : TrxLimit.TRANSFER_ONLINE;
 
                 trxLimit.LimitUpdate(request.getMsisdn(), request.getCustomerLimitType(),
                         trxType, Long.parseLong(request.getAmount()), value, connectionUrl);
@@ -276,7 +286,7 @@ public class MbOnlineTransferServiceImpl extends MbBaseServiceImpl implements Mb
                 amount_display_admin = libFunct.formatIDRCurrency(fee_admin);
                 date_trx = LibFunctionUtil.getDatetime("dd/MM/yyyy HH:mm:ss");
 
-                String title = "Transfer Ke Non BSM";
+                String title = service_code.equalsIgnoreCase("0400") ? "Transfer Ke Bank Lain melalui SKN" : "Transfer Ke Non BSI";
                 List<ContentIntTrf> content = new ArrayList<>();
 
                 if (inquiryTrfReq.getLanguage().equals("id")) {
@@ -295,13 +305,16 @@ public class MbOnlineTransferServiceImpl extends MbBaseServiceImpl implements Mb
                     content.add(new ContentIntTrf("Admin Fee", amount_display_admin, ""));
                     content.add(new ContentIntTrf("Description", request.getDescription(), ""));
                     content.add(new ContentIntTrf("Referrence Number", request.getRef_no(), ""));
-                    title = "Transfer To Non BSM";
+                    title = service_code.equalsIgnoreCase("0400") ? "Transfer To Other Bank via SKN" : "Transfer To Non BSI";
                 }
+
+                String info = request.getLanguage().equalsIgnoreCase("en") ? "Thank you for using BSI Mobile, may our services will bring blessing to you." : "Terimakasih telah menggunakan layanan BSI Mobile, semoga layanan kami mendatangkan berkah bagi Anda.";
+
 
                 OnlineTrfDispResp onlineTrfDispResp = new OnlineTrfDispResp(OnlineTrfResp.getContent().getcbsRefCode(),
                         date_trx,
                         title,
-                        "Terimakasih telah menggunakan layanan BSI Mobile, semoga layanan kami mendatangkan berkah bagi Anda.",
+                        info,
                         content);
 
                 mbApiResp = MbJsonUtil.createResponseTrf(OnlineTrfResp.getResponseCode(),
@@ -317,40 +330,43 @@ public class MbOnlineTransferServiceImpl extends MbBaseServiceImpl implements Mb
 
                 email = request.getCustomerEmail();
 
-                BufferedInputStream bis = new BufferedInputStream(new ClassPathResource(templateTRF).getInputStream());
-                byte[] buffer = new byte[bis.available()];
-                bis.read(buffer, 0, buffer.length);
-                bis.close();
+                if (!service_code.equalsIgnoreCase("0400")) {
+                    BufferedInputStream bis = new BufferedInputStream(new ClassPathResource(templateTRF).getInputStream());
+                    byte[] buffer = new byte[bis.available()];
+                    bis.read(buffer, 0, buffer.length);
+                    bis.close();
 
-                templateTrf = new String(buffer);
-                templateTrf = templateTrf.replace("{image}", new ClassPathResource(templateLogo).getURL().toString());
+                    templateTrf = new String(buffer);
+                    templateTrf = templateTrf.replace("{image}", new ClassPathResource(templateLogo).getURL().toString());
 
-                templateTrf = templateTrf.replace("{via_atm}", via_atm);
-                templateTrf = templateTrf.replace("{status}", "BERHASIL");
+                    templateTrf = templateTrf.replace("{via_atm}", via_atm);
+                    templateTrf = templateTrf.replace("{status}", "BERHASIL");
 
-                templateTrf = templateTrf.replace("{trans_ref}", OnlineTrfResp.getContent().getcbsRefCode());
-                templateTrf = templateTrf.replace("{struck}", OnlineTrfResp.getCorrelationId());
-                templateTrf = templateTrf.replace("{terminal}", TextUtil.maskString(request.getMsisdn(), 0, 8, 'X'));
-                templateTrf = templateTrf.replace("{date_time}", date_trx);
+                    templateTrf = templateTrf.replace("{trans_ref}", OnlineTrfResp.getContent().getcbsRefCode());
+                    templateTrf = templateTrf.replace("{struck}", OnlineTrfResp.getCorrelationId());
+                    templateTrf = templateTrf.replace("{terminal}", TextUtil.maskString(request.getMsisdn(), 0, 8, 'X'));
+                    templateTrf = templateTrf.replace("{date_time}", date_trx);
 
-                templateTrf = templateTrf.replace("{name}", request.getCustomerName());
-                templateTrf = templateTrf.replace("{account}", TextUtil.maskString(request.getAccount_number(), 0, 6, 'X'));
+                    templateTrf = templateTrf.replace("{name}", request.getCustomerName());
+                    templateTrf = templateTrf.replace("{account}", TextUtil.maskString(request.getAccount_number(), 0, 6, 'X'));
 
-                templateTrf = templateTrf.replace("{payment_id}", DestinationAccountNumber);
-                templateTrf = templateTrf.replace("{code_name}", BankName);
-                templateTrf = templateTrf.replace("{beneficiary_name}", inquiryTrfResp.getContent().getDestinationAccountName());
+                    templateTrf = templateTrf.replace("{payment_id}", DestinationAccountNumber);
+                    templateTrf = templateTrf.replace("{code_name}", BankName);
+                    templateTrf = templateTrf.replace("{beneficiary_name}", inquiryTrfResp.getContent().getDestinationAccountName());
 
-                templateTrf = templateTrf.replace("{amount}", amount_display);
-                templateTrf = templateTrf.replace("{description}", request.getDescription());
+                    templateTrf = templateTrf.replace("{amount}", amount_display);
+                    templateTrf = templateTrf.replace("{description}", request.getDescription());
 
-                log.info("Customer Email : " + email);
-                log.info("Transfer Online BSM template was initialized");
+                    log.info("Customer Email : " + email);
+                    log.info("Transfer Online BSI template was initialized");
 
-                log.info("Generating content...");
-                template = templateTrf;
+                    log.info("Generating content...");
+                    template = templateTrf;
 
-                libFunction.sendEmailAsync(OnlineTrfResp.getContent().getcbsRefCode(), email, "Transaksi Bank Syariah Indonesia (NON BSI)",
-                        template, template, landscape);
+                    libFunction.sendEmailAsync(OnlineTrfResp.getContent().getcbsRefCode(), email, "Transaksi Bank Syariah Indonesia (NON BSI)",
+                            template, template, landscape);
+                }
+
 
             } else {
                 System.out.println(OnlineTrfResp.getResponseCode() + " <<<========== response code error");

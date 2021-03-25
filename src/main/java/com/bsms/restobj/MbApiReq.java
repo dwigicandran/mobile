@@ -224,10 +224,8 @@ public class MbApiReq implements Serializable {
     private String totbal;
     private String autosaveacctno;
     private String acctname;
-
-    //cardotp odc
-    private String card_info;
     private String card_no;
+    private String card_info;
 
     private Object content;
     private MbApiContentReq reqContent;

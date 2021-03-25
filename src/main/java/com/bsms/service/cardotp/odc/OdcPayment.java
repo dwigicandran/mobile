@@ -75,7 +75,6 @@ public class OdcPayment extends MbBaseServiceImpl implements MbService {
                     log.info("Update transaction limit failed :" + e.getMessage());
                 }
 
-
                 mbApiResp = MbJsonUtil.createResponse(restResponse.getBody());
             } else {
                 mbApiResp = MbJsonUtil.createErrResponse(restResponse.getBody());

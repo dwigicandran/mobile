@@ -73,7 +73,7 @@ public class PurchaseConfirm extends MbBaseServiceImpl implements MbService {
                 log.info("Biller Code : " + inquiryRequest.getTransactionId());
                 billerId = inquiryRequest.getBillerid() != null ? inquiryRequest.getBillerid() : request.getBillerid();
 //                SpMerchant result = spMerchantRepository.findBySpMerchantId(billerId);
-                List<SpMerchant> result = spMerchantRepository.findAllSpMerchantByMerchantId(billerId);
+                List<SpMerchant> result = spMerchantRepository.findAllBySpMerchantId(billerId);
                 log.info("SPMERCHANT Result : " + new Gson().toJson(result));
 
                 if (result.size() != 0) {

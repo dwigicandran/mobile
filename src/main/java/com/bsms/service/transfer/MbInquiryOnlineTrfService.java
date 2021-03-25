@@ -13,6 +13,7 @@ import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.core.HttpHeaders;
 
+import com.bsms.util.*;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,11 +39,6 @@ import com.bsms.restobjclient.transfer.InquiryTrfReq;
 import com.bsms.restobjclient.transfer.InquiryTrfResp;
 import com.bsms.service.base.MbBaseServiceImpl;
 import com.bsms.service.base.MbService;
-import com.bsms.util.LibFunctionUtil;
-import com.bsms.util.MbJsonUtil;
-import com.bsms.util.MbLogUtil;
-import com.bsms.util.RestUtil;
-import com.bsms.util.TrxLimit;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 
@@ -191,25 +187,29 @@ public class MbInquiryOnlineTrfService extends MbBaseServiceImpl implements MbSe
             log.info("feature" + feature);
 
             //========== define service code ==============//
-            if (((feature & FEAT_PRIMA) == FEAT_PRIMA)) {
-                // ATM Prima
-                log.info("prima");
-                service_code = "0500";
-                via_atm = "Prima";
-            } else if (((feature & FEAT_BERSAMA) == FEAT_BERSAMA)) {
-                // ATM Bersama
-                log.info("bersama");
-                service_code = "0200";
-                via_atm = "ATM Bersama";
-            } else if (trf_method.equalsIgnoreCase("2")) {
+
+            if (trf_method.equalsIgnoreCase("1")) {
+                if (((feature & FEAT_PRIMA) == FEAT_PRIMA)) {
+                    // ATM Prima
+                    log.info("prima");
+                    service_code = "0500";
+                    via_atm = "Prima";
+                } else if (((feature & FEAT_BERSAMA) == FEAT_BERSAMA)) {
+                    // ATM Bersama
+                    log.info("bersama");
+                    service_code = "0200";
+                    via_atm = "ATM Bersama";
+                } else {
+                    // ATM Prima by Default
+                    log.info("else transfer");
+                    service_code = "0500";
+                    via_atm = "Prima";
+                }
+            } else {
                 log.info("transfer skn method ");
                 service_code = "0400";
-            } else {
-                // ATM Prima by Default
-                log.info("else transfer");
-                service_code = "0500";
-                via_atm = "Prima";
             }
+
 
             LibFunctionUtil libFunct = new LibFunctionUtil();
             String trx_id = libFunct.getTransactionID(6);
@@ -255,24 +255,27 @@ public class MbInquiryOnlineTrfService extends MbBaseServiceImpl implements MbSe
                 System.out.println(new Gson().toJson(response.getBody()));
 
                 if ("00".equals(inquiryTrfResp.getResponseCode())) {
-
+                    String info = null;
                     if (trf_method.equalsIgnoreCase("1")) {
                         trf_method = "Online";
                     } else {
                         trf_method = "SKN";
+                        System.out.println("transfer language : " + request.getLanguage());
+                        //Your SKN Transfer Transaction will be processed in a maximum of 1 working day, the SKN process starts at 06:30-14.30 WIB every working day.
+                        info = request.getLanguage().equalsIgnoreCase("id") ? "Transaksi SKN anda akan di proses maksimal 1 hari kerja,  proses SKN mulai pukul 06:30 ; 14:30 WIB setiap hari kerja." : "Your SKN Transfer Transaction will be processed in a maximum of 1 working day, the SKN process starts at 06:30-14.30 WIB every working day.";
                     }
 
                     List<ContentInqTrf> content = new ArrayList<>();
                     if (request.getLanguage().equals("en")) {
                         content.add(new ContentInqTrf("Bank Destination", BankName));
                         content.add(new ContentInqTrf("Transfer Method", trf_method));
-                        content.add(new ContentInqTrf("Amount", request.getAmount()));
+                        content.add(new ContentInqTrf("Amount", TextUtil.decimalFormater(request.getAmount())));
                         content.add(new ContentInqTrf("Description", request.getDescription()));
                         content.add(new ContentInqTrf("Referrence Number", request.getRef_no()));
                     } else { //penambahan content bahasa indo oleh Dwi
                         content.add(new ContentInqTrf("Bank Tujuan", BankName));
                         content.add(new ContentInqTrf("Metode Transfer", trf_method));
-                        content.add(new ContentInqTrf("Jumlah", request.getAmount()));
+                        content.add(new ContentInqTrf("Jumlah", TextUtil.decimalFormater(request.getAmount())));
                         content.add(new ContentInqTrf("Keterangan", request.getDescription()));
                         content.add(new ContentInqTrf("No Referensi", request.getRef_no()));
                     }
@@ -282,7 +285,8 @@ public class MbInquiryOnlineTrfService extends MbBaseServiceImpl implements MbSe
                             request.getCustomerName(),
                             DestinationAccountNumber,
                             inquiryTrfResp.getContent().getDestinationAccountName(),
-                            content, trx_id);
+                            content, trx_id, info);
+
 
                     mbApiResp = MbJsonUtil.createResponseTrf(inquiryTrfResp.getResponseCode(),
                             "Success",

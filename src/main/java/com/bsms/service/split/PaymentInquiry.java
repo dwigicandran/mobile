@@ -82,7 +82,7 @@ public class PaymentInquiry extends MbBaseServiceImpl implements MbService {
 
         String billerId = request.getBillerid() != null ? request.getBillerid() : requestParam;
 //        SpMerchant result = spMerchantRepository.findBySpMerchantId(billerId);
-        List<SpMerchant> result = spMerchantRepository.findAllSpMerchantByMerchantId(billerId);
+        List<SpMerchant> result = spMerchantRepository.findAllBySpMerchantId(billerId);
 
         String paymentType = request.getPayment_type() != null ? request.getPayment_type() : null;
 
