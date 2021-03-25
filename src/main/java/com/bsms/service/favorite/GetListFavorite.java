@@ -1,10 +1,6 @@
 package com.bsms.service.favorite;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -98,6 +94,11 @@ public class GetListFavorite extends MbBaseServiceImpl implements MbService {
                         favorit.add(new Favorit(rs.getString("billkey1"),
                                 rs.getString("fav_title") + ";" + billName + rs.getString("billkey1")));
                     } else if (request.getSub_modul_id().substring(0, 2).equalsIgnoreCase("PY")) {
+                        String subModulId = rs.getString("submodul_id") != null ? rs.getString("submodul_id") : "";
+
+                        if (subModulId.equalsIgnoreCase("PY13") || subModulId.equalsIgnoreCase("PY07")) {
+                            billName = getInstitutionAcademicBillerName(rs.getString("billerid"));
+                        }
                         favorit.add(new Favorit(rs.getString("billkey1") + ";" + rs.getString("billerid"),
                                 rs.getString("fav_title") + ";" + billName + rs.getString("billkey1")));
                     }
@@ -149,6 +150,28 @@ public class GetListFavorite extends MbBaseServiceImpl implements MbService {
         return billName;
     }
 
+    //add by Dwi S
+    private String getInstitutionAcademicBillerName(String billerId) {
+        //for institution and akademik billname
+        String billName = "";
+
+        Connection con;
+        try {
+            con = DriverManager.getConnection(connectionUrl);
+            PreparedStatement stmt = con.prepareStatement("select * from MB_InstitutionAcademic where prefix = ? ");
+
+            stmt.setString(1, billerId);
+
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                billName = rs.getString("name") != null ? rs.getString("name").trim() + " - " : "";
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return billName;
+    }
 
 }
 

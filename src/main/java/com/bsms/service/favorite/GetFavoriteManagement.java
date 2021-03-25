@@ -1,10 +1,6 @@
 package com.bsms.service.favorite;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -101,6 +97,11 @@ public class GetFavoriteManagement extends MbBaseServiceImpl implements MbServic
                     }
 
                 } else if (request.getSection_id().equalsIgnoreCase("PY")) {
+                    String subModulId = rs.getString("submodul_id") != null ? rs.getString("submodul_id") : "";
+
+                    if (subModulId.equalsIgnoreCase("PY13") || subModulId.equalsIgnoreCase("PY07")) {
+                        billName = getInstitutionAcademicBillerName(rs.getString("billerid"));
+                    }
                     favoritManagement.add(new FavoritManagement(rs.getString("id_fav"), rs.getString("billkey1") + ";" + rs.getString("billerid"),
                             rs.getString("fav_title") + ";" + billName + rs.getString("billkey1"), rs.getString("submodul_id")));
                 }
@@ -143,6 +144,29 @@ public class GetFavoriteManagement extends MbBaseServiceImpl implements MbServic
             e.printStackTrace();
             billName = "";
         }
+        return billName;
+    }
+
+    //add by Dwi S
+    private String getInstitutionAcademicBillerName(String billerId) {
+        //for institution and akademik billname
+        String billName = "";
+
+        Connection con;
+        try {
+            con = DriverManager.getConnection(connectionUrl);
+            PreparedStatement stmt = con.prepareStatement("select * from MB_InstitutionAcademic where prefix = ? ");
+
+            stmt.setString(1, billerId);
+
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                billName = rs.getString("name") != null ? rs.getString("name").trim() + " - " : "";
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
         return billName;
     }
 
