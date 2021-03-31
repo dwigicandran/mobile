@@ -30,6 +30,7 @@ import com.bsms.domain.MbApiTxLog;
 import com.bsms.repository.MbTxLogRepository;
 import com.bsms.restobj.MbApiReq;
 import com.bsms.restobj.MbApiResp;
+import com.bsms.restobjclient.emoney.doInquiryEmoneyReq;
 import com.bsms.restobjclient.emoney.doInquiryEmoneyResp;
 import com.bsms.restobjclient.limit.InfoLimitDispResp;
 import com.bsms.restobjclient.transfer.Bank;
@@ -80,7 +81,7 @@ public class doInquiryEmoney extends MbBaseServiceImpl implements MbService  {
 	@Override
 	public MbApiResp process(HttpHeaders header, ContainerRequestContext requestContext, MbApiReq request)
 			throws Exception {
-		
+
 	    		MbApiTxLog txLog = new MbApiTxLog();	
 	            txLogRepository.save(txLog);
 
@@ -98,33 +99,107 @@ public class doInquiryEmoney extends MbBaseServiceImpl implements MbService  {
 		        
 		        if ("00".equals(response_code)) 
 		        {
-		        	System.out.println("::: doInquiry E-Money Microservices Request :::");
+		        	System.out.println("::: doInquiry E-Money Microservices Request From Mobile APP :::");
 		            System.out.println(new Gson().toJson(request));
-		            
-		            try {
-		    			
-		            	HttpEntity<?> req = new HttpEntity(request, RestUtil.getHeaders());
-		            	RestTemplate restTemps = new RestTemplate();
-		            	String url = doInquiryEmoney;
-		            	
-		    			ResponseEntity<doInquiryEmoneyResp> response = restTemps.exchange(url, HttpMethod.POST, req, doInquiryEmoneyResp.class);
-		    			doInquiryEmoneyResp doInquiryEmoneyResp = response.getBody();
-		    			
-		    			System.out.println("::: doInquiry E-Money Microservices Response :::");
-		    			System.out.println(new Gson().toJson(response.getBody()));
-		    			
-		    			
-		    			 mbApiResp = MbJsonUtil.createResponseTrf(doInquiryEmoneyResp.getResponseCode(),doInquiryEmoneyResp.getResponseMessage(),doInquiryEmoneyResp.getResponseContent(),doInquiryEmoneyResp.getTransactionId()); 
-		    			
-		    			
-		    			
-		    		} catch (Exception e) {
-		    			mbApiResp = MbJsonUtil.createResponseTrf("99",
-		    					e.toString(),
-		        				null,""); 
-		    			MbLogUtil.writeLogError(log, "99", e.toString());
-		    		}
-		        }
+
+					doInquiryEmoneyReq doinquiryemoneyreq = new doInquiryEmoneyReq();
+
+					System.out.println("ID Favorite : " + request.getId_favorit());
+
+					if (request.getId_favorit() == null){
+						try {
+							
+							//construct json
+							doinquiryemoneyreq.setCustomer_id(request.getCustomer_id());
+							doinquiryemoneyreq.setLanguage(request.getLanguage());
+							doinquiryemoneyreq.setCardno(request.getBillkey1());
+							doinquiryemoneyreq.setAmount(request.getAmount());
+							doinquiryemoneyreq.setAccount_number(request.getAccount_number());
+							doinquiryemoneyreq.setAccount_name(request.getAccount_name());
+
+
+						} catch (Exception e) {
+							mbApiResp = MbJsonUtil.createResponseTrf("99",
+									"Construct JSON Failed " + e.toString(),
+									null,"");
+							MbLogUtil.writeLogError(log, "99", e.toString());
+						}
+					}else {
+						
+						//========= Read Data From DB ===============//
+						try (Connection con = DriverManager.getConnection(sqlconf);) {
+							Statement stmt;
+							String SQL;
+
+							//============================= check favorite exist or no =================//
+							stmt = con.createStatement();
+							SQL = "SELECT * from Favorite where id_fav='" + request.getId_favorit() + "'";
+							ResultSet rs = stmt.executeQuery(SQL);
+
+							//construct json
+							 if (rs.next()) {
+								 doinquiryemoneyreq.setCustomer_id(request.getCustomer_id());
+									doinquiryemoneyreq.setLanguage(request.getLanguage());
+									doinquiryemoneyreq.setCardno(rs.getString("billkey1"));
+									doinquiryemoneyreq.setAmount(request.getAmount());
+									doinquiryemoneyreq.setAccount_number(request.getAccount_number());
+									doinquiryemoneyreq.setAccount_name(request.getAccount_name());
+							 }
+							 else
+							 {
+								 doinquiryemoneyreq.setCustomer_id(request.getCustomer_id());
+									doinquiryemoneyreq.setLanguage(request.getLanguage());
+									doinquiryemoneyreq.setCardno(request.getBillkey1());
+									doinquiryemoneyreq.setAmount(request.getAmount());
+									doinquiryemoneyreq.setAccount_number(request.getAccount_number());
+									doinquiryemoneyreq.setAccount_name(request.getAccount_name());
+							 }
+							
+
+							con.close();
+
+						}catch (SQLException e) {
+
+							mbApiResp = MbJsonUtil.createResponseTrf("99",
+									"Construct JSON Failed " + e.toString(),
+									null, "");
+							MbLogUtil.writeLogError(log, "99", e.toString());
+						}
+					}
+
+					//============== Display Request From Mobile API ===================//
+					System.out.println("::: doInquiry E-Money Microservices Request From Mobile API:::");
+					System.out.println(new Gson().toJson(doinquiryemoneyreq));
+					
+					//======= Send Data to Microservices =============//
+					try {
+
+						HttpEntity<?> req = new HttpEntity(doinquiryemoneyreq, RestUtil.getHeaders());
+						RestTemplate restTemps = new RestTemplate();
+						String url = doInquiryEmoney;
+
+						ResponseEntity<doInquiryEmoneyResp> response = restTemps.exchange(url, HttpMethod.POST, req, doInquiryEmoneyResp.class);
+						doInquiryEmoneyResp doInquiryEmoneyResp = response.getBody();
+
+						System.out.println("::: doInquiry E-Money Microservices Response :::");
+						System.out.println(new Gson().toJson(response.getBody()));
+
+
+						mbApiResp = MbJsonUtil.createResponseTrf(doInquiryEmoneyResp.getResponseCode(),
+								doInquiryEmoneyResp.getResponseMessage(),
+								doInquiryEmoneyResp.getResponseContent(),
+								doInquiryEmoneyResp.getTransactionId());
+
+
+
+					} catch (Exception e) {
+						mbApiResp = MbJsonUtil.createResponseTrf("99",
+								"Send to Microservices Failed " + e.toString(),
+								null,"");
+						MbLogUtil.writeLogError(log, "99", e.toString());
+					}
+
+				}
 else if ("01".equals(response_code)) {
 		            
 		        	if(request.getLanguage().equalsIgnoreCase("en"))    		

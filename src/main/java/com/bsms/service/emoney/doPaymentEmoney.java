@@ -68,6 +68,9 @@ public class doPaymentEmoney extends MbBaseServiceImpl implements MbService  {
     @Autowired
     private MbTxLogRepository txLogRepository;
     
+    @Value("${template.mail_notif}")
+    private String templateMailNotif;
+    
     RestTemplate restTemplate = new RestTemplate();
     
     MbApiResp mbApiResp;
@@ -111,6 +114,8 @@ public class doPaymentEmoney extends MbBaseServiceImpl implements MbService  {
 	    					
 	    				 trxLimit.LimitUpdate(request.getMsisdn(), request.getCustomerLimitType(), 
 	    			        		trxType, Long.parseLong(request.getAmount()), value,sqlconf);
+	    				 LibFunctionUtil.mailNotif(request.getCustomerEmail(),mbApiResp, templateMailNotif, request.getLanguage());
+	    			        
 	    			 }
 	    			
 	    		} catch (Exception e) {
