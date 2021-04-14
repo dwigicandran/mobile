@@ -213,7 +213,9 @@ public class PurchaseInquiry extends MbBaseServiceImpl implements MbService {
                 errorDefault = e.getCause().getMessage() + errorDefaultEn;
             }
             mbApiResp = MbJsonUtil.createResponseBank("99", errorDefault, null);
+            e.printStackTrace();
         }
+
         return mbApiResp;
     }
 

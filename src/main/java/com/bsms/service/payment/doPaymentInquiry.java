@@ -1,6 +1,5 @@
 package com.bsms.service.payment;
 
-import com.bsms.cons.MbApiConstant;
 import com.bsms.cons.MbConstant;
 import com.bsms.domain.MbApiTxLog;
 import com.bsms.repository.MbTxLogRepository;

@@ -12,7 +12,9 @@ import com.bsms.util.TrxLimit;
 import com.google.gson.Gson;
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONObject;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationContext;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
@@ -21,6 +23,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import javax.ws.rs.container.ContainerRequestContext;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 
 @Slf4j
@@ -36,14 +39,21 @@ public class MpnInquiry extends MbBaseServiceImpl implements MbService {
     @Value("${sql.conf}")
     private String sqlconf;
 
+    @Autowired
+    private ApplicationContext context;
+
+    @Context
+    private ContainerRequestContext requestContext;
+
+
     @Override
     public MbApiResp process(HttpHeaders header, ContainerRequestContext requestContext, MbApiReq request) throws Exception {
         MbApiResp mbApiResp;
 
         log.info("MPN Inquiry Request : " + new Gson().toJson(request));
-
-        String response_msg = null;
+        String response_msg = "";
         String errorDefault = request.getLanguage().equalsIgnoreCase("en") ? MbConstant.ERROR_REQUEST_EN : MbConstant.ERROR_REQUEST_ID;
+
 
         try {
             HttpEntity<?> req = new HttpEntity(request, RestUtil.getHeaders());

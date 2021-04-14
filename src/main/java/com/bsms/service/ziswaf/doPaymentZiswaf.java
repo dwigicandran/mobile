@@ -79,6 +79,9 @@ public class doPaymentZiswaf extends MbBaseServiceImpl implements MbService {
     //add by Dwi S
     @Value("${rest.template.timeout}")
     private int restTimeout;
+    
+    @Value("${template.mail_notif}")
+    private String templateMailNotif;
 
     private static Logger log = LoggerFactory.getLogger(MbInquiryOnlineTrfService.class);
 
@@ -108,7 +111,8 @@ public class doPaymentZiswaf extends MbBaseServiceImpl implements MbService {
             System.out.println(new Gson().toJson(response.getBody()));
 
             mbApiResp = MbJsonUtil.createResponseTrf(doPaymentZiswafResp.getResponseCode(), doPaymentZiswafResp.getResponseMessage(), doPaymentZiswafResp.getResponseContent(), doPaymentZiswafResp.getTransactionId());
-
+            LibFunctionUtil.mailNotif(request.getCustomerEmail(),mbApiResp, templateMailNotif, request.getLanguage());
+		      
 
         } catch (Exception e) {
 //            mbApiResp = MbJsonUtil.createResponseTrf("99",

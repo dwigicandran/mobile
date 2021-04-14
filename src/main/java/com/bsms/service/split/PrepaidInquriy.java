@@ -130,11 +130,12 @@ public class PrepaidInquriy extends MbBaseServiceImpl implements MbService {
             }
 
         } catch (Exception e) {
-            String errorDefault = e.getCause().getMessage() + ", permintaan tidak dapat diproses, silahkan dicoba beberapa saat lagi.";
+            String errorDefault = "permintaan tidak dapat diproses, silahkan dicoba beberapa saat lagi.";
             if (request.getLanguage().equals("en")) {
-                errorDefault = e.getCause().getMessage() + ", request can't be process, please try again later.";
+                errorDefault = "request can't be process, please try again later.";
             }
             mbApiResp = MbJsonUtil.createResponseBank("99", errorDefault, null);
+            e.printStackTrace();
         }
         return mbApiResp;
     }

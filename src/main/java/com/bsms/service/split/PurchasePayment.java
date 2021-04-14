@@ -83,7 +83,7 @@ public class PurchasePayment extends MbBaseServiceImpl implements MbService {
 
             billerId = inquiryRequest.getBillerid() != null ? inquiryRequest.getBillerid() : request.getBillerid();
 //            SpMerchant result = spMerchantRepository.findBySpMerchantId(billerId);
-            List<SpMerchant> result = spMerchantRepository.findAllBySpMerchantId(billerId);
+            List<SpMerchant> result = spMerchantRepository.findAllSpMerchantByMerchantId(billerId);
 
             if (result.get(0).getServiceprovider() == 0) {
                 response = svPayment(request, billerId);

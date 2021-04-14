@@ -69,6 +69,9 @@ public class doPaymentCardOTP extends MbBaseServiceImpl implements MbService  {
     @Autowired
     private MbTxLogRepository txLogRepository;
     
+    @Value("${template.mail_notif}")
+    private String templateMailNotif;
+    
     RestTemplate restTemplate = new RestTemplate();
     
     MbApiResp mbApiResp;
@@ -94,8 +97,6 @@ public class doPaymentCardOTP extends MbBaseServiceImpl implements MbService  {
 	            	HttpEntity<?> req = new HttpEntity(request, RestUtil.getHeaders());
 	            	RestTemplate restTemps = new RestTemplate();
 	            	String url = doPayment;
-
-					System.out.println("doPayment Card OTP Url : " + url);
 	            	
 	    			ResponseEntity<doPaymentCardOTPResp> response = restTemps.exchange(url, HttpMethod.POST, req, doPaymentCardOTPResp.class);
 	    			doPaymentCardOTPResp doPaymentCardOTPResp = response.getBody();
@@ -114,6 +115,8 @@ public class doPaymentCardOTP extends MbBaseServiceImpl implements MbService  {
 	    					
 	    				 trxLimit.LimitUpdate(request.getMsisdn(), request.getCustomerLimitType(), 
 	    			        		trxType, Long.parseLong(request.getAmount()), value,sqlconf);
+	    				 LibFunctionUtil.mailNotif(request.getCustomerEmail(),mbApiResp, templateMailNotif, request.getLanguage());
+	    			        
 	    			 }
 	    			
 	    			
