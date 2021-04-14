@@ -11,10 +11,7 @@ import com.bsms.restobjclient.base.BaseResponse;
 import com.bsms.restobjclient.payment.Content;
 import com.bsms.service.base.MbBaseServiceImpl;
 import com.bsms.service.base.MbService;
-import com.bsms.util.MbJsonUtil;
-import com.bsms.util.MbLogUtil;
-import com.bsms.util.RestUtil;
-import com.bsms.util.TrxLimit;
+import com.bsms.util.*;
 import com.google.gson.Gson;
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONObject;
@@ -56,6 +53,9 @@ public class PurchasePayment extends MbBaseServiceImpl implements MbService {
 
     @Value("${sql.conf}")
     private String sqlconf;
+
+    @Value("${template.mail_notif}")
+    private String templateMailNotif;
 
     private String errorDefaultId = ", permintaan tidak dapat diproses, silahkan dicoba beberapa saat lagi.";
     private String errorDefaultEn = ", request can't be process, please try again later.";
@@ -131,6 +131,7 @@ public class PurchasePayment extends MbBaseServiceImpl implements MbService {
 //                updateLimit(request, paymentInquiryResp);
 
                 mbApiResp = MbJsonUtil.createResponse(response.getBody());
+                LibFunctionUtil.mailNotif(request.getCustomerEmail(),mbApiResp, templateMailNotif, request.getLanguage());
             } else {
                 mbApiResp = MbJsonUtil.createErrResponse(response.getBody());
             }
