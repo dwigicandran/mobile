@@ -1,0 +1,173 @@
+package com.bsms.service.pinemail;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
+
+import javax.ws.rs.client.Client;
+import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.container.ContainerRequestContext;
+import javax.ws.rs.core.HttpHeaders;
+
+import com.bsms.cons.MbConstant;
+import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.MessageSource;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
+
+import com.bsms.cons.MbApiConstant;
+import com.bsms.domain.MbApiTxLog;
+import com.bsms.repository.MbTxLogRepository;
+import com.bsms.restobj.MbApiReq;
+import com.bsms.restobj.MbApiResp;
+import com.bsms.restobjclient.emoney.doInquiryEmoneyResp;
+import com.bsms.restobjclient.limit.ContentInfoLimit;
+import com.bsms.restobjclient.limit.InfoLimitDispResp;
+import com.bsms.restobjclient.pinemail.InquiryPINReq;
+import com.bsms.restobjclient.pinemail.doChangePINResp;
+import com.bsms.restobjclient.qris.doConfirmationQRISResp;
+import com.bsms.restobjclient.qris.doInquiryQRISResp;
+import com.bsms.restobjclient.transfer.Bank;
+import com.bsms.restobjclient.transfer.BankDispResp;
+import com.bsms.restobjclient.transfer.ContentInqTrf;
+import com.bsms.restobjclient.transfer.InquiryTrfDispResp;
+import com.bsms.restobjclient.transfer.InquiryTrfReq;
+import com.bsms.restobjclient.transfer.InquiryTrfResp;
+import com.bsms.service.base.MbBaseServiceImpl;
+import com.bsms.service.base.MbService;
+import com.bsms.service.transfer.MbInquiryOnlineTrfService;
+import com.bsms.util.LibCNCrypt;
+import com.bsms.util.LibFunctionUtil;
+import com.bsms.util.MbJsonUtil;
+import com.bsms.util.MbLogUtil;
+import com.bsms.util.RestUtil;
+import com.bsms.util.TrxLimit;
+import com.dto.accountlist.ListOfAccount;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.Gson;
+
+@Service("doChangePIN")
+public class doChangePIN extends MbBaseServiceImpl implements MbService  {
+	@Value("${sql.conf}")
+	private String connectionUrl;
+
+	@Value("${admin.changepin}")
+    private String changePIN;
+
+	@Autowired
+    private ObjectMapper objMapper;
+
+    @Autowired
+    private MessageSource msg;
+
+    @Autowired
+    private MbTxLogRepository txLogRepository;
+
+    RestTemplate restTemplate = new RestTemplate();
+
+    MbApiResp mbApiResp;
+
+    Client client = ClientBuilder.newClient();
+
+    private static Logger log = LoggerFactory.getLogger(MbInquiryOnlineTrfService.class);
+
+	@Override
+	public MbApiResp process(HttpHeaders header, ContainerRequestContext requestContext, MbApiReq request)
+			throws Exception {
+
+		ResultSet rs;
+        Statement stmt;
+        String SQL;
+        String pinoffset="";
+        String pan="";
+        String zpk="";
+
+	    		MbApiTxLog txLog = new MbApiTxLog();
+	            txLogRepository.save(txLog);
+
+	            //get pan,zpk,pinoffset
+	            try (Connection con = DriverManager.getConnection(connectionUrl);)
+		        {
+		        	stmt= con.createStatement();
+
+		        	SQL= "select Security.ZPK_lmk,CardMapping.CardNumber,CardMapping.PinOffset " +
+		        			"from cardmapping inner join Security on cardmapping.CustomerID=Security.CustomerID "
+		        			+ "where cardmapping.customerID ='"+request.getCustomer_id()+"'";
+		            rs = stmt.executeQuery(SQL);
+
+		            while(rs.next())
+			            {
+		                 pinoffset=rs.getString("PinOffset");
+		                 pan=rs.getString("CardNumber");
+		                 zpk=rs.getString("ZPK_lmk");
+			            }
+
+		            rs.close();
+	                stmt.close();
+
+	                 //close connection
+	                 con.close();
+
+		        } catch (SQLException e) {
+		        	System.out.println(e.toString());
+		        }
+
+	            InquiryPINReq InquiryPINReq = new InquiryPINReq();
+	            InquiryPINReq.setCustomer_id(request.getCustomer_id());
+	            InquiryPINReq.setLanguage(request.getLanguage());
+	            InquiryPINReq.setZpk(zpk);
+	            InquiryPINReq.setPin(request.getPin());
+	            InquiryPINReq.setPinoffset(pinoffset);
+	            InquiryPINReq.setNewpin(request.getNewpin());
+	            InquiryPINReq.setPan(pan);
+
+	        	System.out.println("::: ChangePIN Microservices Request :::");
+	            System.out.println(new Gson().toJson(InquiryPINReq));
+
+		        	 try {
+
+			            	HttpEntity<?> req = new HttpEntity(InquiryPINReq, RestUtil.getHeaders());
+			            	RestTemplate restTemps = new RestTemplate();
+			            	String url = changePIN;
+
+			    			ResponseEntity<doChangePINResp> response = restTemps.exchange(url, HttpMethod.POST, req, doChangePINResp.class);
+			    			doChangePINResp doChangePINResp = response.getBody();
+
+			    			System.out.println("::: ChangePIN Microservices Response :::");
+			    			System.out.println(new Gson().toJson(response.getBody()));
+
+			    			 mbApiResp = MbJsonUtil.createResponseTrf(doChangePINResp.getResponseCode(),doChangePINResp.getResponseMessage(),doChangePINResp.getResponseContent(),doChangePINResp.getTransactionId());
+
+			    		} catch (Exception e) {
+		        	 	String language = request.getLanguage() != null ? request.getLanguage() : "id";
+		        	 	String errorMsg = language.equalsIgnoreCase("en") ? MbConstant.ERROR_REQUEST_EN : MbConstant.ERROR_REQUEST_EN;
+			    			mbApiResp = MbJsonUtil.createResponseTrf("99", errorMsg, null,"");
+			    			MbLogUtil.writeLogError(log, "99", e.toString());
+			    		}
+
+
+
+	            txLog.setResponse(mbApiResp);
+	    		txLogRepository.save(txLog);
+
+
+
+
+		return  mbApiResp;
+	}
+
+}
