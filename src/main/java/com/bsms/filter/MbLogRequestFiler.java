@@ -18,37 +18,43 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class MbLogRequestFiler implements ContainerRequestFilter {
 
-	private static Logger log = LoggerFactory.getLogger(MbLogRequestFiler.class);
-	
-	@Autowired
-	private ObjectMapper objectMapper;
-	
-	@Override
-	public void filter(ContainerRequestContext requestContext) throws IOException {
-		
-		if (log.isInfoEnabled()){
-			log.info("MbLogRequestFiler called");
-			
-			ByteArrayOutputStream out = new ByteArrayOutputStream();
-	        InputStream in = requestContext.getEntityStream();
-	        
-	        StringBuilder b = new StringBuilder();
+    private static Logger log = LoggerFactory.getLogger(MbLogRequestFiler.class);
+
+    @Autowired
+    private ObjectMapper objectMapper;
+
+    @Override
+    public void filter(ContainerRequestContext requestContext) throws IOException {
+
+        if (log.isInfoEnabled()) {
+//			log.info("MbLogRequestFiler called");
+
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            InputStream in = requestContext.getEntityStream();
+            String path = requestContext.getUriInfo().getPath();
+
+            StringBuilder b = new StringBuilder();
 //	        b.append("\n\nJSON Request [");
-	        b.append(requestContext.getUriInfo().getPath());
+            b.append(path);
 //	        b.append("] : \n");
-	        
+
+
             ReaderWriter.writeTo(in, out);
-            
+
             byte[] requestEntity = out.toByteArray();
-            
+
             String jsonStr = new String(requestEntity);
             JsonNode tree = objectMapper.readTree(jsonStr);
             b.append(objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(tree));
-            
-            log.info(b.toString());
-            requestContext.setEntityStream( new ByteArrayInputStream(requestEntity) );
-            
-		}
-	}
-	
+
+
+            if (!path.equals("api/services/checkServices")) {
+                log.info(b.toString());
+            }
+
+            requestContext.setEntityStream(new ByteArrayInputStream(requestEntity));
+
+        }
+    }
+
 }
