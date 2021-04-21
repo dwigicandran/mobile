@@ -157,7 +157,7 @@ public class PurchasePayment extends MbBaseServiceImpl implements MbService {
             String url;
 
             //if indiehome
-            if (billerId.equalsIgnoreCase("0902") || billerId.equalsIgnoreCase("6050")) {
+            if (billerId.equalsIgnoreCase("0902") || billerId.equalsIgnoreCase("6050") || billerId.equalsIgnoreCase("6059")) {
                 url = switcherPaymentUrl;
             } else {
                 url = switcherPepaidPaymentUrl;

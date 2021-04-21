@@ -1,0 +1,50 @@
+apiVersion: apps.openshift.io/v1
+kind: DeploymentConfig
+metadata:
+  labels:
+    app: mb-api-hsm
+  name: mb-api-hsm
+  namespace: superapp
+spec:
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    app: mb-api-hsm
+    deploymentconfig: mb-api-hsm
+  strategy:
+    activeDeadlineSeconds: 21600
+    resources: {}
+    rollingParams:
+      intervalSeconds: 1
+      maxSurge: 25%
+      maxUnavailable: 25%
+      timeoutSeconds: 600
+      updatePeriodSeconds: 1
+    type: Rolling
+  template:
+    metadata:
+      labels:
+        app: mb-api-hsm
+        deploymentconfig: mb-api-hsm
+    spec:
+      containers:
+        - envFrom:
+            - configMapRef:
+                name: tws-config
+            - secretRef:
+                name: superapp
+          image: '10.0.117.124:8083/mobile-api:1.0.0'
+          imagePullPolicy: Always
+          name: mb-api-hsm
+          resources: {}
+      dnsPolicy: ClusterFirst
+      imagePullSecrets:
+        - name: superapp
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+  test: false
+  triggers:
+    - type: ConfigChange
+
