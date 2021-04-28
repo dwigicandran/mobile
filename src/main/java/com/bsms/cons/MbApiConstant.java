@@ -52,6 +52,20 @@ public class MbApiConstant {
 
     public static char[] CHAR_FOR_RANDOMIZE = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890!@#$^&*+?/".toCharArray();
 
+    public static Integer INSERT_LT = 0;
+    public static Integer UPDATE_LT = 1;
+
+    public static Integer TRANSFER = 0;
+    public static Integer TRANSFER_ONLINE = 3;
+    public static Integer TRANSFER_SKN = 4;
+    public static Integer TRANSFER_RTGS = 5;
+    public static Integer TRANSFER_CASH = 6;
+    public static Integer CW = 7;
+    public static Integer EMONEY = 8;
+    public static Integer PURCHASE = 1;
+    public static Integer PAYMENT = 2;
+    public static Integer QRIS = 10;
+
     @Value("${jwt.expiration.time}")
     private String jwtExpirationTime;
     @Value("${verify.token.expiration.time}")
