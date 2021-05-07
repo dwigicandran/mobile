@@ -79,7 +79,6 @@ public class MbBaseServiceImpl {
                 result = "00";
 
                 Calendar calTrxDate = Calendar.getInstance();
-                Date trxDate = calTrxDate.getTime();
                 BigDecimal lastAmount = BigDecimal.ZERO;
 
                 Calendar calLastTrxDate = Calendar.getInstance();
