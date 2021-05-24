@@ -1,6 +1,8 @@
 package com.bsms.service.cardotp.odc;
 
 import com.bsms.cons.MbConstant;
+import com.bsms.repository.MbLimitRepository;
+import com.bsms.repository.MbLimitTrackingRepository;
 import com.bsms.restobj.MbApiReq;
 import com.bsms.restobj.MbApiResp;
 import com.bsms.restobjclient.base.BaseResponse;
@@ -11,6 +13,7 @@ import com.bsms.util.RestUtil;
 import com.bsms.util.TrxLimit;
 import com.google.gson.Gson;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
@@ -21,6 +24,7 @@ import org.springframework.web.client.RestTemplate;
 
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.core.HttpHeaders;
+import java.math.BigDecimal;
 
 @Slf4j
 @Service("doOdcInquiry")
@@ -34,6 +38,9 @@ public class OdcInquiry extends MbBaseServiceImpl implements MbService {
 
     @Value("${sql.conf}")
     private String sqlconf;
+
+    @Autowired MbLimitRepository limitRepository;
+    @Autowired MbLimitTrackingRepository limitTrackingRepository;
 
     @Override
     public MbApiResp process(HttpHeaders header, ContainerRequestContext requestContext, MbApiReq request) throws Exception {
@@ -53,7 +60,12 @@ public class OdcInquiry extends MbBaseServiceImpl implements MbService {
 
             log.info("Get CardOtp Odc Inquiry Add URL : " + url);
 
-            String limitResponse = TrxLimit.checkTransLimit(request.getAmount(), request.getCustomerLimitType(), request.getMsisdn(), TrxLimit.PURCHASE, sqlconf);
+            long amt = Long.valueOf(request.getAmount());
+            Integer custType = request.getCustomerLimitType();
+            BigDecimal trxAmount = new BigDecimal(request.getAmount());
+
+            String limitResponse = checklimitTransaction(request.getAmount(), request.getCustomerLimitType(), request.getMsisdn(), TrxLimit.PURCHASE);
+//            String limitResponse = TrxLimit.checkTransLimit(request.getAmount(), request.getCustomerLimitType(), request.getMsisdn(), TrxLimit.PURCHASE, sqlconf);
             System.out.println("Limit Response : " + limitResponse);
 
             if (limitResponse.equalsIgnoreCase("01")) {
