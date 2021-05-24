@@ -177,6 +177,8 @@ public class PurchaseInquiry extends MbBaseServiceImpl implements MbService {
                 billerId.equalsIgnoreCase("0902") || billerId.equalsIgnoreCase("6050")
                 //if doku
                 || billerId.equalsIgnoreCase("6059")
+                //if ziswaf sharing
+                || billerId.equalsIgnoreCase("6060")
                 //if dompet dhuafa
                 || billerId.equalsIgnoreCase("6061")
             ) {
