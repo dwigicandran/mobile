@@ -26,7 +26,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class MbBaseServiceImpl {
 
-	protected Validator validator;
+    protected Validator validator;
 
     @Autowired
     MbLimitRepository limitRepository;
@@ -57,7 +57,7 @@ public class MbBaseServiceImpl {
     protected MbServiceException createSlServiceException(String errCode, String errDesc, MbApiTxLog txLog, MbTxLogRepository txLogRepository) {
 
         txLogRepository.save(txLog);
-        
+
         MbServiceException response  = new MbServiceException(null);
         response.setResponseCode(errCode);
         response.setResponseMessage(errDesc);

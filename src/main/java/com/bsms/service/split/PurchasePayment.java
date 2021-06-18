@@ -156,8 +156,18 @@ public class PurchasePayment extends MbBaseServiceImpl implements MbService {
 //            String url = switcherPepaidPaymentUrl;
             String url;
 
-            //if indiehome
-            if (billerId.equalsIgnoreCase("0902") || billerId.equalsIgnoreCase("6050")) {
+            if (
+                    //if indiehome
+                    billerId.equalsIgnoreCase("0902") || billerId.equalsIgnoreCase("6050")
+                            //if doku
+                            || billerId.equalsIgnoreCase("6059")
+                            //if ziswaf sharing
+                            || billerId.equalsIgnoreCase("6060")
+                            //if dompet dhuafa
+                            || billerId.equalsIgnoreCase("6061")
+                            //if kita bisa
+                            || billerId.equalsIgnoreCase("6066")
+            ){
                 url = switcherPaymentUrl;
             } else {
                 url = switcherPepaidPaymentUrl;

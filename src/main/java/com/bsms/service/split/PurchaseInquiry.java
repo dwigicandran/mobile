@@ -62,7 +62,7 @@ public class PurchaseInquiry extends MbBaseServiceImpl implements MbService {
     private int restTimeout;
 
     private String errorDefaultId = ", permintaan tidak dapat diproses, silahkan dicoba beberapa saat lagi.";
-    private String errorDefaultEn = ",request can't be process, please try again later.";
+    private String errorDefaultEn = ", request can't be process, please try again later.";
 
     @Override
     public MbApiResp process(HttpHeaders header, ContainerRequestContext requestContext, MbApiReq request) throws Exception {
@@ -172,8 +172,18 @@ public class PurchaseInquiry extends MbBaseServiceImpl implements MbService {
 //            String url = switcherPrepaidInquiryUrl + "/" + billerId;
             String url;
 
-            //if indiehome
-            if (billerId.equalsIgnoreCase("0902") || billerId.equalsIgnoreCase("6050")) {
+            if (
+                //if indiehome
+                billerId.equalsIgnoreCase("0902") || billerId.equalsIgnoreCase("6050")
+                //if doku
+                || billerId.equalsIgnoreCase("6059")
+                //if ziswaf sharing
+                || billerId.equalsIgnoreCase("6060")
+                //if dompet dhuafa
+                || billerId.equalsIgnoreCase("6061")
+                //if kita bisa
+                || billerId.equalsIgnoreCase("6066")
+            ) {
                 url = switcherInquiryUrl;
             } else {
                 url = switcherPrepaidInquiryUrl + "/" + billerId;
@@ -208,12 +218,12 @@ public class PurchaseInquiry extends MbBaseServiceImpl implements MbService {
                 mbApiResp = MbJsonUtil.createErrResponse(response.getBody());
             }
         } catch (Exception e) {
+            log.error("error", e);
             String errorDefault = e.getCause().getMessage() + errorDefaultId;
             if (request.getLanguage().equals("en")) {
                 errorDefault = e.getCause().getMessage() + errorDefaultEn;
             }
             mbApiResp = MbJsonUtil.createResponseBank("99", errorDefault, null);
-            e.printStackTrace();
         }
 
         return mbApiResp;
