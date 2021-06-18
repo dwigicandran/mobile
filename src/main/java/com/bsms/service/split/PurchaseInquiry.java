@@ -181,6 +181,8 @@ public class PurchaseInquiry extends MbBaseServiceImpl implements MbService {
                 || billerId.equalsIgnoreCase("6060")
                 //if dompet dhuafa
                 || billerId.equalsIgnoreCase("6061")
+                //if kita bisa
+                || billerId.equalsIgnoreCase("6066")
             ) {
                 url = switcherInquiryUrl;
             } else {
