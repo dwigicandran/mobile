@@ -229,6 +229,12 @@ public class MbApiReq implements Serializable {
 
     private String max_usage;
     private String expiry_time;
+    private String period;
+    private String deposit_name;
+    private String duedate;
+    private String arooption;
+    private String deposito_setting;
+    private String acctno;
 
     private Object content;
     private MbApiContentReq reqContent;
