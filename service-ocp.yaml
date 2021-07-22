@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: tws-service
+  name: tws-service
+  namespace: superapp
+spec:
+  externalName: 10.0.117.124
+  externalTrafficPolicy: Cluster
+  ports:
+    - name: port1
+      nodePort: 30002
+      port: 8080
+      protocol: TCP
+      targetPort: 8080
+  selector:
+    app: tws-service
+  sessionAffinity: None
+  type: NodePort
+status:
+  loadBalancer: {}
