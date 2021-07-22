@@ -34,223 +34,219 @@ import java.util.List;
 @Slf4j
 @Service("purchaseInquiry")
 public class PurchaseInquiry extends MbBaseServiceImpl implements MbService {
-	@Autowired
-	SpMerchantRepository spMerchantRepository;
+    @Autowired
+    SpMerchantRepository spMerchantRepository;
 
-	@Autowired
-	private MbTxLogRepository txLogRepository;
+    @Autowired
+    private MbTxLogRepository txLogRepository;
 
-	@Context
-	private ContainerRequestContext requestContext;
+    @Context
+    private ContainerRequestContext requestContext;
 
-	@Context
-	private HttpHeaders header;
+    @Context
+    private HttpHeaders header;
 
-	@Value("${ubp.inquiry}")
-	private String ubpInquiryUrl;
+    @Value("${ubp.inquiry}")
+    private String ubpInquiryUrl;
 
-	@Value("${switcher.prepaid.inquiry}")
-	private String switcherPrepaidInquiryUrl;
+    @Value("${switcher.prepaid.inquiry}")
+    private String switcherPrepaidInquiryUrl;
 
-	@Value("${switcher.inquiry}")
-	private String switcherInquiryUrl;
+    @Value("${switcher.inquiry}")
+    private String switcherInquiryUrl;
 
-	@Value("${sql.conf}")
-	private String sqlconf;
+    @Value("${sql.conf}")
+    private String sqlconf;
 
-	@Value("${rest.template.timeout}")
-	private int restTimeout;
+    @Value("${rest.template.timeout}")
+    private int restTimeout;
 
-	private String errorDefaultId = ", permintaan tidak dapat diproses, silahkan dicoba beberapa saat lagi.";
-	private String errorDefaultEn = ",request can't be process, please try again later.";
+    private String errorDefaultId = ", permintaan tidak dapat diproses, silahkan dicoba beberapa saat lagi.";
+    private String errorDefaultEn = ", request can't be process, please try again later.";
 
-	@Override
-	public MbApiResp process(HttpHeaders header, ContainerRequestContext requestContext, MbApiReq request)
-			throws Exception {
-		MbApiResp response;
-		MbApiTxLog txLog = new MbApiTxLog();
+    @Override
+    public MbApiResp process(HttpHeaders header, ContainerRequestContext requestContext, MbApiReq request) throws Exception {
+        MbApiResp response;
+        MbApiTxLog txLog = new MbApiTxLog();
 
-		log.info("Purchase Inquiry Split Runnning : ");
-		log.info("Purchase Inquiry Split Request : " + new Gson().toJson(request));
+        log.info("Purchase Inquiry Split Runnning : ");
+        log.info("Purchase Inquiry Split Request : " + new Gson().toJson(request));
 
-		String requestPath = requestContext.getUriInfo().getPath();
-		String requestParam = requestPath.substring(requestPath.lastIndexOf('/') + 1);
-		String billerId = requestParam != null && !requestParam.equals("purchaseInquiry") ? requestParam
-				: request.getBillerid();
-		log.info("BILLER ID : " + billerId);
+        String requestPath = requestContext.getUriInfo().getPath();
+        String requestParam = requestPath.substring(requestPath.lastIndexOf('/') + 1);
+        String billerId = requestParam != null && !requestParam.equals("purchaseInquiry") ? requestParam : request.getBillerid();
+        log.info("BILLER ID : " + billerId);
 //        log.info("Biller Id : " + request.getBillerid());
 //        log.info("Param : " + requestParam);
 
 //        SpMerchant result = spMerchantRepository.findBySpMerchantId(billerId);
-		List<SpMerchant> result = spMerchantRepository.findAllBySpMerchantId(billerId);
+        List<SpMerchant> result = spMerchantRepository.findAllBySpMerchantId(billerId);
 
-		log.info("SPMerchant result : " + new Gson().toJson(result));
+        log.info("SPMerchant result : " + new Gson().toJson(result));
 //        log.info("service provider : " + result.get(0).getServiceprovider());
 
 //        log.info("REQUEST PARAM : " + requestParam);
-		log.info("result size : " + result.size());
+        log.info("result size : " + result.size());
 
-		if (result.size() != 0) {
-			request.setBillerid(billerId);
-			if (result.get(0).getServiceprovider() == 0) {
-				response = switcherInquiry(request, billerId);
-				log.info("Purchase To Switcher Services");
-			} else {
-				log.info("Purchase TO UBP Services");
-				response = ubpInquiry(request, billerId);
-			}
-		} else {
-			String msg = "Unknown Service Provider";
-			Content content = new Content();
-			content.setKey("ErrorCode");
-			content.setValue(msg);
-			response = MbJsonUtil.createSPMerchantResponse(msg, content);
-			log.info(msg);
-		}
 
-		log.info("MOBILE API RESPONSE : " + new Gson().toJson(response));
-		txLog.setId(response.getTransactionId());
-		txLog.setResponse(response);
-		txLog.setRequest(request);
-		txLogRepository.save(txLog);
+        if (result.size() != 0) {
+            request.setBillerid(billerId);
+            if (result.get(0).getServiceprovider() == 0) {
+                response = switcherInquiry(request, billerId);
+                log.info("Purchase To Switcher Services");
+            } else {
+                log.info("Purchase TO UBP Services");
+                response = ubpInquiry(request, billerId);
+            }
+        } else {
+            String msg = "Unknown Service Provider";
+            Content content = new Content();
+            content.setKey("ErrorCode");
+            content.setValue(msg);
+            response = MbJsonUtil.createSPMerchantResponse(msg, content);
+            log.info(msg);
+        }
 
-		return response;
-	}
+        log.info("MOBILE API RESPONSE : " + new Gson().toJson(response));
+        txLog.setId(response.getTransactionId());
+        txLog.setResponse(response);
+        txLog.setRequest(request);
+        txLogRepository.save(txLog);
 
-	private MbApiResp ubpInquiry(MbApiReq request, String billerId) {
-		log.info("UBP Biller : " + billerId);
-		MbApiResp mbApiResp;
-		try {
-			HttpEntity<?> req = new HttpEntity(request, RestUtil.getHeaders());
-			RestTemplate restTemps = new RestTemplate();
-			((SimpleClientHttpRequestFactory) restTemps.getRequestFactory()).setConnectTimeout(restTimeout);
-			((SimpleClientHttpRequestFactory) restTemps.getRequestFactory()).setReadTimeout(restTimeout);
-			String url = ubpInquiryUrl + "/" + billerId;
+        return response;
+    }
 
-			log.info("Split UBP url : " + url);
-			ResponseEntity<BaseResponse> response = restTemps.exchange(url, HttpMethod.POST, req, BaseResponse.class);
-			log.info("UBP Response : " + new Gson().toJson(response));
+    private MbApiResp ubpInquiry(MbApiReq request, String billerId) {
+        log.info("UBP Biller : " + billerId);
+        MbApiResp mbApiResp;
+        try {
+            HttpEntity<?> req = new HttpEntity(request, RestUtil.getHeaders());
+            RestTemplate restTemps = new RestTemplate();
+            ((SimpleClientHttpRequestFactory) restTemps.getRequestFactory()).setConnectTimeout(restTimeout);
+            ((SimpleClientHttpRequestFactory) restTemps.getRequestFactory()).setReadTimeout(restTimeout);
+            String url = ubpInquiryUrl + "/" + billerId;
 
-			BaseResponse paymentInquiryResp = response.getBody();
-			if (paymentInquiryResp.getResponseCode().equals("00")) {
-				int trxType = request.getModul_id().equalsIgnoreCase("PU") ? TrxLimit.PURCHASE : TrxLimit.PAYMENT;
-				String limitResponse = checkLimit(response.getBody().getAmount(), request.getCustomerLimitType(),
-						request.getMsisdn(), trxType);
-				String response_msg = "";
+            log.info("Split UBP url : " + url);
+            ResponseEntity<BaseResponse> response = restTemps.exchange(url, HttpMethod.POST, req, BaseResponse.class);
+            log.info("UBP Response : " + new Gson().toJson(response));
 
-				if (limitResponse.equalsIgnoreCase("01")) {
-					response_msg = request.getLanguage().equalsIgnoreCase("en") ? MbConstant.ERROR_LIMIT_FINANCIAL_EN
-							: MbConstant.ERROR_LIMIT_FINANCIAL_ID;
-					mbApiResp = MbJsonUtil.createResponseTrf("01", response_msg, null, "");
-				} else if (limitResponse.equalsIgnoreCase("02")) {
-					response_msg = request.getLanguage().equalsIgnoreCase("en") ? MbConstant.ERROR_LIMIT_EXCEED_EN
-							: MbConstant.ERROR_LIMIT_EXCEED_ID;
-					mbApiResp = MbJsonUtil.createResponseTrf("02", response_msg, null, "");
-				} else {
-					mbApiResp = MbJsonUtil.createResponse(response.getBody());
-				}
+
+            BaseResponse paymentInquiryResp = response.getBody();
+            if (paymentInquiryResp.getResponseCode().equals("00")) {
+                int trxType = request.getModul_id().equalsIgnoreCase("PU") ? TrxLimit.PURCHASE : TrxLimit.PAYMENT;
+                String limitResponse = checkLimit(response.getBody().getAmount(), request.getCustomerLimitType(), request.getMsisdn(), trxType);
+                String response_msg = "";
+
+                if (limitResponse.equalsIgnoreCase("01")) {
+                    response_msg = request.getLanguage().equalsIgnoreCase("en") ? MbConstant.ERROR_LIMIT_FINANCIAL_EN : MbConstant.ERROR_LIMIT_FINANCIAL_ID;
+                    mbApiResp = MbJsonUtil.createResponseTrf("01", response_msg, null, "");
+                } else if (limitResponse.equalsIgnoreCase("02")) {
+                    response_msg = request.getLanguage().equalsIgnoreCase("en") ? MbConstant.ERROR_LIMIT_EXCEED_EN : MbConstant.ERROR_LIMIT_EXCEED_ID;
+                    mbApiResp = MbJsonUtil.createResponseTrf("02", response_msg, null, "");
+                } else {
+                    mbApiResp = MbJsonUtil.createResponse(response.getBody());
+                }
 //                mbApiResp = MbJsonUtil.createResponse(response.getBody());
-			} else {
-				mbApiResp = MbJsonUtil.createErrResponse(response.getBody());
-			}
-		} catch (Exception e) {
-			String errorDefault = e.getCause().getMessage() + errorDefaultId;
-			if (request.getLanguage().equals("en")) {
-				errorDefault = e.getCause().getMessage() + errorDefaultEn;
-			}
-			mbApiResp = MbJsonUtil.createResponseBank("99", errorDefault, null);
-		}
-		return mbApiResp;
-	}
+            } else {
+                mbApiResp = MbJsonUtil.createErrResponse(response.getBody());
+            }
+        } catch (Exception e) {
+            String errorDefault = e.getCause().getMessage() + errorDefaultId;
+            if (request.getLanguage().equals("en")) {
+                errorDefault = e.getCause().getMessage() + errorDefaultEn;
+            }
+            mbApiResp = MbJsonUtil.createResponseBank("99", errorDefault, null);
+        }
+        return mbApiResp;
+    }
 
-	private MbApiResp switcherInquiry(MbApiReq request, String billerId) throws Exception {
-		log.info("Switcher Biller : " + billerId);
-		MbApiResp mbApiResp;
+    private MbApiResp switcherInquiry(MbApiReq request, String billerId) throws Exception {
+        log.info("Switcher Biller : " + billerId);
+        MbApiResp mbApiResp;
 
-		try {
-			HttpEntity<?> req = new HttpEntity(request, RestUtil.getHeaders());
-			RestTemplate restTemps = new RestTemplate();
-			((SimpleClientHttpRequestFactory) restTemps.getRequestFactory()).setConnectTimeout(restTimeout);
-			((SimpleClientHttpRequestFactory) restTemps.getRequestFactory()).setReadTimeout(restTimeout);
-			String url;
+        try {
+            HttpEntity<?> req = new HttpEntity(request, RestUtil.getHeaders());
+            RestTemplate restTemps = new RestTemplate();
+            ((SimpleClientHttpRequestFactory) restTemps.getRequestFactory()).setConnectTimeout(restTimeout);
+            ((SimpleClientHttpRequestFactory) restTemps.getRequestFactory()).setReadTimeout(restTimeout);
+//            String url = switcherPrepaidInquiryUrl + "/" + billerId;
+            String url;
 
-			if (
-			// if indiehome
-			billerId.equalsIgnoreCase("0902") || billerId.equalsIgnoreCase("6050")
-			// if doku
-					|| billerId.equalsIgnoreCase("6059")
-					// if ziswaf sharing
-					|| billerId.equalsIgnoreCase("6060")
-					// if dompet dhuafa
-					|| billerId.equalsIgnoreCase("6061")
-					// if kita bisa
-					|| billerId.equalsIgnoreCase("6066")) {
-				url = switcherInquiryUrl;
-			} else {
-				url = switcherPrepaidInquiryUrl + "/" + billerId;
-			}
+            if (
+                //if indiehome
+                billerId.equalsIgnoreCase("0902") || billerId.equalsIgnoreCase("6050")
+                //if doku
+                || billerId.equalsIgnoreCase("6059")
+                //if ziswaf sharing
+                || billerId.equalsIgnoreCase("6060")
+                //if dompet dhuafa
+                || billerId.equalsIgnoreCase("6061")
+                //if kita bisa
+                || billerId.equalsIgnoreCase("6066")
+            ) {
+                url = switcherInquiryUrl;
+            } else {
+                url = switcherPrepaidInquiryUrl + "/" + billerId;
+            }
 
-			log.info("Split Switcher url : " + url);
-			log.info("Split Switcher request : " + new Gson().toJson(request));
+            log.info("Split Switcher url : " + url);
+            log.info("Split Switcher request : " + new Gson().toJson(request));
 
-			ResponseEntity<BaseResponse> response = restTemps.exchange(url, HttpMethod.POST, req, BaseResponse.class);
-			BaseResponse paymentInquiryResp = response.getBody();
+            ResponseEntity<BaseResponse> response = restTemps.exchange(url, HttpMethod.POST, req, BaseResponse.class);
+            BaseResponse paymentInquiryResp = response.getBody();
 
-			log.info("Switcher Response : " + new Gson().toJson(response));
+            log.info("Switcher Response : " + new Gson().toJson(response));
 
-			if (paymentInquiryResp.getResponseCode().equals("00")) {
+            if (paymentInquiryResp.getResponseCode().equals("00")) {
 
-				int trxType = request.getModul_id().equalsIgnoreCase("PU") ? TrxLimit.PURCHASE : TrxLimit.PAYMENT;
-				String limitResponse = checkLimit(response.getBody().getAmount(), request.getCustomerLimitType(),
-						request.getMsisdn(), trxType);
-				String response_msg = "";
+                int trxType = request.getModul_id().equalsIgnoreCase("PU") ? TrxLimit.PURCHASE : TrxLimit.PAYMENT;
+                String limitResponse = checkLimit(response.getBody().getAmount(), request.getCustomerLimitType(), request.getMsisdn(), trxType);
+                String response_msg = "";
 
-				if (limitResponse.equalsIgnoreCase("01")) {
-					response_msg = request.getLanguage().equalsIgnoreCase("en") ? MbConstant.ERROR_LIMIT_FINANCIAL_EN
-							: MbConstant.ERROR_LIMIT_FINANCIAL_ID;
-					mbApiResp = MbJsonUtil.createResponseTrf("01", response_msg, null, "");
-				} else if (limitResponse.equalsIgnoreCase("02")) {
-					response_msg = request.getLanguage().equalsIgnoreCase("en") ? MbConstant.ERROR_LIMIT_EXCEED_EN
-							: MbConstant.ERROR_LIMIT_EXCEED_ID;
-					mbApiResp = MbJsonUtil.createResponseTrf("02", response_msg, null, "");
-				} else {
-					mbApiResp = MbJsonUtil.createResponse(response.getBody());
-				}
+                if (limitResponse.equalsIgnoreCase("01")) {
+                    response_msg = request.getLanguage().equalsIgnoreCase("en") ? MbConstant.ERROR_LIMIT_FINANCIAL_EN : MbConstant.ERROR_LIMIT_FINANCIAL_ID;
+                    mbApiResp = MbJsonUtil.createResponseTrf("01", response_msg, null, "");
+                } else if (limitResponse.equalsIgnoreCase("02")) {
+                    response_msg = request.getLanguage().equalsIgnoreCase("en") ? MbConstant.ERROR_LIMIT_EXCEED_EN : MbConstant.ERROR_LIMIT_EXCEED_ID;
+                    mbApiResp = MbJsonUtil.createResponseTrf("02", response_msg, null, "");
+                } else {
+                    mbApiResp = MbJsonUtil.createResponse(response.getBody());
+                }
 
 //                mbApiResp = MbJsonUtil.createResponse(response.getBody());
-			} else {
-				mbApiResp = MbJsonUtil.createErrResponse(response.getBody());
-			}
+            } else {
+                mbApiResp = MbJsonUtil.createErrResponse(response.getBody());
+            }
+        } catch (Exception e) {
+            log.error("error", e);
+            String errorDefault = e.getCause().getMessage() + errorDefaultId;
+            if (request.getLanguage().equals("en")) {
+                errorDefault = e.getCause().getMessage() + errorDefaultEn;
+            }
+            mbApiResp = MbJsonUtil.createResponseBank("99", errorDefault, null);
+        }
 
-		} catch (Exception e) {
-			log.error("error", e);
-			String errorDefault = e.getCause().getMessage() + errorDefaultId;
-			if (request.getLanguage().equals("en")) {
-				errorDefault = e.getCause().getMessage() + errorDefaultEn;
-			}
-			mbApiResp = MbJsonUtil.createResponseBank("99", errorDefault, null);
-			e.printStackTrace();
-		}
+        return mbApiResp;
+    }
 
-		return mbApiResp;
-	}
 
-	private String checkLimit(String amount, int customerLimitType, String msisdn, int trxType) {
+    private String checkLimit(String amount, int customerLimitType, String msisdn, int trxType) {
 //        String limitResponseCode = MbConstant.ERROR_NUM_UNKNOWN;
-		String limitResponseCode = "00";
-		TrxLimit trxLimit = new TrxLimit();
-		JSONObject value = new JSONObject();
+        String limitResponseCode = "00";
+        TrxLimit trxLimit = new TrxLimit();
+        JSONObject value = new JSONObject();
 
-		try {
-			double pdamAmount = Double.parseDouble(amount); // transaction amount
-			long amount_convert = (new Double(pdamAmount)).longValue(); // 129
-			limitResponseCode = trxLimit.checkLimit(msisdn, customerLimitType, trxType, amount_convert, value, sqlconf);
-		} catch (Exception e) {
-			e.printStackTrace();
-			log.info("Limit Check Error : " + e.getMessage());
-		}
+        try {
+            double pdamAmount = Double.parseDouble(amount); //transaction amount
+            long amount_convert = (new Double(pdamAmount)).longValue(); //129
+            limitResponseCode = trxLimit.checkLimit(msisdn, customerLimitType, trxType, amount_convert, value, sqlconf);
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.info("Limit Check Error : " + e.getMessage());
+        }
 
-		return limitResponseCode;
-	}
+        return limitResponseCode;
+    }
+
 
 }

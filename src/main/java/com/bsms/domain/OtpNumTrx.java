@@ -24,7 +24,7 @@ public class OtpNumTrx {
 	
 	@Column(name = "lang")
 	private String lang;
-	
+
 	public void setId(Integer id) {
 		this.id = id;
 	}
