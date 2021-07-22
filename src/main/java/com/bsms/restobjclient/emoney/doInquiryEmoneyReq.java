@@ -34,5 +34,4 @@ public class doInquiryEmoneyReq implements Serializable {
     private String cardAcceptorMerchantId;
     private String currency;
     private String beneficiaryInstitutionCode;
-
 }

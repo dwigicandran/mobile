@@ -8,6 +8,7 @@ import com.bsms.restobj.MbApiResp;
 import com.bsms.restobjclient.base.BaseResponse;
 import com.bsms.service.base.MbBaseServiceImpl;
 import com.bsms.service.base.MbService;
+import com.bsms.util.LibFunctionUtil;
 import com.bsms.util.MbJsonUtil;
 import com.bsms.util.MbLogUtil;
 import com.bsms.util.RestUtil;
@@ -39,6 +40,9 @@ public class UmrahPayment extends MbBaseServiceImpl implements MbService {
 
     @Value("${rest.template.timeout}")
     private int restTimeOut;
+    
+    @Value("${template.mail_notif}")
+    private String templateMailNotif;
 
     @Override
     public MbApiResp process(HttpHeaders header, ContainerRequestContext requestContext, MbApiReq request) throws Exception {
@@ -67,6 +71,9 @@ public class UmrahPayment extends MbBaseServiceImpl implements MbService {
 
             if (response.getBody() != null) {
                 mbApiResp = MbJsonUtil.createResponse(response.getBody());
+                LibFunctionUtil.mailNotif(request.getCustomerEmail(),mbApiResp, templateMailNotif, request.getLanguage());
+   		     
+                
             } else {
                 MbLogUtil.writeLogError(log, "Response body null", MbApiConstant.NOT_AVAILABLE);
                 mbApiResp = MbJsonUtil.createResponseBank("99", errorDefault, null);

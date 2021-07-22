@@ -9,7 +9,7 @@ import javax.persistence.Table;
 @Table(name = "MB_LIMIT_VIEW")
 public class MbLimit {
 
-    @Id
+	@Id
     @Column(name = "id")
     private String id;
     @Column(name = "customer_type")
@@ -28,7 +28,7 @@ public class MbLimit {
     private String userId;
     @Column(name = "description")
     private String description;
-
+    
     public String getId() {
         return id;
     }
@@ -100,4 +100,5 @@ public class MbLimit {
     public void setDescription(String description) {
         this.description = description;
     }
+	
 }

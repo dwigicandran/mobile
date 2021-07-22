@@ -69,6 +69,9 @@ public class doPaymentEmoney extends MbBaseServiceImpl implements MbService  {
     @Autowired
     private MbTxLogRepository txLogRepository;
     
+    @Value("${template.mail_notif}")
+    private String templateMailNotif;
+    
     RestTemplate restTemplate = new RestTemplate();
     
     MbApiResp mbApiResp;
@@ -108,10 +111,10 @@ public class doPaymentEmoney extends MbBaseServiceImpl implements MbService  {
 				doinquiryemoneyreq.setCurrency("360");
 
 		System.out.println(new Gson().toJson(doinquiryemoneyreq));
-	            
+
 	            try {
 	    			
-	            	HttpEntity<?> req = new HttpEntity(doinquiryemoneyreq, RestUtil.getHeaders());
+	            	HttpEntity<?> req = new HttpEntity(request, RestUtil.getHeaders());
 	            	RestTemplate restTemps = new RestTemplate();
 	            	String url = doPaymentEMoney;
 	            	
@@ -132,7 +135,8 @@ public class doPaymentEmoney extends MbBaseServiceImpl implements MbService  {
 	    					
 	    				 trxLimit.LimitUpdate(request.getMsisdn(), request.getCustomerLimitType(), 
 	    			        		trxType, Long.parseLong(request.getAmount()), value,sqlconf);
-	    				 //favorit
+	    				 LibFunctionUtil.mailNotif(request.getCustomerEmail(),mbApiResp, templateMailNotif, request.getLanguage());
+	    			        
 	    			 }
 	    			
 	    		} catch (Exception e) {

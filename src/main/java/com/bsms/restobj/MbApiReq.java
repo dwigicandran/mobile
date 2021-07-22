@@ -226,7 +226,6 @@ public class MbApiReq implements Serializable {
     private String acctname;
     private String card_no;
     private String card_info;
-
     private String max_usage;
     private String expiry_time;
     private String period;

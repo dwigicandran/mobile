@@ -1,22 +1,19 @@
 package com.bsms.domain;
 
-
-//Addition By Dwi S - February 2020
-
-import lombok.ToString;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import java.util.Date;
 
+import lombok.ToString;
+
 @Entity
 @Table(name = "Favorite")
 @ToString
 public class Favorite {
 
-    @Id
+	@Id
     @Column(name = "id")
     private Integer id;
     @Column(name = "id_fav")
@@ -51,7 +48,7 @@ public class Favorite {
     private String typeBank;
     @Column(name = "billName")
     private String billName;
-
+    
     public Integer getId() {
         return id;
     }
@@ -187,4 +184,5 @@ public class Favorite {
     public void setBillName(String billName) {
         this.billName = billName;
     }
+	
 }

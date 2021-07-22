@@ -9,6 +9,7 @@ import com.bsms.restobj.MbApiReq;
 import com.bsms.restobj.MbApiResp;
 import com.bsms.restobjclient.base.BaseResponse;
 import com.bsms.restobjclient.payment.Content;
+import com.bsms.restobjclient.ziswaf.doPaymentZiswafResp;
 import com.bsms.service.base.MbBaseServiceImpl;
 import com.bsms.service.base.MbService;
 import com.bsms.util.*;
@@ -127,11 +128,9 @@ public class PurchasePayment extends MbBaseServiceImpl implements MbService {
             log.info("UBP Response : " + new Gson().toJson(response));
 
             if (paymentInquiryResp.getResponseCode().equals("00")) {
-
-//                updateLimit(request, paymentInquiryResp);
-
                 mbApiResp = MbJsonUtil.createResponse(response.getBody());
                 LibFunctionUtil.mailNotif(request.getCustomerEmail(),mbApiResp, templateMailNotif, request.getLanguage());
+            
             } else {
                 mbApiResp = MbJsonUtil.createErrResponse(response.getBody());
             }
@@ -156,6 +155,8 @@ public class PurchasePayment extends MbBaseServiceImpl implements MbService {
 //            String url = switcherPepaidPaymentUrl;
             String url;
 
+            //if indiehome
+            if (billerId.equalsIgnoreCase("0902") || billerId.equalsIgnoreCase("6050")) {
             if (
                     //if indiehome
                     billerId.equalsIgnoreCase("0902") || billerId.equalsIgnoreCase("6050")
@@ -181,9 +182,13 @@ public class PurchasePayment extends MbBaseServiceImpl implements MbService {
             log.info("Switcher Response : " + new Gson().toJson(response));
 
             BaseResponse paymentInquiryResp = response.getBody();
+           
             if (paymentInquiryResp.getResponseCode().equals("00")) {
                 updateLimit(request, paymentInquiryResp);
-                mbApiResp = MbJsonUtil.createResponse(response.getBody());
+                
+               mbApiResp = MbJsonUtil.createResponse(response.getBody());
+               LibFunctionUtil.mailNotif(request.getCustomerEmail(),mbApiResp, templateMailNotif, request.getLanguage());
+	       		     
             } else {
                 mbApiResp = MbJsonUtil.createErrResponse(response.getBody());
             }
