@@ -5,7 +5,6 @@ import com.bsms.restobj.MbApiResp;
 import com.bsms.restobjclient.base.BaseResponse;
 import com.bsms.service.base.MbBaseServiceImpl;
 import com.bsms.service.base.MbService;
-import com.bsms.util.LibFunctionUtil;
 import com.bsms.util.MbJsonUtil;
 import com.bsms.util.RestUtil;
 import com.google.gson.Gson;
@@ -30,9 +29,6 @@ public class doPaymentWakaf extends MbBaseServiceImpl implements MbService {
 
     @Value("${rest.template.timeout}")
     private int restTimeout;
-    
-    @Value("${template.mail_notif}")
-    private String templateMailNotif;
 
     @Override
     public MbApiResp process(HttpHeaders header, ContainerRequestContext requestContext, MbApiReq request) throws Exception {
@@ -56,8 +52,6 @@ public class doPaymentWakaf extends MbBaseServiceImpl implements MbService {
             log.info("Response Result : " + new Gson().toJson(response));
             if (paymentInquiryResp.getResponseCode().equals("00")) {
                 mbApiResp = MbJsonUtil.createResponse(response.getBody());
-                LibFunctionUtil.mailNotif(request.getCustomerEmail(),mbApiResp, templateMailNotif, request.getLanguage());
-  		      
             } else {
                 mbApiResp = MbJsonUtil.createErrResponse(response.getBody());
             }

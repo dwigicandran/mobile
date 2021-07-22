@@ -76,22 +76,18 @@ public class GetListBanner extends MbBaseServiceImpl implements MbService{
 		        	SQL= "SELECT * from MB_Banner where section='1'";
 		            ResultSet rs = stmt.executeQuery(SQL);
 		            
-		            //banner info
 		            while (rs.next()) 
 	 	            {
-		            	banner1.add(new Banner1(rs.getString("img"),rs.getString("title"),rs.getString("tgl"),
-		            			rs.getString("detail"),rs.getString("submodul_id"),rs.getString("category")));
+		            	banner1.add(new Banner1(rs.getString("img")));
 	 	            }
 		            
 		            stmt2= con.createStatement();
 		        	SQL2= "SELECT * from MB_Banner where section='2'";
 		            ResultSet rs2 = stmt2.executeQuery(SQL2);
 		            
-		            //banner transactional
 		            while (rs2.next()) 
 	 	            {
-		            	banner2.add(new Banner2(rs2.getString("img"),rs2.getString("title"),rs2.getString("tgl"),
-		            			rs2.getString("detail"),rs2.getString("submodul_id"),rs2.getString("category")));
+		            	banner2.add(new Banner2(rs2.getString("img")));
 	 	            }
 		            
 		            
