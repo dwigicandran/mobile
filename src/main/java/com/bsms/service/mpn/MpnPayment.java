@@ -6,6 +6,7 @@ import com.bsms.restobj.MbApiResp;
 import com.bsms.restobjclient.base.BaseResponse;
 import com.bsms.service.base.MbBaseServiceImpl;
 import com.bsms.service.base.MbService;
+import com.bsms.util.LibFunctionUtil;
 import com.bsms.util.MbJsonUtil;
 import com.bsms.util.RestUtil;
 import com.bsms.util.TrxLimit;
@@ -35,11 +36,14 @@ public class MpnPayment extends MbBaseServiceImpl implements MbService {
 
     @Value("${sql.conf}")
     private String sqlconf;
+    
+    @Value("${template.mail_notif}")
+    private String templateMailNotif;
 
 
     @Override
     public MbApiResp process(HttpHeaders header, ContainerRequestContext requestContext, MbApiReq request) throws Exception {
-        MbApiResp mbApiResp;
+        MbApiResp mbApiResp = null;
         log.info("MPN Payment Running");
         log.info("MPN Payment Request : " + new Gson().toJson(request));
 
@@ -68,6 +72,8 @@ public class MpnPayment extends MbBaseServiceImpl implements MbService {
                         double d = Double.parseDouble(amount);
                         long amount_convert = (new Double(d)).longValue();
                         trxLimit.LimitUpdate(request.getMsisdn(), request.getCustomerLimitType(), trxType, amount_convert, value, sqlconf);
+                        //LibFunctionUtil.mailNotif(request.getCustomerEmail(),mbApiResp, templateMailNotif, request.getLanguage());
+	    			      
                     } catch (Exception e) {
                         e.printStackTrace();
                         log.info("Update transaction limit failed :" + e.getMessage());

@@ -4,18 +4,12 @@ import java.io.*;
 import java.math.BigInteger;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
-import java.net.Socket;
 import java.net.SocketException;
-import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.UnknownHostException;
-import java.nio.channels.FileChannel;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
@@ -39,30 +33,15 @@ import javax.crypto.spec.SecretKeySpec;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 
-import java.text.DateFormat;
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Random;
-
 import com.bsms.restobj.MbApiResp;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.mail.MailException;
 
-import org.springframework.mail.javamail.JavaMailSender;
 
-import javax.activation.DataHandler;
-import javax.activation.DataSource;
-import javax.activation.FileDataSource;
 import javax.mail.Message;
-import javax.mail.Multipart;
-import javax.mail.PasswordAuthentication;
 import javax.mail.Session;
 import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
@@ -70,26 +49,18 @@ import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 
-import com.itextpdf.text.BaseColor;
 import com.itextpdf.text.Document;
-import com.itextpdf.text.Element;
-import com.itextpdf.text.Font;
-import com.itextpdf.text.FontFactory;
 import com.itextpdf.text.PageSize;
-import com.itextpdf.text.Paragraph;
-import com.itextpdf.text.Phrase;
-import com.itextpdf.text.pdf.ColumnText;
-import com.itextpdf.text.pdf.PdfPCell;
-import com.itextpdf.text.pdf.PdfPTable;
-import com.itextpdf.text.pdf.PdfPageEventHelper;
 import com.itextpdf.text.pdf.PdfWriter;
 import com.itextpdf.tool.xml.XMLWorkerHelper;
 
 public class LibFunctionUtil {
 
 	//========== Email Method Added By Dodo ===================//
-	private static String mailHeaderEn = "Purchase/Payment ";
-	private static String mailHeaderId = "Bayar/Beli ";
+//	private static String mailHeaderEn = "Purchase/Payment ";
+//	private static String mailHeaderId = "Bayar/Beli ";
+	
+	//Header Email Notif ambil dari title dari ResponseContent
 
 	 public static void sendEmailAsync(String trans_ref,
 	          String mail_to, String subject, String html_content,
@@ -155,7 +126,7 @@ public class LibFunctionUtil {
 	      Date tempDate = new Date();
 
 	      Properties props = new Properties();
-	      props.put("10.250.48.151", "BSM MAIL Server");
+	      props.put("10.250.48.151", "BSI MAIL Server");
 	      props.put("mail.smtp.port", "25");
 	      props.put("mail.smtp.host", "10.250.48.151");
 	      props.put("mail.smtp.auth", "false");
@@ -170,7 +141,8 @@ public class LibFunctionUtil {
 
 	      MimeMessage msg = new MimeMessage(session);
 
-	      msg.setFrom("mobile@syariahmandiri.co.id");
+	      //msg.setFrom("mobile@syariahmandiri.co.id");
+	      msg.setFrom("mobile@bankbsi.co.id");
 	      //msg.setRecipients(Message.RecipientType.TO, mail_to);
 	      if (mail_to.contains(","))
 	          msg.setRecipients(Message.RecipientType.TO, InternetAddress.parse(mail_to));
@@ -236,7 +208,9 @@ public class LibFunctionUtil {
        }
 	  }
 
-	public static void mailNotif(String mailDest, MbApiResp mbApiResp, String mailTemplate, String lang) {
+	public static void mailNotif(String mailDest, MbApiResp mbApiResp, String mailTemplate, 
+			String lang) 
+	{
 		try {
 			boolean landscape = false;
 			String template = null;
@@ -268,13 +242,59 @@ public class LibFunctionUtil {
 					mailContent += "<tr><td></td><td>" + content.get(i).getAsJsonObject().get("desc").getAsString() + "</td></tr>";
 				}
 			}
+    
+			templateTrf = templateTrf.replace("{header}", respContent.get("title").getAsString());	
+			//templateTrf = templateTrf.replace("{code_name}", respContent.get("title").getAsString());
+			templateTrf = templateTrf.replace("{image}", new ClassPathResource("template/logo.jpg").getURL().toString());
+			templateTrf = templateTrf.replace("{mail_content}", mailContent);
+			templateTrf = templateTrf.replace("{footer}", respContent.get("footer").getAsString());
+			template = templateTrf;
 
-			if (lang.equals("id")) {
-				templateTrf = templateTrf.replace("{header}", mailHeaderId);
-			} else {
-				templateTrf = templateTrf.replace("{header}", mailHeaderEn);
+			sendEmailAsync(respContent.get("no").getAsString(), mailDest, "Transaksi Bank Syariah Indonesia " + respContent.get("title").getAsString(),
+					template, template, landscape);
+		} catch (Exception e) {
+			e.printStackTrace();
+			System.out.println("Error mailer : " + e.getMessage());
+		}
+	}
+	
+	public static void mailNotif2(String mailDest, Object object, String mailTemplate, 
+			String lang) 
+	{
+		try {
+			boolean landscape = false;
+			String template = null;
+			String templateTrf = null;
+
+			System.out.println("template : " + mailTemplate);
+
+			BufferedInputStream bis = new BufferedInputStream(new ClassPathResource(mailTemplate).getInputStream());
+			byte[] buffer = new byte[bis.available()];
+			bis.read(buffer, 0, buffer.length);
+			bis.close();
+
+			templateTrf = new String(buffer);
+
+			JsonObject resp = new JsonParser().parse(new Gson().toJson(object)).getAsJsonObject();
+			JsonObject respContent = resp.get("responseContent").getAsJsonObject();
+			JsonArray content = resp.get("responseContent").getAsJsonObject().get("content").getAsJsonArray();
+
+			String mailContent = "";
+			mailContent += "<tr><td>Transaction No</td><td>" + respContent.get("no").getAsString() + "</td></tr>";
+			mailContent += "<tr><td>Date</td><td>" + respContent.get("date").getAsString() + "</td></tr>";
+			mailContent += "<tr><td colspan='2'><b>" + respContent.get("title").getAsString() + "</b></td></tr>";
+
+			for (int i = 0; i < content.size(); i++) {
+				mailContent += "<tr><td>" + content.get(i).getAsJsonObject().get("key").getAsString() + "</td><td>"
+						+ content.get(i).getAsJsonObject().get("value").getAsString() + "</td></tr>";
+				if (content.get(i).getAsJsonObject().has("desc")) {
+					System.out.println("punya desc");
+					mailContent += "<tr><td></td><td>" + content.get(i).getAsJsonObject().get("desc").getAsString() + "</td></tr>";
+				}
 			}
-			templateTrf = templateTrf.replace("{code_name}", respContent.get("title").getAsString());
+    
+			templateTrf = templateTrf.replace("{header}", respContent.get("title").getAsString());	
+			//templateTrf = templateTrf.replace("{code_name}", respContent.get("title").getAsString());
 			templateTrf = templateTrf.replace("{image}", new ClassPathResource("template/logo.jpg").getURL().toString());
 			templateTrf = templateTrf.replace("{mail_content}", mailContent);
 			templateTrf = templateTrf.replace("{footer}", respContent.get("footer").getAsString());

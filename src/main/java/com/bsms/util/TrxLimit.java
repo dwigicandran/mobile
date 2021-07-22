@@ -101,14 +101,15 @@ public class TrxLimit {
                         result = "00";
                     }
                 }
-//                System.out.println("Transaction Amount : " + trxAmount);
-//                System.out.println("Last Amount : " + lastAmount);
-//                System.out.println("Daily Limit : " + dailyAmtLimit);
-//                System.out.println("Transaction Amount Limit : " + trxAmtLimit);
+                System.out.println("Transaction Amount : " + trxAmount);
+                System.out.println("Last Amount : " + lastAmount);
+                System.out.println("Daily Limit : " + dailyAmtLimit);
+                System.out.println("Transaction Amount Limit : " + trxAmtLimit);
                 rs2.close();
                 stmt2.close();
 
             }
+
 
             con.close();
 

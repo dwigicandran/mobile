@@ -13,6 +13,7 @@ import com.bsms.util.RestUtil;
 import com.bsms.util.TrxLimit;
 import com.google.gson.Gson;
 import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
@@ -22,9 +23,10 @@ import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import java.math.BigDecimal;
+
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.core.HttpHeaders;
-import java.math.BigDecimal;
 
 @Slf4j
 @Service("doOdcInquiry")
@@ -38,7 +40,7 @@ public class OdcInquiry extends MbBaseServiceImpl implements MbService {
 
     @Value("${sql.conf}")
     private String sqlconf;
-
+    
     @Autowired MbLimitRepository limitRepository;
     @Autowired MbLimitTrackingRepository limitTrackingRepository;
 
@@ -59,12 +61,13 @@ public class OdcInquiry extends MbBaseServiceImpl implements MbService {
             String response_msg;
 
             log.info("Get CardOtp Odc Inquiry Add URL : " + url);
-
+            
             long amt = Long.valueOf(request.getAmount());
             Integer custType = request.getCustomerLimitType();
             BigDecimal trxAmount = new BigDecimal(request.getAmount());
 
             String limitResponse = checklimitTransaction(request.getAmount(), request.getCustomerLimitType(), request.getMsisdn(), TrxLimit.PURCHASE);
+
 //            String limitResponse = TrxLimit.checkTransLimit(request.getAmount(), request.getCustomerLimitType(), request.getMsisdn(), TrxLimit.PURCHASE, sqlconf);
             System.out.println("Limit Response : " + limitResponse);
 

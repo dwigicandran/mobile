@@ -12,6 +12,7 @@ import com.bsms.restobjclient.base.BaseResponse;
 import com.bsms.restobjclient.payment.Content;
 import com.bsms.service.base.MbBaseServiceImpl;
 import com.bsms.service.base.MbService;
+import com.bsms.util.LibFunctionUtil;
 import com.bsms.util.MbJsonUtil;
 import com.bsms.util.MbLogUtil;
 import com.bsms.util.RestUtil;
@@ -56,6 +57,9 @@ public class PrepaidPayment extends MbBaseServiceImpl implements MbService {
 
     @Value("${rest.template.timeout}")
     private int restTimeout;
+    
+    @Value("${template.mail_notif}")
+    private String templateMailNotif;
 
     @Override
     public MbApiResp process(HttpHeaders header, ContainerRequestContext requestContext, MbApiReq request) throws Exception {
@@ -130,6 +134,8 @@ public class PrepaidPayment extends MbBaseServiceImpl implements MbService {
             if (paymentInquiryResp.getResponseCode().equals("00")) {
 //                updateLimit(request, paymentInquiryResp);
                 mbApiResp = MbJsonUtil.createResponse(response.getBody());
+                LibFunctionUtil.mailNotif(request.getCustomerEmail(),mbApiResp, templateMailNotif, request.getLanguage());
+	       		
             } else {
                 mbApiResp = MbJsonUtil.createErrResponse(response.getBody());
             }
@@ -164,6 +170,8 @@ public class PrepaidPayment extends MbBaseServiceImpl implements MbService {
                 updateLimit(request, paymentInquiryResp);
 
                 mbApiResp = MbJsonUtil.createResponse(response.getBody());
+                LibFunctionUtil.mailNotif(request.getCustomerEmail(),mbApiResp, templateMailNotif, request.getLanguage());
+	       		
             } else {
                 mbApiResp = MbJsonUtil.createErrResponse(response.getBody());
             }

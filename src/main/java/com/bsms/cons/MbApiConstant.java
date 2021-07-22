@@ -65,7 +65,7 @@ public class MbApiConstant {
     public static Integer PURCHASE = 1;
     public static Integer PAYMENT = 2;
     public static Integer QRIS = 10;
-
+    
     @Value("${jwt.expiration.time}")
     private String jwtExpirationTime;
     @Value("${verify.token.expiration.time}")

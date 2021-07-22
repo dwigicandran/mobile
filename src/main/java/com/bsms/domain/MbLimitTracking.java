@@ -12,7 +12,7 @@ import java.util.Date;
 @Table(name = "MB_LIMITTRACKING_VIEW")
 public class MbLimitTracking {
 
-    @Id
+	@Id
     @JsonProperty("id")
     private Long id;
     @Column(name = "msisdn")
@@ -23,7 +23,7 @@ public class MbLimitTracking {
     private Date lastTrxDate;
     @Column(name = "total_amount")
     private String totalAmount;
-
+    
     public Long getId() {
         return id;
     }
@@ -58,4 +58,5 @@ public class MbLimitTracking {
     public void setTrxType(Integer trxType) {
         this.trxType = trxType;
     }
+	
 }

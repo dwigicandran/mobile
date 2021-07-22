@@ -11,6 +11,8 @@ import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 
+import org.springframework.beans.factory.annotation.Autowired;
+
 import com.bsms.domain.MbApiTxLog;
 import com.bsms.domain.MbLimit;
 import com.bsms.domain.MbLimitTracking;
@@ -20,15 +22,12 @@ import com.bsms.repository.MbLimitTrackingRepository;
 import com.bsms.repository.MbTxLogRepository;
 import com.bsms.restobj.MbApiStatusResp;
 import com.bsms.util.MbErrorUtil;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
-@Component
 public class MbBaseServiceImpl {
 
-    protected Validator validator;
-
-    @Autowired
+	protected Validator validator;
+	
+	@Autowired
     MbLimitRepository limitRepository;
     @Autowired
     MbLimitTrackingRepository limitTrackingRepository;
@@ -57,7 +56,7 @@ public class MbBaseServiceImpl {
     protected MbServiceException createSlServiceException(String errCode, String errDesc, MbApiTxLog txLog, MbTxLogRepository txLogRepository) {
 
         txLogRepository.save(txLog);
-
+        
         MbServiceException response  = new MbServiceException(null);
         response.setResponseCode(errCode);
         response.setResponseMessage(errDesc);
@@ -65,7 +64,7 @@ public class MbBaseServiceImpl {
         // return response;
         return new MbServiceException(MbErrorUtil.createError(errCode, errDesc));
     }
-
+    
     protected String checklimitTransaction(String amount, int customerLimitType, String msisdn, int trxType) {
         BigDecimal trxAmount = new BigDecimal(amount);
         String result;
@@ -109,4 +108,5 @@ public class MbBaseServiceImpl {
         }
         return result;
     }
+	
 }
