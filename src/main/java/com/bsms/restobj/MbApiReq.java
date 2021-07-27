@@ -234,6 +234,12 @@ public class MbApiReq implements Serializable {
     private String arooption;
     private String deposito_setting;
     private String acctno;
+    private String npwp;
+    private String nominal;
+    private String berat_emas;
+    private String jenis_satuan;
+    private String no_npwp;
+    private String image_npwp;
 
     private Object content;
     private MbApiContentReq reqContent;
