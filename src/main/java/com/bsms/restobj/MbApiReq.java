@@ -240,6 +240,11 @@ public class MbApiReq implements Serializable {
     private String jenis_satuan;
     private String no_npwp;
     private String image_npwp;
+    private String gold_account;
+    private String harga_beli;
+    private String harga_jual;
+    private String total_transaksi;
+    private String pph;
 
     private Object content;
     private MbApiContentReq reqContent;
