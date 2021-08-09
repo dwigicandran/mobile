@@ -245,6 +245,10 @@ public class MbApiReq implements Serializable {
     private String harga_jual;
     private String total_transaksi;
     private String pph;
+    private String gold_acc_source;
+    private String gold_acc_destination;
+    private String berita_transfer;
+    private String account_destination;
 
     private Object content;
     private MbApiContentReq reqContent;

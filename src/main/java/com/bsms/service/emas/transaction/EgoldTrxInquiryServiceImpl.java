@@ -31,6 +31,7 @@ public class EgoldTrxInquiryServiceImpl extends MbBaseServiceImpl implements MbS
 
     @Value("${emas.inquiry.purchase}") private String endpointPurchase;
     @Value("${emas.inquiry.sell}") private String endpointSell;
+    @Value("${emas.inquiry.trf}") private String endpointTrf;
     @Value("${rest.template.timeout}") private int restTimeout;
 
     @Autowired
@@ -52,6 +53,8 @@ public class EgoldTrxInquiryServiceImpl extends MbBaseServiceImpl implements MbS
             url = endpointPurchase;
         } else if("sell".equals(requestParam)) {
             url = endpointSell;
+        } else if("trf".equals(requestParam)){
+            url = endpointTrf;
         }
 
         try{
