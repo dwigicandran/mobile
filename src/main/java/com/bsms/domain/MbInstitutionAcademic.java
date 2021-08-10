@@ -9,7 +9,7 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "MB_InstitutionAcademic")
+@Table(name = "MB_Institutionacademic")
 @ToString
 @Data
 public class MbInstitutionAcademic {
