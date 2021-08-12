@@ -177,41 +177,23 @@ public class MbApiReq implements Serializable {
     private String denomId;
     private String onBehalf;
     private String phoneNumber;
-
-    //umrah dan haji
     private String payment_type;
     private String payment_id;
-
-    //card block
     private String card_type;
-
-    //wakaf
     private String wakaf_type;
     private String nazhir_id;
-
-    //portofolio
     private String info_type;
     private String cif;
-
-    //setting
     private String prefix;
-
-    //inbox notif
     private String nid;
     private String msgtype;
     private String mid;
     private String gmid;
     private String flag;
-
-    //PDAM
     private String bcList;
     private String serviceId;
-
-    //institution
     private String pay_code;
     private String category;
-
-    //acop autosave
     private String flow_id;
     private String autosavetype;
     private String target_amount;
@@ -249,6 +231,16 @@ public class MbApiReq implements Serializable {
     private String gold_acc_destination;
     private String berita_transfer;
     private String account_destination;
+    private String jenis_kepingan;
+    private String jumlah_kepingan;
+    private String metode_pengiriman;
+    private String lokasi_pengiriman;
+    private String branch_code;
+    private String date_start;
+    private String date_end;
+    private String ongkos_cetak_satuan;
+    private String ongkos_cetak_total;
+    private String total_amount;
 
     private Object content;
     private MbApiContentReq reqContent;
