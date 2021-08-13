@@ -111,18 +111,26 @@ public class doInquiryEmoney extends MbBaseServiceImpl implements MbService  {
 
 					if (request.getId_favorit() == null){
 						try {
+
+//							doinquiryemoneyreq.setSourceAccountNumber(request.getAccount_number());
+//							doinquiryemoneyreq.setSourceAccountName(request.getCustomerName());
+//							doinquiryemoneyreq.setCardno(request.getBillkey1());
+//							doinquiryemoneyreq.setAmount(request.getAmount());
+//							doinquiryemoneyreq.setCardAcceptorTerminal("00307180");
+//							doinquiryemoneyreq.setCurrency("360");
+
 							doinquiryemoneyreq.setCorrelationId(trx_id);
 							doinquiryemoneyreq.setTransactionId(trx_id);
 							doinquiryemoneyreq.setDeliveryChannel("6027");
-							doinquiryemoneyreq.setSourceAccountNumber(request.getAccount_number());
-							doinquiryemoneyreq.setSourceAccountName(request.getCustomerName());
-							doinquiryemoneyreq.setCardNo(request.getBillkey1());
-							doinquiryemoneyreq.setAmount(request.getAmount());
 							doinquiryemoneyreq.setDescription(request.getDescription());
 							doinquiryemoneyreq.setPan(request.getPan());
-							doinquiryemoneyreq.setCardAcceptorTerminal("00307180");
 							doinquiryemoneyreq.setCardAcceptorMerchantId(request.getMsisdn());
-							doinquiryemoneyreq.setCurrency("360");
+							doinquiryemoneyreq.setCustomer_id(request.getCustomer_id());
+							doinquiryemoneyreq.setLanguage(request.getLanguage());
+							doinquiryemoneyreq.setCardno(request.getBillkey1());
+							doinquiryemoneyreq.setAmount(request.getAmount());
+							doinquiryemoneyreq.setAccount_number(request.getAccount_number());
+							doinquiryemoneyreq.setAccount_name(request.getAccount_name());
 
 							System.out.println(new Gson().toJson(doinquiryemoneyreq));
 
@@ -133,22 +141,14 @@ public class doInquiryEmoney extends MbBaseServiceImpl implements MbService  {
 							ResponseEntity<doInquiryEmoneyResp> response = restTemps.exchange(url, HttpMethod.POST, req, doInquiryEmoneyResp.class);
 							doInquiryEmoneyResp doInquiryEmoneyResp = response.getBody();
 
-							System.out.println("::: doInquiry E-Money Microservices Response :::");
 							System.out.println(new Gson().toJson(response.getBody()));
 
-
 							mbApiResp = MbJsonUtil.createResponseTrf(doInquiryEmoneyResp.getResponseCode(),doInquiryEmoneyResp.getResponseMessage(),doInquiryEmoneyResp.getResponseContent(),doInquiryEmoneyResp.getTransactionId());
-
-
-
 						} catch (Exception e) {
-							mbApiResp = MbJsonUtil.createResponseTrf("99",
-									e.toString(),
-									null,"");
+							mbApiResp = MbJsonUtil.createResponseTrf("99", e.toString(), null,"");
 							MbLogUtil.writeLogError(log, "99", e.toString());
 						}
 					}else {
-						// isi pake class request
 						try (Connection con = DriverManager.getConnection(sqlconf);) {
 							Statement stmt;
 							String SQL;
@@ -163,7 +163,7 @@ public class doInquiryEmoney extends MbBaseServiceImpl implements MbService  {
 								doinquiryemoneyreq.setDeliveryChannel("6027");
 								doinquiryemoneyreq.setSourceAccountNumber(request.getAccount_number());
 								doinquiryemoneyreq.setSourceAccountName(request.getCustomerName());
-								doinquiryemoneyreq.setCardNo(request.getBillkey1());
+								doinquiryemoneyreq.setCardno(request.getBillkey1());
 								doinquiryemoneyreq.setAmount(request.getAmount());
 								doinquiryemoneyreq.setDescription(request.getDescription());
 								doinquiryemoneyreq.setPan(request.getPan());
