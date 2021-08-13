@@ -90,9 +90,7 @@ public class MbOnlineTransferServiceImpl extends MbBaseServiceImpl implements Mb
 
     @Value("${tmp.folder}")
     private static String tmp_folder;
-    
-    @Value("${template.mail_notif}")
-    private String templateMailNotif;
+
 
     RestTemplate restTemplate = new RestTemplate();
 
@@ -322,11 +320,52 @@ public class MbOnlineTransferServiceImpl extends MbBaseServiceImpl implements Mb
                 mbApiResp = MbJsonUtil.createResponseTrf(OnlineTrfResp.getResponseCode(),
                         "Success",
                         onlineTrfDispResp, trx_id);
-                
-                LibFunctionUtil.mailNotif(request.getCustomerEmail(),mbApiResp, templateMailNotif, request.getLanguage());
-	       		     
 
-               
+                LibFunctionUtil libFunction = new LibFunctionUtil();
+
+                boolean landscape = false;
+                String template = null;
+                String templateTrf = null;
+                String email;
+
+                email = request.getCustomerEmail();
+
+                if (!service_code.equalsIgnoreCase("0400")) {
+                    BufferedInputStream bis = new BufferedInputStream(new ClassPathResource(templateTRF).getInputStream());
+                    byte[] buffer = new byte[bis.available()];
+                    bis.read(buffer, 0, buffer.length);
+                    bis.close();
+
+                    templateTrf = new String(buffer);
+                    templateTrf = templateTrf.replace("{image}", new ClassPathResource(templateLogo).getURL().toString());
+
+                    templateTrf = templateTrf.replace("{via_atm}", via_atm);
+                    templateTrf = templateTrf.replace("{status}", "BERHASIL");
+
+                    templateTrf = templateTrf.replace("{trans_ref}", OnlineTrfResp.getContent().getcbsRefCode());
+                    templateTrf = templateTrf.replace("{struck}", OnlineTrfResp.getCorrelationId());
+                    templateTrf = templateTrf.replace("{terminal}", TextUtil.maskString(request.getMsisdn(), 0, 8, 'X'));
+                    templateTrf = templateTrf.replace("{date_time}", date_trx);
+
+                    templateTrf = templateTrf.replace("{name}", request.getCustomerName());
+                    templateTrf = templateTrf.replace("{account}", TextUtil.maskString(request.getAccount_number(), 0, 6, 'X'));
+
+                    templateTrf = templateTrf.replace("{payment_id}", DestinationAccountNumber);
+                    templateTrf = templateTrf.replace("{code_name}", BankName);
+                    templateTrf = templateTrf.replace("{beneficiary_name}", inquiryTrfResp.getContent().getDestinationAccountName());
+
+                    templateTrf = templateTrf.replace("{amount}", amount_display);
+                    templateTrf = templateTrf.replace("{description}", request.getDescription());
+
+                    log.info("Customer Email : " + email);
+                    log.info("Transfer Online BSI template was initialized");
+
+                    log.info("Generating content...");
+                    template = templateTrf;
+
+                    libFunction.sendEmailAsync(OnlineTrfResp.getContent().getcbsRefCode(), email, "Transaksi Bank Syariah Indonesia (NON BSI)",
+                            template, template, landscape);
+                }
 
 
             } else {

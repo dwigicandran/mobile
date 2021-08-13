@@ -9,7 +9,6 @@ import com.bsms.restobjclient.base.BaseResponse;
 import com.bsms.service.base.MbBaseServiceImpl;
 import com.bsms.service.base.MbService;
 import com.bsms.service.transfer.MbInquiryOnlineTrfService;
-import com.bsms.util.LibFunctionUtil;
 import com.bsms.util.MbJsonUtil;
 import com.bsms.util.MbLogUtil;
 import com.bsms.util.RestUtil;
@@ -48,9 +47,6 @@ public class doPaymentPurchase extends MbBaseServiceImpl implements MbService {
     private String sqlconf;
 
     private MbApiResp mbApiResp;
-    
-    @Value("${template.mail_notif}")
-    private String templateMailNotif;
 
     private static Logger log = LoggerFactory.getLogger(MbInquiryOnlineTrfService.class);
 
@@ -88,16 +84,12 @@ public class doPaymentPurchase extends MbBaseServiceImpl implements MbService {
                         double d = Double.parseDouble(amount);
                         long amount_convert = (new Double(d)).longValue();
                         trxLimit.LimitUpdate(request.getMsisdn(), request.getCustomerLimitType(), trxType, amount_convert, value, sqlconf);
-                       
-    	    			
                     } catch (Exception e) {
                         e.printStackTrace();
                         log.info("Update transaction limit failed :" + e.getMessage());
                     }
                 }
                 mbApiResp = MbJsonUtil.createResponse(response.getBody());
-                LibFunctionUtil.mailNotif(request.getCustomerEmail(),mbApiResp, templateMailNotif, request.getLanguage());
-                 
             } else {
                 System.out.println("run error");
                 mbApiResp = MbJsonUtil.createPdamPaymentErrorResponse(response.getBody(), request.getLanguage());

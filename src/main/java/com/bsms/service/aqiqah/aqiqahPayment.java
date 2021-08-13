@@ -8,7 +8,6 @@ import com.bsms.restobj.MbApiResp;
 import com.bsms.restobjclient.base.BaseResponse;
 import com.bsms.service.base.MbBaseServiceImpl;
 import com.bsms.service.base.MbService;
-import com.bsms.util.LibFunctionUtil;
 import com.bsms.util.MbJsonUtil;
 import com.bsms.util.MbLogUtil;
 import com.bsms.util.RestUtil;
@@ -42,9 +41,6 @@ public class aqiqahPayment extends MbBaseServiceImpl implements MbService {
 
     @Value("${sql.conf}")
     private String sqlconf;
-    
-    @Value("${template.mail_notif}")
-    private String templateMailNotif;
 
 
     @Override
@@ -90,8 +86,6 @@ public class aqiqahPayment extends MbBaseServiceImpl implements MbService {
                     double d = Double.parseDouble(request.getDenomId());
                     long amount_convert = (new Double(d)).longValue();
                     trxLimit.LimitUpdate(request.getMsisdn(), request.getCustomerLimitType(), trxType, amount_convert, value, sqlconf);
-                    LibFunctionUtil.mailNotif(request.getCustomerEmail(),mbApiResp, templateMailNotif, request.getLanguage());
-       		     
                 } catch (Exception e) {
                     e.printStackTrace();
                     log.info("Update transaction limit failed :" + e.getMessage());

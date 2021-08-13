@@ -28,7 +28,6 @@ import com.bsms.restobjclient.infoERGold.doInfoERGoldResp;
 import com.bsms.service.base.MbBaseServiceImpl;
 import com.bsms.service.base.MbService;
 import com.bsms.service.transfer.MbInquiryOnlineTrfService;
-import com.bsms.util.LibFunctionUtil;
 import com.bsms.util.MbJsonUtil;
 import com.bsms.util.MbLogUtil;
 import com.bsms.util.RestUtil;
@@ -49,9 +48,6 @@ public class MbMabrurOpening extends MbBaseServiceImpl implements MbService  {
     
     @Autowired
     private MbTxLogRepository txLogRepository;
-    
-    @Value("${template.mail_notif}")
-    private String templateMailNotif;
     
     RestTemplate restTemplate = new RestTemplate();
     
@@ -83,12 +79,8 @@ public class MbMabrurOpening extends MbBaseServiceImpl implements MbService  {
 	    			System.out.println("::: doOpeningMabrur Microservices Response :::");
 	    			System.out.println(new Gson().toJson(response.getBody()));
 	    			
-	    			 
 	    			 mbApiResp = MbJsonUtil.createResponseTrf(doOpenAccountResp.getResponseCode(),doOpenAccountResp.getResponseMessage(),
 	    					 doOpenAccountResp.getResponseContent(),doOpenAccountResp.getTransactionId()); 
-	    			 
-	    			 LibFunctionUtil.mailNotif(request.getCustomerEmail(),mbApiResp, templateMailNotif, request.getLanguage());
-		       		    
 	    			
 	    			
 	    			

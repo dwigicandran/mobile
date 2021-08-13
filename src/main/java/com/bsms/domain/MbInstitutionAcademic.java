@@ -14,7 +14,7 @@ import javax.persistence.Table;
 @Data
 public class MbInstitutionAcademic {
 
-	@Id
+    @Id
     @Column(name = "id")
     private int id;
     @Column(name = "name")
@@ -23,5 +23,6 @@ public class MbInstitutionAcademic {
     private String prefix;
     @Column(name = "type")
     private int type;
-	
+
+
 }
