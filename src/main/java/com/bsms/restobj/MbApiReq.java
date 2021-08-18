@@ -242,6 +242,8 @@ public class MbApiReq implements Serializable {
     private String ongkos_cetak_satuan;
     private String ongkos_cetak_total;
     private String total_amount;
+    private String kode_reservasi;
+    private String otp_number;
 
     private Object content;
     private MbApiContentReq reqContent;
