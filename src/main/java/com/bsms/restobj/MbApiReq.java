@@ -22,7 +22,6 @@ public class MbApiReq implements Serializable {
     @JsonProperty("session_id")
     private String sessionId;
     private String session;
-
     private Integer customerLimitType;
     private String reqTime;
     private String reffNum;
@@ -50,7 +49,6 @@ public class MbApiReq implements Serializable {
     private String imei;
     private String language;
     private String menuId;
-
     private String customerId;
     private String osVersion;
     private String device;
@@ -70,7 +68,6 @@ public class MbApiReq implements Serializable {
     private String amount;
     private String description;
     private String stan;
-
     private String caId;
     private String zpkLMK;
     private String msisdn;
@@ -80,14 +77,12 @@ public class MbApiReq implements Serializable {
     private String token;
     private String activationCode;
     private String otp;
-
     private String modulId;
     private String versionName;
     private String ipAddress;
     private String requestType;
     private String versionValue;
     private String iccid;
-
     private String correlation_id;
     private String modul_id;
     private String sub_modul_id;
@@ -114,8 +109,6 @@ public class MbApiReq implements Serializable {
     private String os_type;
     private String version_code;
     private String agent_id;
-
-    //purchase and payment
     private String billkey1;
     private String billKey1;
     private String billkey2;
@@ -126,8 +119,6 @@ public class MbApiReq implements Serializable {
     private String cardno;
     private String transaction_id;
     private String programId;
-
-    //qris
     private String qrcode;
     private String mpan;
     private String merchantName;
@@ -137,8 +128,6 @@ public class MbApiReq implements Serializable {
     private String tips;
     private String feetype;
     private String remark;
-
-    //update emoney
     private String date_time;
     private String seq;
     private String cardAttr;
@@ -153,26 +142,16 @@ public class MbApiReq implements Serializable {
     private String jwt;
     private String apiVersion;
     private String random;
-
-    //infocenter
     private String latitude;
     private String longitude;
-
-    //change email
     private String email;
-
-    //change pin
     private String zpk;
     private String pinoffset;
     private String pin;
     private String newpin;
     private String pan;
-
-    //opening account
     private String zakat;
     private String aopurpose;
-
-    //qurban
     private String supplierId;
     private String denomId;
     private String onBehalf;
@@ -208,7 +187,6 @@ public class MbApiReq implements Serializable {
     private String acctname;
     private String card_no;
     private String card_info;
-
     private String max_usage;
     private String expiry_time;
     private String period;
@@ -242,6 +220,8 @@ public class MbApiReq implements Serializable {
     private String ongkos_cetak_satuan;
     private String ongkos_cetak_total;
     private String total_amount;
+    private String kode_reservasi;
+    private String otp_number;
 
     private Object content;
     private MbApiContentReq reqContent;
