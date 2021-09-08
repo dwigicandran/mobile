@@ -222,6 +222,10 @@ public class MbApiReq implements Serializable {
     private String total_amount;
     private String kode_reservasi;
     private String otp_number;
+    private String noNPWP;
+    private String scopeUpdate;
+    private String imageNPWP;
+    private String rekeningSumber;
 
     private Object content;
     private MbApiContentReq reqContent;
