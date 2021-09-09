@@ -226,6 +226,7 @@ public class MbApiReq implements Serializable {
     private String scopeUpdate;
     private String imageNPWP;
     private String rekeningSumber;
+    private String hargaJual;
 
     private Object content;
     private MbApiContentReq reqContent;
