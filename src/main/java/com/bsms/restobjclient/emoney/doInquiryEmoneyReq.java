@@ -23,7 +23,7 @@ public class doInquiryEmoneyReq implements Serializable {
     private String deliveryChannel;
     private String sourceAccountNumber;
     private String sourceAccountName;
-    private String cardNo;
+    private String cardno;
     private String encryptedPinBlock;
     private String description;
     private String amount;
@@ -35,4 +35,7 @@ public class doInquiryEmoneyReq implements Serializable {
     private String currency;
     private String beneficiaryInstitutionCode;
 
+    private String customer_id;
+    private String account_number;
+    private String account_name;
 }

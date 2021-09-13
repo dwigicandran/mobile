@@ -88,155 +88,160 @@ import com.itextpdf.tool.xml.XMLWorkerHelper;
 public class LibFunctionUtil {
 
 	//========== Email Method Added By Dodo ===================//
-	private static String mailHeaderEn = "Purchase/Payment ";
-	private static String mailHeaderId = "Bayar/Beli ";
+//	private static String mailHeaderEn = "Purchase/Payment ";
+//	private static String mailHeaderId = "Bayar/Beli ";
 
-	 public static void sendEmailAsync(String trans_ref,
-	          String mail_to, String subject, String html_content,
-	          String pdf_content, boolean landscape) {
+	//Header Email Notif ambil dari title dari ResponseContent
 
-	      Thread t = new Thread(new EmailSender(trans_ref, mail_to, subject, html_content, pdf_content,
-	    		  landscape));
-	      t.start();
-	  }
+	public static void sendEmailAsync(String trans_ref,
+									  String mail_to, String subject, String html_content,
+									  String pdf_content, boolean landscape) {
 
-	 private static class EmailSender implements Runnable {
-	        String trans_ref;
-	        String mail_to;
-	        String subject;
-	        String html_content;
-	        String pdf_content;
-	        boolean landscape;
-	        String tmp_folder;
+		Thread t = new Thread(new EmailSender(trans_ref, mail_to, subject, html_content, pdf_content,
+				landscape));
+		t.start();
+	}
 
-	        public EmailSender(String trans_ref,
-	          String mail_to, String subject, String html_content,
-	          String pdf_content, boolean landscape) {
-	            this.trans_ref = trans_ref;
-	            this.mail_to = mail_to;
-	            this.subject = subject;
-	            this.html_content = html_content;
-	            this.pdf_content = pdf_content;
-	            this.landscape = landscape;
+	private static class EmailSender implements Runnable {
+		String trans_ref;
+		String mail_to;
+		String subject;
+		String html_content;
+		String pdf_content;
+		boolean landscape;
+		String tmp_folder;
 
-	        }
+		public EmailSender(String trans_ref,
+						   String mail_to, String subject, String html_content,
+						   String pdf_content, boolean landscape) {
+			this.trans_ref = trans_ref;
+			this.mail_to = mail_to;
+			this.subject = subject;
+			this.html_content = html_content;
+			this.pdf_content = pdf_content;
+			this.landscape = landscape;
 
-	        @Override
-	        public void run() {
-	            try {
-	                SendEmail(trans_ref,
-	                          mail_to,
-	                          subject,
-	                          html_content,
-	                          pdf_content, landscape);
-	            }
-	            catch (Exception e) {
-	            	System.out.println(e.getMessage());
-	            }
-	        }
+		}
 
-	  }
+		@Override
+		public void run() {
+			try {
+				SendEmail(trans_ref,
+						mail_to,
+						subject,
+						html_content,
+						pdf_content, landscape);
+			}
+			catch (Exception e) {
+				System.out.println(e.getMessage());
+			}
+		}
 
-	 public static void SendEmail(String trans_ref,
-	          String mail_to, String subject, String html_content,
-	          String pdf_content, boolean landscape) throws IOException {
+	}
 
-	    String dir_name = "/tmp/" + getDatetime("yyyyMMdd");
+	public static void SendEmail(String trans_ref,
+								 String mail_to, String subject, String html_content,
+								 String pdf_content, boolean landscape) throws IOException {
+
+		String dir_name = "/tmp/" + getDatetime("yyyyMMdd");
 
 
-	    CreateDir(dir_name);
+		CreateDir(dir_name);
 
-	    String file_path = dir_name + "/" + trans_ref + ".pdf";
+		String file_path = dir_name + "/" + trans_ref + ".pdf";
 
-	    try {
+		try {
 
-	      System.out.println("Sending email to: " + mail_to);
+			System.out.println("Sending email to: " + mail_to);
 
-	      Date tempDate = new Date();
+			Date tempDate = new Date();
 
-	      Properties props = new Properties();
-	      props.put("10.250.48.151", "BSM MAIL Server");
-	      props.put("mail.smtp.port", "25");
-	      props.put("mail.smtp.host", "10.250.48.151");
-	      props.put("mail.smtp.auth", "false");
-	      //props.put("mail.smtp.auth", "true");
-	      //props.put("mail.smtp.starttls.enable", true);
-	      props.put("mail.smtp.starttls.enable", false);
-	      props.put("mail.smtp.connectiontimeout", "30000");
-	      props.put("mail.smtp.timeout", "30000");
+			Properties props = new Properties();
+			props.put("10.250.48.151", "BSI MAIL Server");
+			props.put("mail.smtp.port", "25");
+			props.put("mail.smtp.host", "10.250.48.151");
+			props.put("mail.smtp.auth", "false");
+			//props.put("mail.smtp.auth", "true");
+			//props.put("mail.smtp.starttls.enable", true);
+			props.put("mail.smtp.starttls.enable", false);
+			props.put("mail.smtp.connectiontimeout", "30000");
+			props.put("mail.smtp.timeout", "30000");
 
-	      Session session = Session.getInstance(props, null);
-	      session.setDebug(true);
+			Session session = Session.getInstance(props, null);
+			session.setDebug(true);
 
-	      MimeMessage msg = new MimeMessage(session);
+			MimeMessage msg = new MimeMessage(session);
 
-	      msg.setFrom("mobile@syariahmandiri.co.id");
-	      //msg.setRecipients(Message.RecipientType.TO, mail_to);
-	      if (mail_to.contains(","))
-	          msg.setRecipients(Message.RecipientType.TO, InternetAddress.parse(mail_to));
-	      else
-	          msg.setRecipients(Message.RecipientType.TO, mail_to);
-	      msg.setSubject(subject);
-	      msg.setSentDate(new Date());
+			//msg.setFrom("mobile@syariahmandiri.co.id");
+			msg.setFrom("mobile@bankbsi.co.id");
+			//msg.setRecipients(Message.RecipientType.TO, mail_to);
+			if (mail_to.contains(","))
+				msg.setRecipients(Message.RecipientType.TO, InternetAddress.parse(mail_to));
+			else
+				msg.setRecipients(Message.RecipientType.TO, mail_to);
+			msg.setSubject(subject);
+			msg.setSentDate(new Date());
 
 //	      OutputStream pdf_file = new FileOutputStream(new File(file_path));
 
-	     Document document;
-	      if (landscape == true) {
-	        document = new Document(PageSize.LETTER.rotate());
-	      } else {
-	        document = new Document();
-	      }
+			Document document;
+			if (landscape == true) {
+				document = new Document(PageSize.LETTER.rotate());
+			} else {
+				document = new Document();
+			}
 
 //	      PdfWriter.getInstance(document, pdf_file);
 //	      document.open();
 //	      HTMLWorker htmlWorker = new HTMLWorker(document);
 //	      htmlWorker.parse(new StringReader(pdf_content));
 //	      document.close();
-	//
+			//
 //	      pdf_file.close();
 
-	      OutputStream pdf_file = new FileOutputStream(new File(file_path));
-	      PdfWriter writer = PdfWriter.getInstance(document, pdf_file);
-	      writer.setFullCompression();
-	      document.open();
-	      InputStream is = new ByteArrayInputStream(pdf_content.getBytes());
-	      XMLWorkerHelper.getInstance().parseXHtml(writer, document, is);
-	      document.close();
+			OutputStream pdf_file = new FileOutputStream(new File(file_path));
+			PdfWriter writer = PdfWriter.getInstance(document, pdf_file);
+			writer.setFullCompression();
+			document.open();
+			InputStream is = new ByteArrayInputStream(pdf_content.getBytes());
+			XMLWorkerHelper.getInstance().parseXHtml(writer, document, is);
+			document.close();
 
-	      pdf_file.close();
+			pdf_file.close();
 
-	      MimeMultipart multipart = new MimeMultipart("alternative");
-	      MimeBodyPart messageBodyPart = new MimeBodyPart();
-	      messageBodyPart.setContent(html_content, "text/html");
-	      multipart.addBodyPart(messageBodyPart);
+			MimeMultipart multipart = new MimeMultipart("alternative");
+			MimeBodyPart messageBodyPart = new MimeBodyPart();
+			messageBodyPart.setContent(html_content, "text/html");
+			multipart.addBodyPart(messageBodyPart);
 
-	      String fileName = trans_ref + ".pdf";
-	      messageBodyPart = new MimeBodyPart();
-	      DataSource source = new FileDataSource(file_path);
-	      messageBodyPart.setDataHandler(new DataHandler(source));
-	      messageBodyPart.setFileName(fileName);
-	      multipart.addBodyPart(messageBodyPart);
+			String fileName = trans_ref + ".pdf";
+			messageBodyPart = new MimeBodyPart();
+			DataSource source = new FileDataSource(file_path);
+			messageBodyPart.setDataHandler(new DataHandler(source));
+			messageBodyPart.setFileName(fileName);
+			multipart.addBodyPart(messageBodyPart);
 
-	      msg.setContent(multipart);
-	      msg.saveChanges();
+			msg.setContent(multipart);
+			msg.saveChanges();
 
 
-	      Transport.send(msg);
+			Transport.send(msg);
 
-	      tempDate = new Date();
+			tempDate = new Date();
 
-	      //logger.info("Email sent to: " + mail_to + " on " + tempDate);
+			//logger.info("Email sent to: " + mail_to + " on " + tempDate);
 
-	      System.out.println("Email sent to: " + mail_to + " on " + tempDate);
+			System.out.println("Email sent to: " + mail_to + " on " + tempDate);
 
-	    }
-	    catch (Exception e) {
-       	System.out.println(e.getMessage());
-       }
-	  }
+		}
+		catch (Exception e) {
+			System.out.println(e.getMessage());
+		}
+	}
 
-	public static void mailNotif(String mailDest, MbApiResp mbApiResp, String mailTemplate, String lang) {
+	public static void mailNotif(String mailDest, MbApiResp mbApiResp, String mailTemplate,
+								 String lang)
+	{
 		try {
 			boolean landscape = false;
 			String template = null;
@@ -269,12 +274,58 @@ public class LibFunctionUtil {
 				}
 			}
 
-			if (lang.equals("id")) {
-				templateTrf = templateTrf.replace("{header}", mailHeaderId);
-			} else {
-				templateTrf = templateTrf.replace("{header}", mailHeaderEn);
+			templateTrf = templateTrf.replace("{header}", respContent.get("title").getAsString());
+			//templateTrf = templateTrf.replace("{code_name}", respContent.get("title").getAsString());
+			templateTrf = templateTrf.replace("{image}", new ClassPathResource("template/logo.jpg").getURL().toString());
+			templateTrf = templateTrf.replace("{mail_content}", mailContent);
+			templateTrf = templateTrf.replace("{footer}", respContent.get("footer").getAsString());
+			template = templateTrf;
+
+			sendEmailAsync(respContent.get("no").getAsString(), mailDest, "Transaksi Bank Syariah Indonesia " + respContent.get("title").getAsString(),
+					template, template, landscape);
+		} catch (Exception e) {
+			e.printStackTrace();
+			System.out.println("Error mailer : " + e.getMessage());
+		}
+	}
+
+	public static void mailNotif2(String mailDest, Object object, String mailTemplate,
+								  String lang)
+	{
+		try {
+			boolean landscape = false;
+			String template = null;
+			String templateTrf = null;
+
+			System.out.println("template : " + mailTemplate);
+
+			BufferedInputStream bis = new BufferedInputStream(new ClassPathResource(mailTemplate).getInputStream());
+			byte[] buffer = new byte[bis.available()];
+			bis.read(buffer, 0, buffer.length);
+			bis.close();
+
+			templateTrf = new String(buffer);
+
+			JsonObject resp = new JsonParser().parse(new Gson().toJson(object)).getAsJsonObject();
+			JsonObject respContent = resp.get("responseContent").getAsJsonObject();
+			JsonArray content = resp.get("responseContent").getAsJsonObject().get("content").getAsJsonArray();
+
+			String mailContent = "";
+			mailContent += "<tr><td>Transaction No</td><td>" + respContent.get("no").getAsString() + "</td></tr>";
+			mailContent += "<tr><td>Date</td><td>" + respContent.get("date").getAsString() + "</td></tr>";
+			mailContent += "<tr><td colspan='2'><b>" + respContent.get("title").getAsString() + "</b></td></tr>";
+
+			for (int i = 0; i < content.size(); i++) {
+				mailContent += "<tr><td>" + content.get(i).getAsJsonObject().get("key").getAsString() + "</td><td>"
+						+ content.get(i).getAsJsonObject().get("value").getAsString() + "</td></tr>";
+				if (content.get(i).getAsJsonObject().has("desc")) {
+					System.out.println("punya desc");
+					mailContent += "<tr><td></td><td>" + content.get(i).getAsJsonObject().get("desc").getAsString() + "</td></tr>";
+				}
 			}
-			templateTrf = templateTrf.replace("{code_name}", respContent.get("title").getAsString());
+
+			templateTrf = templateTrf.replace("{header}", respContent.get("title").getAsString());
+			//templateTrf = templateTrf.replace("{code_name}", respContent.get("title").getAsString());
 			templateTrf = templateTrf.replace("{image}", new ClassPathResource("template/logo.jpg").getURL().toString());
 			templateTrf = templateTrf.replace("{mail_content}", mailContent);
 			templateTrf = templateTrf.replace("{footer}", respContent.get("footer").getAsString());

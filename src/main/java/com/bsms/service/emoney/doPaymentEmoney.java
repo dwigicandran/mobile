@@ -66,8 +66,8 @@ public class doPaymentEmoney extends MbBaseServiceImpl implements MbService  {
     @Autowired
     private MessageSource msg;
     
-    @Autowired
-    private MbTxLogRepository txLogRepository;
+    @Value("${template.mail_notif}")
+    private String templateMailNotif;
     
     RestTemplate restTemplate = new RestTemplate();
     
@@ -82,72 +82,42 @@ public class doPaymentEmoney extends MbBaseServiceImpl implements MbService  {
 	@Override
 	public MbApiResp process(HttpHeaders header, ContainerRequestContext requestContext, MbApiReq request)
 			throws Exception {
-		
-	    		MbApiTxLog txLog = new MbApiTxLog();	
-	            txLogRepository.save(txLog);
+		System.out.println(new Gson().toJson(request));
 
-				LibFunctionUtil libFunct = new LibFunctionUtil();
-				String trx_id = libFunct.getTransactionID(6);
+		try {
 
-	        	System.out.println("::: doPayment E-Money Microservices Request :::");
-	            System.out.println(new Gson().toJson(request));
+			HttpEntity<?> req = new HttpEntity(request, RestUtil.getHeaders());
+			RestTemplate restTemps = new RestTemplate();
+			String url = doPaymentEMoney;
 
-				doInquiryEmoneyReq doinquiryemoneyreq = new doInquiryEmoneyReq();
+			ResponseEntity<doPaymentEmoneyResp> response = restTemps.exchange(url, HttpMethod.POST, req, doPaymentEmoneyResp.class);
+			doPaymentEmoneyResp doPaymentEmoneyResp = response.getBody();
 
-				doinquiryemoneyreq.setCorrelationId(trx_id);
-				doinquiryemoneyreq.setTransactionId(trx_id);
-				doinquiryemoneyreq.setDeliveryChannel("6027");
-				doinquiryemoneyreq.setSourceAccountNumber(request.getAccount_number());
-				doinquiryemoneyreq.setSourceAccountName(request.getCustomerName());
-				doinquiryemoneyreq.setCardNo(request.getBillkey1());
-				doinquiryemoneyreq.setAmount(request.getAmount());
-				doinquiryemoneyreq.setDescription(request.getDescription());
-				doinquiryemoneyreq.setPan(request.getPan());
-				doinquiryemoneyreq.setCardAcceptorTerminal("00307180");
-				doinquiryemoneyreq.setCardAcceptorMerchantId(request.getMsisdn());
-				doinquiryemoneyreq.setCurrency("360");
+			System.out.println("::: doPayment E-Money Microservices Response :::");
+			System.out.println(new Gson().toJson(response.getBody()));
 
-		System.out.println(new Gson().toJson(doinquiryemoneyreq));
-	            
-	            try {
-	    			
-	            	HttpEntity<?> req = new HttpEntity(doinquiryemoneyreq, RestUtil.getHeaders());
-	            	RestTemplate restTemps = new RestTemplate();
-	            	String url = doPaymentEMoney;
-	            	
-	    			ResponseEntity<doPaymentEmoneyResp> response = restTemps.exchange(url, HttpMethod.POST, req, doPaymentEmoneyResp.class);
-	    			doPaymentEmoneyResp doPaymentEmoneyResp = response.getBody();
-	    			
-	    			System.out.println("::: doPayment E-Money Microservices Response :::");
-	    			System.out.println(new Gson().toJson(response.getBody()));
-	    			
-	    			
-	    			 mbApiResp = MbJsonUtil.createResponseTrf(doPaymentEmoneyResp.getResponseCode(),doPaymentEmoneyResp.getResponseMessage(),doPaymentEmoneyResp.getResponseContent(),doPaymentEmoneyResp.getTransactionId()); 
-	    			
-	    			 if(doPaymentEmoneyResp.getResponseCode().equalsIgnoreCase("00"))
-	    			 {
-	    				 JSONObject value = new JSONObject();
-	    					TrxLimit trxLimit = new TrxLimit();
-	    					int trxType = TrxLimit.EMONEY;
-	    					
-	    				 trxLimit.LimitUpdate(request.getMsisdn(), request.getCustomerLimitType(), 
-	    			        		trxType, Long.parseLong(request.getAmount()), value,sqlconf);
-	    				 //favorit
-	    			 }
-	    			
-	    		} catch (Exception e) {
-	    			mbApiResp = MbJsonUtil.createResponseTrf("99",
-	    					e.toString(),
-	        				null,""); 
-	    			MbLogUtil.writeLogError(log, "99", e.toString());
-	    		}
 
-	            txLog.setResponse(mbApiResp);
-	    		txLogRepository.save(txLog);
-	        
-	        
-	
-		
+			mbApiResp = MbJsonUtil.createResponseTrf(doPaymentEmoneyResp.getResponseCode(),doPaymentEmoneyResp.getResponseMessage(),doPaymentEmoneyResp.getResponseContent(),doPaymentEmoneyResp.getTransactionId());
+
+			if(doPaymentEmoneyResp.getResponseCode().equalsIgnoreCase("00"))
+			{
+				JSONObject value = new JSONObject();
+				TrxLimit trxLimit = new TrxLimit();
+				int trxType = TrxLimit.EMONEY;
+
+				trxLimit.LimitUpdate(request.getMsisdn(), request.getCustomerLimitType(),
+						trxType, Long.parseLong(request.getAmount()), value,sqlconf);
+				LibFunctionUtil.mailNotif(request.getCustomerEmail(),mbApiResp, templateMailNotif, request.getLanguage());
+
+			}
+
+		} catch (Exception e) {
+			mbApiResp = MbJsonUtil.createResponseTrf("99",
+					e.toString(),
+					null,"");
+			MbLogUtil.writeLogError(log, "99", e.toString());
+		}
+
 		return  mbApiResp;
 	}
 

@@ -22,7 +22,6 @@ public class MbApiReq implements Serializable {
     @JsonProperty("session_id")
     private String sessionId;
     private String session;
-
     private Integer customerLimitType;
     private String reqTime;
     private String reffNum;
@@ -50,7 +49,6 @@ public class MbApiReq implements Serializable {
     private String imei;
     private String language;
     private String menuId;
-
     private String customerId;
     private String osVersion;
     private String device;
@@ -70,7 +68,6 @@ public class MbApiReq implements Serializable {
     private String amount;
     private String description;
     private String stan;
-
     private String caId;
     private String zpkLMK;
     private String msisdn;
@@ -80,14 +77,12 @@ public class MbApiReq implements Serializable {
     private String token;
     private String activationCode;
     private String otp;
-
     private String modulId;
     private String versionName;
     private String ipAddress;
     private String requestType;
     private String versionValue;
     private String iccid;
-
     private String correlation_id;
     private String modul_id;
     private String sub_modul_id;
@@ -114,8 +109,6 @@ public class MbApiReq implements Serializable {
     private String os_type;
     private String version_code;
     private String agent_id;
-
-    //purchase and payment
     private String billkey1;
     private String billKey1;
     private String billkey2;
@@ -126,8 +119,6 @@ public class MbApiReq implements Serializable {
     private String cardno;
     private String transaction_id;
     private String programId;
-
-    //qris
     private String qrcode;
     private String mpan;
     private String merchantName;
@@ -137,8 +128,6 @@ public class MbApiReq implements Serializable {
     private String tips;
     private String feetype;
     private String remark;
-
-    //update emoney
     private String date_time;
     private String seq;
     private String cardAttr;
@@ -153,65 +142,37 @@ public class MbApiReq implements Serializable {
     private String jwt;
     private String apiVersion;
     private String random;
-
-    //infocenter
     private String latitude;
     private String longitude;
-
-    //change email
     private String email;
-
-    //change pin
     private String zpk;
     private String pinoffset;
     private String pin;
     private String newpin;
     private String pan;
-
-    //opening account
     private String zakat;
     private String aopurpose;
-
-    //qurban
     private String supplierId;
     private String denomId;
     private String onBehalf;
     private String phoneNumber;
-
-    //umrah dan haji
     private String payment_type;
     private String payment_id;
-
-    //card block
     private String card_type;
-
-    //wakaf
     private String wakaf_type;
     private String nazhir_id;
-
-    //portofolio
     private String info_type;
     private String cif;
-
-    //setting
     private String prefix;
-
-    //inbox notif
     private String nid;
     private String msgtype;
     private String mid;
     private String gmid;
     private String flag;
-
-    //PDAM
     private String bcList;
     private String serviceId;
-
-    //institution
     private String pay_code;
     private String category;
-
-    //acop autosave
     private String flow_id;
     private String autosavetype;
     private String target_amount;
@@ -226,7 +187,6 @@ public class MbApiReq implements Serializable {
     private String acctname;
     private String card_no;
     private String card_info;
-
     private String max_usage;
     private String expiry_time;
     private String period;
@@ -235,6 +195,33 @@ public class MbApiReq implements Serializable {
     private String arooption;
     private String deposito_setting;
     private String acctno;
+    private String npwp;
+    private String nominal;
+    private String berat_emas;
+    private String jenis_satuan;
+    private String no_npwp;
+    private String image_npwp;
+    private String gold_account;
+    private String harga_beli;
+    private String harga_jual;
+    private String total_transaksi;
+    private String pph;
+    private String gold_acc_source;
+    private String gold_acc_destination;
+    private String berita_transfer;
+    private String account_destination;
+    private String jenis_kepingan;
+    private String jumlah_kepingan;
+    private String metode_pengiriman;
+    private String lokasi_pengiriman;
+    private String branch_code;
+    private String date_start;
+    private String date_end;
+    private String ongkos_cetak_satuan;
+    private String ongkos_cetak_total;
+    private String total_amount;
+    private String kode_reservasi;
+    private String otp_number;
 
     private Object content;
     private MbApiContentReq reqContent;
