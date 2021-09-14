@@ -52,68 +52,67 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 
 @Service("doInquiryEMoney")
-public class doInquiryEmoney extends MbBaseServiceImpl implements MbService  {
+public class doInquiryEmoney extends MbBaseServiceImpl implements MbService {
 	@Value("${sql.conf}")
 	private String sqlconf;
-	
+
 	@Value("${emoney.doInquiry}")
-    private String doInquiryEmoney;
-	
+	private String doInquiryEmoney;
+
 	@Autowired
-    private ObjectMapper objMapper;
+	private ObjectMapper objMapper;
 
-    @Autowired
-    private MessageSource msg;
-    
-    @Autowired
-    private MbTxLogRepository txLogRepository;
-    
-    RestTemplate restTemplate = new RestTemplate();
-    
-    MbApiResp mbApiResp;
+	@Autowired
+	private MessageSource msg;
 
-    ResponseEntity<InquiryTrfResp> response;
-    
-    Client client = ClientBuilder.newClient();
-	
-    private static Logger log = LoggerFactory.getLogger(MbInquiryOnlineTrfService.class);
-    
+	@Autowired
+	private MbTxLogRepository txLogRepository;
+
+	RestTemplate restTemplate = new RestTemplate();
+
+	MbApiResp mbApiResp;
+
+	ResponseEntity<InquiryTrfResp> response;
+
+	Client client = ClientBuilder.newClient();
+
+	private static Logger log = LoggerFactory.getLogger(MbInquiryOnlineTrfService.class);
+
 	@Override
 	public MbApiResp process(HttpHeaders header, ContainerRequestContext requestContext, MbApiReq request)
 			throws Exception {
 
-				LibFunctionUtil libFunct = new LibFunctionUtil();
-				String trx_id = libFunct.getTransactionID(6);
+		LibFunctionUtil libFunct = new LibFunctionUtil();
+		String trx_id = libFunct.getTransactionID(6);
 
-	    		MbApiTxLog txLog = new MbApiTxLog();	
-	            txLogRepository.save(txLog);
+		MbApiTxLog txLog = new MbApiTxLog();
+		txLogRepository.save(txLog);
 
-	          //=============== cek limit ================//
-	            String response_msg=null;
-	            
-				JSONObject value = new JSONObject();
-				TrxLimit trxLimit = new TrxLimit();
-				int trxType = TrxLimit.EMONEY;
-				
-//		        String response_code = trxLimit.checkLimit(request.getMsisdn(), request.getCustomerLimitType(), 
-//		        		trxType, Long.parseLong(request.getAmount()), value,sqlconf);
-		        
-		        String response_code = checklimitTransaction(request.getAmount(), request.getCustomerLimitType(), 
-		        		request.getMsisdn(), TrxLimit.EMONEY, request.getLanguage());
-		        
-		        System.out.println("RC Check Limit : "+response_code);
-		        
-		        if ("00".equals(response_code)) 
-		        {
-		        	System.out.println("::: doInquiry E-Money Microservices Request :::");
-		            System.out.println(new Gson().toJson(request));
+		// =============== cek limit ================//
+		String response_msg = null;
 
-					doInquiryEmoneyReq doinquiryemoneyreq = new doInquiryEmoneyReq();
+		JSONObject value = new JSONObject();
+		TrxLimit trxLimit = new TrxLimit();
+		int trxType = TrxLimit.EMONEY;
 
-					System.out.println("ID Favorit : " + request.getId_favorit());
+//		String response_code = trxLimit.checkLimit(request.getMsisdn(), request.getCustomerLimitType(), trxType,
+//				Long.parseLong(request.getAmount()), value, sqlconf);
 
-					if (request.getId_favorit() == null){
-						try {
+		String response_code = checklimitTransaction(request.getAmount(), request.getCustomerLimitType(),
+				request.getMsisdn(), trxType, request.getLanguage());
+		
+		System.out.println("RC Check Limit : " + response_code);
+
+		if ("00".equals(response_code)) {
+			System.out.println("::: doInquiry E-Money Microservices Request :::");
+			System.out.println(new Gson().toJson(request));
+
+			doInquiryEmoneyReq doinquiryemoneyreq = new doInquiryEmoneyReq();
+
+			System.out.println("ID Favorit : " + request.getId_favorit());
+
+			if (request.getId_favorit() == null) {
+				try {
 
 //							doinquiryemoneyreq.setSourceAccountNumber(request.getAccount_number());
 //							doinquiryemoneyreq.setSourceAccountName(request.getCustomerName());
@@ -122,162 +121,121 @@ public class doInquiryEmoney extends MbBaseServiceImpl implements MbService  {
 //							doinquiryemoneyreq.setCardAcceptorTerminal("00307180");
 //							doinquiryemoneyreq.setCurrency("360");
 
-							doinquiryemoneyreq.setCorrelationId(trx_id);
-							doinquiryemoneyreq.setTransactionId(trx_id);
-							doinquiryemoneyreq.setDeliveryChannel("6027");
-							doinquiryemoneyreq.setDescription(request.getDescription());
-							doinquiryemoneyreq.setPan(request.getPan());
-							doinquiryemoneyreq.setCardAcceptorMerchantId(request.getMsisdn());
-							doinquiryemoneyreq.setCustomer_id(request.getCustomer_id());
-							doinquiryemoneyreq.setLanguage(request.getLanguage());
-							doinquiryemoneyreq.setCardno(request.getBillkey1());
-							doinquiryemoneyreq.setAmount(request.getAmount());
-							doinquiryemoneyreq.setAccount_number(request.getAccount_number());
-							doinquiryemoneyreq.setAccount_name(request.getAccount_name());
-
-							System.out.println(new Gson().toJson(doinquiryemoneyreq));
-
-							HttpEntity<?> req = new HttpEntity(doinquiryemoneyreq, RestUtil.getHeaders());
-							RestTemplate restTemps = new RestTemplate();
-							String url = doInquiryEmoney;
-
-							ResponseEntity<doInquiryEmoneyResp> response = restTemps.exchange(url, HttpMethod.POST, req, doInquiryEmoneyResp.class);
-							doInquiryEmoneyResp doInquiryEmoneyResp = response.getBody();
-
-							System.out.println(new Gson().toJson(response.getBody()));
-
-							mbApiResp = MbJsonUtil.createResponseTrf(doInquiryEmoneyResp.getResponseCode(),doInquiryEmoneyResp.getResponseMessage(),doInquiryEmoneyResp.getResponseContent(),doInquiryEmoneyResp.getTransactionId());
-						} catch (Exception e) {
-							mbApiResp = MbJsonUtil.createResponseTrf("99", e.toString(), null,"");
-							MbLogUtil.writeLogError(log, "99", e.toString());
-						}
-					}else {
-						try (Connection con = DriverManager.getConnection(sqlconf);) {
-							Statement stmt;
-							String SQL;
-
-							//============================= check favorite exist or no =================//
-							stmt = con.createStatement();
-							SQL = "SELECT * from Favorite where id_fav='" + request.getId_favorit() + "'";
-							ResultSet rs = stmt.executeQuery(SQL);
-
-								doinquiryemoneyreq.setCorrelationId(trx_id);
-								doinquiryemoneyreq.setTransactionId(trx_id);
-								doinquiryemoneyreq.setDeliveryChannel("6027");
-								doinquiryemoneyreq.setSourceAccountNumber(request.getAccount_number());
-								doinquiryemoneyreq.setSourceAccountName(request.getCustomerName());
-								doinquiryemoneyreq.setCardno(request.getBillkey1());
-								doinquiryemoneyreq.setAmount(request.getAmount());
-								doinquiryemoneyreq.setDescription(request.getDescription());
-								doinquiryemoneyreq.setPan(request.getPan());
-								doinquiryemoneyreq.setCardAcceptorTerminal("00307180");
-								doinquiryemoneyreq.setCardAcceptorMerchantId(request.getMsisdn());
-								doinquiryemoneyreq.setCurrency("360");
-
-							con.close();
-
-						}catch (SQLException e) {
-
-							MbLogUtil.writeLogError(log, e, e.toString());
-
-							mbApiResp = MbJsonUtil.createResponseTrf("99",
-									"Inquiry Transfer Failed",
-									null, "");
-						}
-					}
+					doinquiryemoneyreq.setCorrelationId(trx_id);
+					doinquiryemoneyreq.setTransactionId(trx_id);
+					doinquiryemoneyreq.setDeliveryChannel("6027");
+					doinquiryemoneyreq.setDescription(request.getDescription());
+					doinquiryemoneyreq.setPan(request.getPan());
+					doinquiryemoneyreq.setCardAcceptorMerchantId(request.getMsisdn());
+					doinquiryemoneyreq.setCustomer_id(request.getCustomer_id());
+					doinquiryemoneyreq.setLanguage(request.getLanguage());
+					doinquiryemoneyreq.setCardno(request.getBillkey1());
+					doinquiryemoneyreq.setAmount(request.getAmount());
+					doinquiryemoneyreq.setAccount_number(request.getAccount_number());
+					doinquiryemoneyreq.setAccount_name(request.getAccount_name());
 
 					System.out.println(new Gson().toJson(doinquiryemoneyreq));
 
-					try {
+					HttpEntity<?> req = new HttpEntity(doinquiryemoneyreq, RestUtil.getHeaders());
+					RestTemplate restTemps = new RestTemplate();
+					String url = doInquiryEmoney;
 
-						HttpEntity<?> req = new HttpEntity(doinquiryemoneyreq, RestUtil.getHeaders());
-						RestTemplate restTemps = new RestTemplate();
-						String url = doInquiryEmoney;
+					ResponseEntity<doInquiryEmoneyResp> response = restTemps.exchange(url, HttpMethod.POST, req,
+							doInquiryEmoneyResp.class);
+					doInquiryEmoneyResp doInquiryEmoneyResp = response.getBody();
 
-						ResponseEntity<doInquiryEmoneyResp> response = restTemps.exchange(url, HttpMethod.POST, req, doInquiryEmoneyResp.class);
-						doInquiryEmoneyResp doInquiryEmoneyResp = response.getBody();
+					System.out.println(new Gson().toJson(response.getBody()));
 
-						System.out.println("::: doInquiry E-Money Microservices Response :::");
-						System.out.println(new Gson().toJson(response.getBody()));
-
-
-						mbApiResp = MbJsonUtil.createResponseTrf(doInquiryEmoneyResp.getResponseCode(),doInquiryEmoneyResp.getResponseMessage(),doInquiryEmoneyResp.getResponseContent(),doInquiryEmoneyResp.getTransactionId());
-
-
-
-					} catch (Exception e) {
-						mbApiResp = MbJsonUtil.createResponseTrf("99",
-								e.toString(),
-								null,"");
-						MbLogUtil.writeLogError(log, "99", e.toString());
-					}
-
+					mbApiResp = MbJsonUtil.createResponseTrf(doInquiryEmoneyResp.getResponseCode(),
+							doInquiryEmoneyResp.getResponseMessage(), doInquiryEmoneyResp.getResponseContent(),
+							doInquiryEmoneyResp.getTransactionId());
+				} catch (Exception e) {
+					mbApiResp = MbJsonUtil.createResponseTrf("99", e.toString(), null, "");
+					MbLogUtil.writeLogError(log, "99", e.toString());
 				}
-else if ("01".equals(response_code)) {
-		            
-		        	if(request.getLanguage().equalsIgnoreCase("en"))    		
-		        	{
-		        		response_msg = "You cannot do financial transactions.\nPlease come to our branch to activate it.";
-		                mbApiResp = MbJsonUtil.createResponseTrf("01",
-		                		response_msg,
-		        				null,""); 
-		        	}
-		        	else
-		        	{
-		        		response_msg = "Anda belum bisa melakukan transaksi finansial.\nSilahkan datang ke cabang untuk mengaktifkannya.";
-		                mbApiResp = MbJsonUtil.createResponseTrf("01",
-		                		response_msg,
-		        				null,""); 
-		        	}
-		        	
-		        	
-		            
-		        }
-		        else if ("02".equals(response_code)) {
-		          
-		        	if(request.getLanguage().equalsIgnoreCase("en"))    		
-		        	{
-		        		response_msg = "Your transaction has exceeded the limit.";
-		                mbApiResp = MbJsonUtil.createResponseTrf("02",
-		                		response_msg,
-		        				null,""); 
-		        	}
-		        	else
-		        	{
-		        		response_msg = "Transaksi Anda melebihi limit.";
-		                mbApiResp = MbJsonUtil.createResponseTrf("02",
-		                		response_msg,
-		        				null,""); 
-		        	}
-		        	
-		           
-		        }
-		        else
-		        {
-		        	
-		        	if(request.getLanguage().equalsIgnoreCase("en"))    		
-		        	{
-		        		mbApiResp = MbJsonUtil.createResponseTrf("03",
-								"Limit Check Failed",
-			    				null,""); 
-		        	}
-		        	else
-		        	{
-		        		mbApiResp = MbJsonUtil.createResponseTrf("03",
-								"Check Limit Gagal",
-			    				null,""); 
-		        	}
-		        	
-		        }
-	        	
+			} else {
+				try (Connection con = DriverManager.getConnection(sqlconf);) {
+					Statement stmt;
+					String SQL;
 
-	            txLog.setResponse(mbApiResp);
-	    		txLogRepository.save(txLog);
-	        
-	        
-	
-		
-		return  mbApiResp;
+					// ============================= check favorite exist or no =================//
+					stmt = con.createStatement();
+					SQL = "SELECT * from Favorite where id_fav='" + request.getId_favorit() + "'";
+					ResultSet rs = stmt.executeQuery(SQL);
+
+					doinquiryemoneyreq.setCorrelationId(trx_id);
+					doinquiryemoneyreq.setTransactionId(trx_id);
+					doinquiryemoneyreq.setDeliveryChannel("6027");
+					doinquiryemoneyreq.setSourceAccountNumber(request.getAccount_number());
+					doinquiryemoneyreq.setSourceAccountName(request.getCustomerName());
+					doinquiryemoneyreq.setCardno(request.getBillkey1());
+					doinquiryemoneyreq.setAmount(request.getAmount());
+					doinquiryemoneyreq.setDescription(request.getDescription());
+					doinquiryemoneyreq.setPan(request.getPan());
+					doinquiryemoneyreq.setCardAcceptorTerminal("00307180");
+					doinquiryemoneyreq.setCardAcceptorMerchantId(request.getMsisdn());
+					doinquiryemoneyreq.setCurrency("360");
+
+					con.close();
+
+				} catch (SQLException e) {
+					MbLogUtil.writeLogError(log, e, e.toString());
+					mbApiResp = MbJsonUtil.createResponseTrf("99", "Inquiry Transfer Failed", null, "");
+				}
+			}
+
+			System.out.println(new Gson().toJson(doinquiryemoneyreq));
+
+			try {
+				HttpEntity<?> req = new HttpEntity(doinquiryemoneyreq, RestUtil.getHeaders());
+				RestTemplate restTemps = new RestTemplate();
+				String url = doInquiryEmoney;
+
+				ResponseEntity<doInquiryEmoneyResp> response = restTemps.exchange(url, HttpMethod.POST, req,
+						doInquiryEmoneyResp.class);
+				doInquiryEmoneyResp doInquiryEmoneyResp = response.getBody();
+
+				System.out.println("::: doInquiry E-Money Microservices Response :::");
+				System.out.println(new Gson().toJson(response.getBody()));
+
+				mbApiResp = MbJsonUtil.createResponseTrf(doInquiryEmoneyResp.getResponseCode(),
+						doInquiryEmoneyResp.getResponseMessage(), doInquiryEmoneyResp.getResponseContent(),
+						doInquiryEmoneyResp.getTransactionId());
+			} catch (Exception e) {
+				mbApiResp = MbJsonUtil.createResponseTrf("99", e.toString(), null, "");
+				MbLogUtil.writeLogError(log, "99", e.toString());
+			}
+
+		} else if ("01".equals(response_code)) {
+
+			if (request.getLanguage().equalsIgnoreCase("en")) {
+				response_msg = "You cannot do financial transactions.\nPlease come to our branch to activate it.";
+				mbApiResp = MbJsonUtil.createResponseTrf("01", response_msg, null, "");
+			} else {
+				response_msg = "Anda belum bisa melakukan transaksi finansial.\nSilahkan datang ke cabang untuk mengaktifkannya.";
+				mbApiResp = MbJsonUtil.createResponseTrf("01", response_msg, null, "");
+			}
+		} else if ("02".equals(response_code)) {
+
+			if (request.getLanguage().equalsIgnoreCase("en")) {
+				response_msg = "Your transaction has exceeded the limit.";
+				mbApiResp = MbJsonUtil.createResponseTrf("02", response_msg, null, "");
+			} else {
+				response_msg = "Transaksi Anda melebihi limit.";
+				mbApiResp = MbJsonUtil.createResponseTrf("02", response_msg, null, "");
+			}
+		} else {
+			if (request.getLanguage().equalsIgnoreCase("en")) {
+				mbApiResp = MbJsonUtil.createResponseTrf("03", "Limit Check Failed", null, "");
+			} else {
+				mbApiResp = MbJsonUtil.createResponseTrf("03", "Check Limit Gagal", null, "");
+			}
+
+		}
+		txLog.setResponse(mbApiResp);
+		txLogRepository.save(txLog);
+
+		return mbApiResp;
 	}
 
 }
