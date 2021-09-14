@@ -22,4 +22,9 @@ public class MbDateFormatUtil {
 		return dateFormat.format(date);
 	}
 	
+	public static String dateTime() {
+		String dateTimeFormat = new SimpleDateFormat("yyyyMMddHHmmss").format(new Date());
+		return dateTimeFormat;
+	}
+	
 }

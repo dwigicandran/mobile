@@ -49,6 +49,12 @@ public class MbApiResp implements Serializable {
     private MbApiStatusResp respStatus;
     private PINKeyResp pinKeyResp;
     private ActivationResp activationResp;
+    
+    private String code;
+    private String respTime;
+
+    @JsonInclude(JsonInclude.Include.NON_NULL) private String trxId;
+    @JsonInclude(JsonInclude.Include.NON_NULL) private String trxDateTime;
 
     //setting
     private String rc;

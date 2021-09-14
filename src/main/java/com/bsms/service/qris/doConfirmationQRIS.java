@@ -97,8 +97,12 @@ public class doConfirmationQRIS extends MbBaseServiceImpl implements MbService {
         double d = QRISAmount + QRISTips; //check limits with tips
         long amount_convert = (new Double(d)).longValue(); //129
 
-        String response_code = trxLimit.checkLimit(request.getMsisdn(), request.getCustomerLimitType(),
-                trxType, amount_convert, value, sqlconf);
+//        String response_code = trxLimit.checkLimit(request.getMsisdn(), request.getCustomerLimitType(),
+//                trxType, amount_convert, value, sqlconf);
+        
+        String trxAmt=String.valueOf(d);  
+        String response_code = checklimitTransaction(trxAmt, request.getCustomerLimitType(), 
+        		request.getMsisdn(), TrxLimit.QRIS, request.getLanguage());
 
         System.out.println("RC Check Limit : " + response_code);
 
