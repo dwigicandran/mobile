@@ -1,6 +1,7 @@
 package com.bsms.service.base;
 
 import java.math.BigDecimal;
+import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Optional;
@@ -23,6 +24,7 @@ import com.bsms.repository.MbTxLogRepository;
 import com.bsms.restobj.MbApiStatusResp;
 import com.bsms.util.MbErrorUtil;
 
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -128,5 +130,36 @@ public class MbBaseServiceImpl {
         }
         return result;
     }
-    
+
+    public String updLimitTrx(String msisdn, Integer customerType, Integer trxType, Long trxAmount) {
+        String result = "00";
+        Calendar calTrxDate = Calendar.getInstance();
+        Date trxDate = calTrxDate.getTime();
+
+        BigDecimal sum;
+        BigDecimal lastAmount = BigDecimal.ZERO;
+        BigDecimal trxAmt = new BigDecimal(trxAmount);
+
+        Optional<MbLimitTracking> mbLimitTracking = limitTrackingRepository.findByMsisdnAndTrxType(msisdn, trxType);
+        if(mbLimitTracking.isPresent()) {
+            Calendar calLastTrxDate = Calendar.getInstance();
+            calLastTrxDate.setTime((Date) mbLimitTracking.get().getLastTrxDate());
+            if (calLastTrxDate.get(Calendar.DATE) == calTrxDate.get(Calendar.DATE) &&
+                    calLastTrxDate.get(Calendar.MONTH) == calTrxDate.get(Calendar.MONTH) &&
+                    calLastTrxDate.get(Calendar.YEAR) == calTrxDate.get(Calendar.YEAR)) {
+                lastAmount = new BigDecimal(mbLimitTracking.get().getTotalAmount());
+            }
+            sum = trxAmt.add(lastAmount);
+            limitTrackingRepository.updateLimit(mbLimitTracking.get().getLastTrxDate(), String.valueOf(sum),
+                    msisdn, trxType);
+        } else {
+            MbLimitTracking limitTrackingInsert = new MbLimitTracking();
+            limitTrackingInsert.setMsisdn(msisdn);
+            limitTrackingInsert.setTrxType(trxType);
+            limitTrackingInsert.setLastTrxDate(new Timestamp(trxDate.getTime()));
+            limitTrackingInsert.setTotalAmount(String.valueOf(trxAmt));
+            limitTrackingRepository.save(limitTrackingInsert);
+        }
+        return result;
+    }
 }
