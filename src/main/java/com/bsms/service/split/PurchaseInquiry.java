@@ -151,6 +151,7 @@ public class PurchaseInquiry extends MbBaseServiceImpl implements MbService {
                 mbApiResp = MbJsonUtil.createErrResponse(response.getBody());
             }
         } catch (Exception e) {
+            log.error("error", e);
             String errorDefault = e.getCause().getMessage() + errorDefaultId;
             if (request.getLanguage().equals("en")) {
                 errorDefault = e.getCause().getMessage() + errorDefaultEn;
@@ -183,6 +184,12 @@ public class PurchaseInquiry extends MbBaseServiceImpl implements MbService {
                 || billerId.equalsIgnoreCase("6061")
                 //if kita bisa
                 || billerId.equalsIgnoreCase("6066")
+                //if bhinneka
+                || billerId.equalsIgnoreCase("6027")
+                //if Bumdes
+                || billerId.equalsIgnoreCase("6070")
+                //if ASDP Ferizy
+                || billerId.equalsIgnoreCase("6136")
             ) {
                 url = switcherInquiryUrl;
             } else {
