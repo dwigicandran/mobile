@@ -64,7 +64,7 @@ public class OdcInquiry extends MbBaseServiceImpl implements MbService {
             Integer custType = request.getCustomerLimitType();
             BigDecimal trxAmount = new BigDecimal(request.getAmount());
 
-            String limitResponse = checklimitTransaction(request.getAmount(), request.getCustomerLimitType(), request.getMsisdn(), TrxLimit.PURCHASE);
+            String limitResponse = checklimitTransaction(request.getAmount(), request.getCustomerLimitType(), request.getMsisdn(), TrxLimit.PURCHASE, request.getLanguage());
 //            String limitResponse = TrxLimit.checkTransLimit(request.getAmount(), request.getCustomerLimitType(), request.getMsisdn(), TrxLimit.PURCHASE, sqlconf);
             System.out.println("Limit Response : " + limitResponse);
 

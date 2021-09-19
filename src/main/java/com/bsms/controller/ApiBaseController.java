@@ -10,6 +10,7 @@ import javax.ws.rs.core.Response.ResponseBuilder;
 
 import com.bsms.util.RestUtil;
 import com.google.gson.Gson;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +23,7 @@ import org.springframework.stereotype.Component;
 
 import com.bsms.domain.ErrorMessage;
 import com.bsms.domain.MbAppContent;
+import com.bsms.except.CustomException;
 import com.bsms.except.MbServiceException;
 import com.bsms.profile.CardMapping;
 import com.bsms.profile.Customer;
@@ -152,7 +154,10 @@ public class ApiBaseController {
 
         } catch (MbServiceException e) {
             throw createException(e, request);
-
+        } catch (CustomException customException){
+        	log.error(serviceName+" AppException with error code: "+customException.getCode()+" message: "+customException.getDescription());
+        	customException.printStackTrace();            
+            response = MbJsonUtil.createJsonParseExceptionResponse(customException, customException.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
             String lang = request.getLanguage() != null ? request.getLanguage() : "en";

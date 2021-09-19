@@ -2,10 +2,7 @@ package com.bsms.domain;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.util.Date;
 
 @Entity
@@ -13,6 +10,7 @@ import java.util.Date;
 public class MbLimitTracking {
 
     @Id
+    @GeneratedValue(strategy=GenerationType.IDENTITY)
     @JsonProperty("id")
     private Long id;
     @Column(name = "msisdn")

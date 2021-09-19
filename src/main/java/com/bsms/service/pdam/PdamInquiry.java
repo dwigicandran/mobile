@@ -65,7 +65,11 @@ public class PdamInquiry extends MbBaseServiceImpl implements MbService {
 
             BaseResponse paymentInquiryResp = restResponse.getBody();
             if (paymentInquiryResp.getResponseCode().equals("00")) {
-                String limitResponse = checkLimit(restResponse.getBody().getAmount(), request.getCustomerLimitType(), request.getMsisdn(), TrxLimit.PAYMENT);
+//                String limitResponse = checkLimit(restResponse.getBody().getAmount(), request.getCustomerLimitType(), request.getMsisdn(), TrxLimit.PAYMENT);
+                
+                String limitResponse = checklimitTransaction(restResponse.getBody().getAmount(), request.getCustomerLimitType(), 
+                		request.getMsisdn(), TrxLimit.PAYMENT, request.getLanguage());
+                
                 System.out.println("Limit Response : " + limitResponse);
 
                 if (limitResponse.equalsIgnoreCase("01")) {

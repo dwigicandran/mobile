@@ -47,12 +47,7 @@ public class aqiqahInquiry extends MbBaseServiceImpl implements MbService {
     public MbApiResp process(HttpHeaders header, ContainerRequestContext requestContext, MbApiReq request) throws Exception {
         MbApiTxLog txLog = new MbApiTxLog();
 
-        log.info("::: doInquiryUrl aqiqah Request RUN :::");
         log.info(new Gson().toJson(request));
-
-        JSONObject value = new JSONObject();
-        TrxLimit trxLimit = new TrxLimit();
-        int trxType = TrxLimit.PURCHASE;
 
         String limitResponseCode = null;
         String response_msg = null;
@@ -65,11 +60,14 @@ public class aqiqahInquiry extends MbBaseServiceImpl implements MbService {
         try {
             double aqiqahAmount = Double.parseDouble(request.getDenomId()); //transaction amount
             long amount_convert = (new Double(aqiqahAmount)).longValue(); //129
-            limitResponseCode = trxLimit.checkLimit(request.getMsisdn(), request.getCustomerLimitType(), trxType, amount_convert, value, sqlconf);
+//            limitResponseCode = trxLimit.checkLimit(request.getMsisdn(), request.getCustomerLimitType(), trxType, amount_convert, value, sqlconf);
             log.info("Aqiqah amount limit check response : " + limitResponseCode);
         } catch (Exception e) {
             log.info("Limit Check Error : " + e.getMessage());
         }
+        
+        limitResponseCode = checklimitTransaction(request.getDenomId(), request.getCustomerLimitType(), 
+        		request.getMsisdn(), TrxLimit.PURCHASE, request.getLanguage());
 
         if ("00".equals(limitResponseCode)) {
             try {
