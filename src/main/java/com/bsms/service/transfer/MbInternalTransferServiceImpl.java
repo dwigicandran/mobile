@@ -211,9 +211,8 @@ public class MbInternalTransferServiceImpl extends MbBaseServiceImpl implements 
                 JSONObject value = new JSONObject();
                 TrxLimit trxLimit = new TrxLimit();
                 int trxType = TrxLimit.TRANSFER;
-
-                trxLimit.LimitUpdate(request.getMsisdn(), request.getCustomerLimitType(),
-                        trxType, Long.parseLong(request.getAmount()), value, sqlconf);
+                updLimitTrx(request.getMsisdn(), request.getCustomerLimitType(),
+                        trxType, Long.parseLong(request.getAmount()));
 
                 amount = Double.parseDouble(request.getAmount());
                 amount_display = libFunct.formatIDRCurrency(amount);
