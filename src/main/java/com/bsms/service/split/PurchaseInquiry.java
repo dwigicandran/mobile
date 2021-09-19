@@ -134,9 +134,7 @@ public class PurchaseInquiry extends MbBaseServiceImpl implements MbService {
             BaseResponse paymentInquiryResp = response.getBody();
             if (paymentInquiryResp.getResponseCode().equals("00")) {
                 int trxType = request.getModul_id().equalsIgnoreCase("PU") ? TrxLimit.PURCHASE : TrxLimit.PAYMENT;
-//                String limitResponse = checkLimit(response.getBody().getAmount(), request.getCustomerLimitType(), request.getMsisdn(), trxType);
-                String limitResponse = checklimitTransaction(response.getBody().getAmount(), request.getCustomerLimitType(), 
-                		request.getMsisdn(), trxType, request.getLanguage());
+                String limitResponse = checkLimit(response.getBody().getAmount(), request.getCustomerLimitType(), request.getMsisdn(), trxType);
                 String response_msg = "";
 
                 if (limitResponse.equalsIgnoreCase("01")) {
@@ -153,6 +151,7 @@ public class PurchaseInquiry extends MbBaseServiceImpl implements MbService {
                 mbApiResp = MbJsonUtil.createErrResponse(response.getBody());
             }
         } catch (Exception e) {
+            log.error("error", e);
             String errorDefault = e.getCause().getMessage() + errorDefaultId;
             if (request.getLanguage().equals("en")) {
                 errorDefault = e.getCause().getMessage() + errorDefaultEn;
@@ -176,15 +175,21 @@ public class PurchaseInquiry extends MbBaseServiceImpl implements MbService {
 
             if (
                 //if indiehome
-                billerId.equalsIgnoreCase("0902") || billerId.equalsIgnoreCase("6050")
-                //if doku
-                || billerId.equalsIgnoreCase("6059")
-                //if ziswaf sharing
-                || billerId.equalsIgnoreCase("6060")
-                //if dompet dhuafa
-                || billerId.equalsIgnoreCase("6061")
-                //if kita bisa
-                || billerId.equalsIgnoreCase("6066")
+                    billerId.equalsIgnoreCase("0902") || billerId.equalsIgnoreCase("6050")
+                            //if doku
+                            || billerId.equalsIgnoreCase("6059")
+                            //if ziswaf sharing
+                            || billerId.equalsIgnoreCase("6060")
+                            //if dompet dhuafa
+                            || billerId.equalsIgnoreCase("6061")
+                            //if kita bisa
+                            || billerId.equalsIgnoreCase("6066")
+                            //if bhinneka
+                            || billerId.equalsIgnoreCase("6027")
+                            //if Bumdes
+                            || billerId.equalsIgnoreCase("6070")
+                            //if ASDP Ferizy
+                            || billerId.equalsIgnoreCase("6136")
             ) {
                 url = switcherInquiryUrl;
             } else {
