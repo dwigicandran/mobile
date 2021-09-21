@@ -72,6 +72,20 @@
 			<version>2.10</version>
 		</dependency>
 
+		<!-- HSMLib dependencies -->
+		<dependency>
+			<groupId>HSMLib</groupId>
+			<artifactId>HSMLib</artifactId>
+			<version>1.0.1</version>
+		</dependency>
+
+		<!-- json.org.me dependencies -->
+		<dependency>
+			<groupId>Lib</groupId>
+			<artifactId>Lib</artifactId>
+			<version>2.0</version>
+		</dependency>
+
 		<!-- https://mvnrepository.com/artifact/org.bouncycastle/bcprov-jdk15 -->
 		<dependency>
 			<groupId>org.bouncycastle</groupId>
