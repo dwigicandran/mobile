@@ -58,7 +58,7 @@ public class QurbanInquiry extends MbBaseServiceImpl implements MbService {
         TrxLimit trxLimit = new TrxLimit();
         int trxType = TrxLimit.PURCHASE;
 
-        String limitResponseCode = null;
+//        String limitResponseCode = null;
         String response_msg = null;
         String errorDefault = MbConstant.ERROR_REQUEST_ID;
         if (request.getLanguage().equals("en")) {
@@ -69,10 +69,14 @@ public class QurbanInquiry extends MbBaseServiceImpl implements MbService {
         try {
             double qurbanAmount = Double.parseDouble(request.getDenomId()); //transaction amount
             long amount_convert = (new Double(qurbanAmount)).longValue(); //129
-            limitResponseCode = trxLimit.checkLimit(request.getMsisdn(), request.getCustomerLimitType(), trxType, amount_convert, value, sqlconf);
+//            limitResponseCode = trxLimit.checkLimit(request.getMsisdn(), request.getCustomerLimitType(), trxType, amount_convert, value, sqlconf);
+            
         } catch (Exception e) {
             log.info("Limit Check Error : " + e.getMessage());
         }
+        
+        String limitResponseCode = checklimitTransaction(request.getDenomId(), request.getCustomerLimitType(), 
+        		request.getMsisdn(), TrxLimit.PURCHASE, request.getLanguage());
 
         if ("00".equals(limitResponseCode)) {
             try {

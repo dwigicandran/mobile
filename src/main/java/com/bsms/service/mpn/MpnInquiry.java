@@ -71,7 +71,10 @@ public class MpnInquiry extends MbBaseServiceImpl implements MbService {
 
             BaseResponse paymentInquiryResp = restResponse.getBody();
             if (paymentInquiryResp.getResponseCode().equals("00")) {
-                String limitResponse = checkLimit(restResponse.getBody().getAmount(), request.getCustomerLimitType(), request.getMsisdn(), TrxLimit.PAYMENT);
+//                String limitResponse = checkLimit(restResponse.getBody().getAmount(), request.getCustomerLimitType(), request.getMsisdn(), TrxLimit.PAYMENT);
+                
+                String limitResponse = checklimitTransaction(restResponse.getBody().getAmount(), request.getCustomerLimitType(), 
+                		request.getMsisdn(), TrxLimit.PAYMENT, request.getLanguage());
 
                 if (limitResponse.equalsIgnoreCase("01")) {
                     response_msg = request.getLanguage().equalsIgnoreCase("en") ? MbConstant.ERROR_LIMIT_FINANCIAL_EN : MbConstant.ERROR_LIMIT_FINANCIAL_ID;

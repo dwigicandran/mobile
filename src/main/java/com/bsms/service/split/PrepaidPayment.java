@@ -221,7 +221,8 @@ public class PrepaidPayment extends MbBaseServiceImpl implements MbService {
 
             double d = Double.parseDouble(amount);
             long amount_convert = (new Double(d)).longValue();
-            trxLimit.LimitUpdate(request.getMsisdn(), request.getCustomerLimitType(), trxType, amount_convert, value, sqlconf);
+            updLimitTrx(request.getMsisdn(), request.getCustomerLimitType(),
+                    trxType, amount_convert);
         } catch (Exception e) {
             e.printStackTrace();
             log.info("Update transaction limit failed :" + e.getMessage());

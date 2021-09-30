@@ -1,10 +1,11 @@
 package com.bsms.domain;
 
-import javax.persistence.*;
-
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 import lombok.Data;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
 
 @Data
 @Entity
@@ -32,6 +33,9 @@ public class Customer {
 	
 	@Column(name="createotpdate")
 	private String createotpdate;
+
+	@Column(name="createdate")
+	private String createdate;
 	
 	@Column(name="TAK")
 	private String tak;

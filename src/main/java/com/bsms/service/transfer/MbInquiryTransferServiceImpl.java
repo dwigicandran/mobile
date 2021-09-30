@@ -95,8 +95,11 @@ public class MbInquiryTransferServiceImpl extends MbBaseServiceImpl implements M
         TrxLimit trxLimit = new TrxLimit();
         int trxType = TrxLimit.TRANSFER;
 
-        String response_code = trxLimit.checkLimit(request.getMsisdn(), request.getCustomerLimitType(),
-                trxType, Long.parseLong(request.getAmount()), value, sqlconf);
+//        String response_code = trxLimit.checkLimit(request.getMsisdn(), request.getCustomerLimitType(),
+//                trxType, Long.parseLong(request.getAmount()), value, sqlconf);
+        
+        String response_code = checklimitTransaction(request.getAmount(), request.getCustomerLimitType(), 
+        		request.getMsisdn(), trxType, request.getLanguage());
 
         System.out.println("RC Check Limit : " + response_code);
 

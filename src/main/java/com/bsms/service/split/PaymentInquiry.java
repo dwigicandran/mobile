@@ -141,7 +141,9 @@ public class PaymentInquiry extends MbBaseServiceImpl implements MbService {
             if (paymentInquiryResp.getResponseCode().equals("00")) {
                 int trxType = request.getModul_id().equalsIgnoreCase("PU") ? TrxLimit.PURCHASE : TrxLimit.PAYMENT;
 
-                String limitResponse = checkLimit(response.getBody().getAmount(), request.getCustomerLimitType(), request.getMsisdn(), trxType);
+//                String limitResponse = checkLimit(response.getBody().getAmount(), request.getCustomerLimitType(), request.getMsisdn(), trxType);
+                String limitResponse = checklimitTransaction(response.getBody().getAmount(), request.getCustomerLimitType(), 
+                		request.getMsisdn(), trxType, request.getLanguage());
                 String response_msg = "";
 
                 if (limitResponse.equalsIgnoreCase("01")) {
