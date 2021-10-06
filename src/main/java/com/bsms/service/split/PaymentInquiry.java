@@ -142,8 +142,11 @@ public class PaymentInquiry extends MbBaseServiceImpl implements MbService {
                 int trxType = request.getModul_id().equalsIgnoreCase("PU") ? TrxLimit.PURCHASE : TrxLimit.PAYMENT;
 
 //                String limitResponse = checkLimit(response.getBody().getAmount(), request.getCustomerLimitType(), request.getMsisdn(), trxType);
-                String limitResponse = checklimitTransaction(response.getBody().getAmount(), request.getCustomerLimitType(), 
-                		request.getMsisdn(), trxType, request.getLanguage());
+                /** add validation for amount */
+                String amount =
+                        (response.getBody().getAmount()!=null && response.getBody().getAmount().isEmpty()) ?
+                                response.getBody().getAmount() : "0";
+                String limitResponse = checklimitTransaction(amount, request.getCustomerLimitType(), request.getMsisdn(), trxType, request.getLanguage());
                 String response_msg = "";
 
                 if (limitResponse.equalsIgnoreCase("01")) {
@@ -162,7 +165,7 @@ public class PaymentInquiry extends MbBaseServiceImpl implements MbService {
             }
 
         } catch (Exception e) {
-            log.info("exception : " + e.getCause().getMessage());
+            log.error("error", e);
             String errorDefault = e.getCause().getMessage() + ", permintaan tidak dapat diproses, silahkan dicoba beberapa saat lagi.";
             if (request.getLanguage().equals("en")) {
                 errorDefault = e.getCause().getMessage() + ", request can't be process, please try again later.";
@@ -200,7 +203,7 @@ public class PaymentInquiry extends MbBaseServiceImpl implements MbService {
             }
 
         } catch (Exception e) {
-            log.info("exception : " + e.getCause().getMessage());
+            log.error("error : ", e);
             String errorDefault = e.getCause().getMessage() + ", permintaan tidak dapat diproses, silahkan dicoba beberapa saat lagi.";
             if (request.getLanguage().equals("en")) {
                 errorDefault = e.getCause().getMessage() + ", request can't be process, please try again later.";
@@ -238,7 +241,7 @@ public class PaymentInquiry extends MbBaseServiceImpl implements MbService {
             }
 
         } catch (Exception e) {
-            log.info("exception : " + e.getCause().getMessage());
+            log.error("error : ", e);
             String errorDefault = e.getCause().getMessage() + ", permintaan tidak dapat diproses, silahkan dicoba beberapa saat lagi.";
             if (request.getLanguage().equals("en")) {
                 errorDefault = e.getCause().getMessage() + ", request can't be process, please try again later.";
